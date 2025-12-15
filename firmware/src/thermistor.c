@@ -10,7 +10,7 @@
 void therm_init(void) {
 	ADMUX |= (1 << REFS0);	// Use 5v as reference voltage
 	ADMUX &= ~(1 << ADLAR); // Use right-adjusted result
-	
+
     // Intialize ADC (Enable, divison factor of 128)
 	ADCSRA |= (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 }
@@ -52,7 +52,7 @@ static float therm_calc_temp(float resistance) {
     // Steinhart-hart equation to get temp from resistance
 	const float temp_k = 1 / (A + B * log(r) + C * log(r) * log(r) * log(r));
 	const float temp_c = temp_k - 273.15;
-	return temp_c; 
+	return temp_c;
 }
 
 float therm_get_temp(void) {

@@ -7,7 +7,7 @@
 int main() {
 	therm_init();
 	uart_init();
-	
+
 	while (1) {
         const float temp_c = therm_get_temp();
 
@@ -17,6 +17,6 @@ int main() {
 
         _delay_ms(500);
 	}
-    
+
 	return 0;
 }

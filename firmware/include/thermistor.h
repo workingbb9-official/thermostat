@@ -11,7 +11,7 @@ void therm_init(void);
 
 /**
  * @brief Calculate temperature
- * 
+ *
  * @return float Temperature in Celsius
  */
 float therm_get_temp(void);

@@ -1,11 +1,5 @@
-set(CMAKE_TOOLCHAIN_FILE
-	"${CMAKE_CURRENT_SOURCE_DIR}/avr.toolchain.cmake"
-	CACHE INTERNAL ""
-)
-
 cmake_minimum_required(VERSION 3.15)
-
-project(read_temp LANGUAGES C)
+project(firmware LANGUAGES C)
 
 set(SOURCES
 	src/main.c
