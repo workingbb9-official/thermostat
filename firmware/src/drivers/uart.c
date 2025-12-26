@@ -1,6 +1,5 @@
-#include "uart.h"
+#include "drivers/uart.h"
 
-#include <stdint.h>
 #include <avr/io.h>
 
 #include "config.h"
@@ -22,22 +21,7 @@ void uart_init(void) {
     UCSR0B &= ~(1 << UCSZ02);
 }
 
-/**
- * @brief Transmits char over UART
- * @param Character to transmit
- *
- */
-static void uart_transmit_c(const uint8_t data) {
+void uart_transmit_c(uint8_t byte) {
 	while (!(UCSR0A & (1 << UDRE0)));   // Wait for buffer to clear
-	UDR0 = data;
-}
-
-
-void uart_transmit(const char *data) {
-	while (*data != '\0') {
-        uart_transmit_c(*data);
-		++data;
-	}
-
-    uart_transmit_c('\0');
+	UDR0 = byte;
 }

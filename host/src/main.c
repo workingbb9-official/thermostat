@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "port.h"
-#include "file_utils.h"
-#include "analysis.h"
+#include "services/port.h"
+#include "services/file_utils.h"
+#include "logic/analysis.h"
 
 #define BUFF_SIZE 32
 

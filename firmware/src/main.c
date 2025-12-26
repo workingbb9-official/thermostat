@@ -1,22 +1,17 @@
-#include "thermistor.h"
-#include "uart.h"
-
 #include <util/delay.h>
-#include <stdlib.h>
+
+#include "app/system_core.h"
+
+#define EXIT_SUCCESS 0
 
 int main() {
-	therm_init();
-	uart_init();
+    system_init();
 
 	while (1) {
-        const float temp_c = therm_get_temp();
+        system_send_temp();
 
-        char buff[16];
-        dtostrf(temp_c, 4, 2, buff);
-        uart_transmit(buff);
-
-        _delay_ms(500);
+        _delay_ms(3000);
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }

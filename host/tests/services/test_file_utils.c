@@ -1,4 +1,4 @@
-#include "file_utils.h"
+#include "services/file_utils.h"
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 int main(void) {
-    int fd = open("host/test/data.txt", O_RDWR | O_APPEND);
+    int fd = open("host/test/data/data.txt", O_RDWR | O_APPEND);
 
     char buffer[1024];
     ssize_t bytes_read = file_read_line(fd, buffer, sizeof(buffer), 2);

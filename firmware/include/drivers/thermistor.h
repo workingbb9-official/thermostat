@@ -10,10 +10,10 @@
 void therm_init(void);
 
 /**
- * @brief Calculate temperature
+ * @brief Gets the value that thermistor stores
  *
- * @return Temperature in Celsius
+ * @return uint16_t A binary value from 0-1023
  */
-float therm_get_temp(void);
+uint16_t therm_read(void);
 
 #endif // THERMISTOR_H
