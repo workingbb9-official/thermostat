@@ -1,23 +1,15 @@
-# Build output
 /build/
 build_*/
 
-# AVR build artifacts
+host/data/*.txt
+
 *.o
 *.elf
 *.hex
 *.map
 *.lss
 
-# CMake junk
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
 Makefile
-
-# Editor / OS
-.vscode/
-.idea/
-*.swp
-.DS_Store
-

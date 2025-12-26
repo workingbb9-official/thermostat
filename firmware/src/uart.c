@@ -39,5 +39,5 @@ void uart_transmit(const char *data) {
 		++data;
 	}
 
-    uart_transmit_c('\n');
+    uart_transmit_c('\0');
 }

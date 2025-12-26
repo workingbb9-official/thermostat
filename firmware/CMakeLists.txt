@@ -9,7 +9,7 @@ set(SOURCES
 
 include_directories(include)
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} PRIVATE m c printf_flt)
+target_link_libraries(${PROJECT_NAME})
 
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
