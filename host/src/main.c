@@ -18,7 +18,7 @@ void signal_handler(int signum);
 
 int main(void) {
     port = open("/dev/ttyACM0", O_RDONLY);
-    data_fd = open("../../host/data/temperature.txt", O_RDWR | O_APPEND);
+    data_fd = open("host/data/temperature.txt", O_RDWR | O_APPEND);
     
     float data[256];
     int line = 0;

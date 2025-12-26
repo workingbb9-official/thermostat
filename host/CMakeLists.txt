@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 project(host LANGUAGES C)
 
+set(PROJECT_ROOT_DIR "${CMAKE_SOURCE_DIR}/..")
+
 # serial port
 add_library(serial_port src/services/port.c)
 target_include_directories(serial_port
