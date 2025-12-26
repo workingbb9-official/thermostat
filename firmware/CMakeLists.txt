@@ -1,27 +1,34 @@
 cmake_minimum_required(VERSION 3.15)
 project(firmware LANGUAGES C)
 
+# thermistor
 add_library(therm_driver src/drivers/thermistor.c)
 add_library(therm_mgr src/logic/therm_mgr.c)
 
 target_include_directories(therm_driver
     PUBLIC include
 )
-
 target_include_directories(therm_mgr
     PUBLIC include
 )
 
 target_link_libraries(therm_mgr PRIVATE therm_driver)
 
+# UART
 add_library(uart_driver src/drivers/uart.c)
+add_library(uart_mgr src/logic/uart_mgr.c)
 
 target_include_directories(uart_driver
     PUBLIC include
 )
+target_include_directories(uart_mgr
+    PUBLIC include
+)
+
+target_link_libraries(uart_mgr PRIVATE uart_driver)
 
 add_executable(${PROJECT_NAME} src/main.c)
-target_link_libraries(${PROJECT_NAME} PRIVATE therm_mgr uart_driver)
+target_link_libraries(${PROJECT_NAME} PRIVATE therm_mgr uart_mgr)
 
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
