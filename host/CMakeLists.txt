@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 project(host LANGUAGES C)
 
-set(PROJECT_ROOT_DIR "${CMAKE_SOURCE_DIR}/..")
+set(PROJECT_ROOT_DIR ${CMAKE_SOURCE_DIR})
+option(TESTS OFF)
 
 # serial port
 add_library(serial_port src/services/port.c)
@@ -20,6 +21,10 @@ add_library(data_analysis src/logic/analysis.c)
 target_include_directories(data_analysis
     PUBLIC include
 )
+
+if (TESTS)
+    add_subdirectory(tests)
+endif()
 
 add_executable(${PROJECT_NAME} src/main.c)
 target_link_libraries(${PROJECT_NAME} PRIVATE serial_port file_utils data_analysis)
