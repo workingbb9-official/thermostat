@@ -25,7 +25,7 @@ target_include_directories(uart_mgr
 )
 target_link_libraries(uart_mgr PRIVATE uart_driver)
 
-# System
+# system core
 add_library(system_core src/app/system_core.c)
 
 target_include_directories(system_core

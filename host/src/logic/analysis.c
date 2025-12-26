@@ -1,4 +1,4 @@
-#include "analysis.h"
+#include "logic/analysis.h"
 
 #include <stdlib.h>
 

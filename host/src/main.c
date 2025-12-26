@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "port.h"
-#include "file_utils.h"
-#include "analysis.h"
+#include "services/port.h"
+#include "services/file_utils.h"
+#include "logic/analysis.h"
 
 #define BUFF_SIZE 32
 
@@ -18,7 +18,7 @@ void signal_handler(int signum);
 
 int main(void) {
     port = open("/dev/ttyACM0", O_RDONLY);
-    data_fd = open("host/data/temperature.txt", O_RDWR | O_APPEND);
+    data_fd = open("../../host/data/temperature.txt", O_RDWR | O_APPEND);
     
     float data[256];
     int line = 0;
