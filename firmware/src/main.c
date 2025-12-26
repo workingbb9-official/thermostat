@@ -1,19 +1,14 @@
 #include <util/delay.h>
-#include <stdlib.h>
 
-#include "logic/therm_mgr.h"
-#include "logic/uart_mgr.h"
+#include "app/system_core.h"
+
+#define EXIT_SUCCESS 0
 
 int main() {
-	therm_mgr_init();
-	uart_mgr_init();
+    system_init();
 
 	while (1) {
-        const float temp_c = therm_mgr_get_temp();
-
-        char buff[16];
-        dtostrf(temp_c, 4, 2, buff);
-        uart_mgr_transmit(buff);
+        system_send_temp();
 
         _delay_ms(3000);
 	}

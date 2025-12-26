@@ -11,7 +11,6 @@ target_include_directories(therm_driver
 target_include_directories(therm_mgr
     PUBLIC include
 )
-
 target_link_libraries(therm_mgr PRIVATE therm_driver)
 
 # UART
@@ -24,11 +23,18 @@ target_include_directories(uart_driver
 target_include_directories(uart_mgr
     PUBLIC include
 )
-
 target_link_libraries(uart_mgr PRIVATE uart_driver)
 
+# System
+add_library(system_core src/app/system_core.c)
+
+target_include_directories(system_core
+    PUBLIC include
+)
+target_link_libraries(system_core PRIVATE therm_mgr uart_mgr)
+
 add_executable(${PROJECT_NAME} src/main.c)
-target_link_libraries(${PROJECT_NAME} PRIVATE therm_mgr uart_mgr)
+target_link_libraries(${PROJECT_NAME} PRIVATE system_core)
 
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
