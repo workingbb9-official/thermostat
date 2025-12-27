@@ -1,0 +1,8 @@
+#ifndef BOARD_CONFIG_H
+#define BOARD_CONFIG_H
+
+#define THERM_PIN 0
+#define F_CPU 16000000UL
+#define BAUD 115200UL
+
+#endif // BOARD_CONFIG_H
