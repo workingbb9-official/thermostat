@@ -15,5 +15,5 @@ void system_send_temp(void) {
 
     char buff[16];
     dtostrf(temp_c, 4, 2, buff);
-    uart_mgr_transmit(buff);
+    uart_mgr_transmit_string(buff);
 }

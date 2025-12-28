@@ -15,6 +15,6 @@ void uart_mgr_init(void);
  * 
  * 
  */
-void uart_mgr_transmit(const char *data);
+void uart_mgr_transmit_string(const char *data);
 
 #endif // UART_MGR_H
