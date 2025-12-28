@@ -17,7 +17,7 @@ int data_fd = -2;
 void signal_handler(int signum); 
 
 int main(void) {
-    port = port_mgr_init("/dev/ttyACM0");
+    port = port_mgr_init();
     if (port < 0) {
         printf("Error with opening port");
         return EXIT_FAILURE;
@@ -67,8 +67,11 @@ int main(void) {
 
     while (read(port, &buffer[pos], 1) == 1) {
         if (pos >= sizeof(buffer)) {
-            close(port);
             printf("Reading was too large\n");
+            if (port_mgr_close() != 0) {
+                printf("Error closing port\n");
+                return EXIT_FAILURE;
+            }
             return EXIT_FAILURE;
         }
         if (buffer[pos] == '\0') {
@@ -79,14 +82,18 @@ int main(void) {
         ++pos;
     }
     
-    close(port);
+    if (port_mgr_close() != 0) {
+        printf("Error closing port\n");
+        return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
 }
 
 void signal_handler(int signum) { 
     if (signum == SIGINT) {
-        if (port < 0) {
-            close(port);
+        if (port < 0 || port_mgr_close != 0) {
+            printf("Error closing port\n");
+            exit(EXIT_FAILURE);
         }
         if (data_fd < 0) {
             close(data_fd);

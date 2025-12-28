@@ -19,14 +19,6 @@ int port_open(const char *file_path) {
     return fd;
 }
 
-static speed_t numeric_to_baud(int rate) {
-    switch (rate) {
-        case 9600: return B9600;
-        case 115200: return B115200;
-        default: return B0;
-    }
-}
-
 int port_configure(int port, int speed) {
     speed_t baud_rate = numeric_to_baud(speed);
     if (baud_rate == B0) {
@@ -72,4 +64,24 @@ int port_configure(int port, int speed) {
     }
 
     return 0;
+}
+
+int port_close(int fd) {
+    if (fd < 0) {
+        return 1;
+    }
+
+    if (close(fd) != 0) {
+        return 1;
+    }
+
+    return 0;
+}
+
+static speed_t numeric_to_baud(int rate) {
+    switch (rate) {
+        case 9600: return B9600;
+        case 115200: return B115200;
+        default: return B0;
+    }
 }
