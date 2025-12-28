@@ -8,11 +8,17 @@ static uint16_t remove_decimal(float x);
 static DataPacket create_temp_packet(uint16_t temp);
 
 void system_send_temp(void) {
-    const float temp_c = therm_mgr_get_temp();
-    uint16_t temp_int = remove_decimal(temp_c);
+    volatile static uint32_t ticks = 0;
+    ++ticks;
+
+    if (ticks >= 80000) {
+        const float temp_c = therm_mgr_get_temp();
+        uint16_t temp_int = remove_decimal(temp_c);
     
-    DataPacket temp_packet = create_temp_packet(temp_int);
-    uart_mgr_transmit(&temp_packet);
+        DataPacket temp_packet = create_temp_packet(temp_int);
+        uart_mgr_transmit(&temp_packet);
+        ticks = 0;
+    }
 }
 
 /*
@@ -20,7 +26,7 @@ void system_send_temp(void) {
  * @param Float to be converted
  *
  * Accuracy of 2 decimal places
- * Example: 23.454 turned to 2345
+ * Example: 23.457 turned to 2346
  *
  * @return Converted version of input
  */
