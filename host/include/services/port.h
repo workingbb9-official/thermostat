@@ -2,13 +2,20 @@
 #define PORT_H
 
 /**
- * @brief Opens and configures serial port
+ * @brief Opens serial port in O_RDWR mode
  * @param File path of port
- *
- * See implementation for configuration settings
  *
  * @return File descriptor of port (negative for failure) 
  */
 int port_open(const char *file_path);
+
+/**
+ * @brief Configures serial port
+ * @param Id of port from open(), transmission speed (eg. 115200)
+ *
+ * Uses /dev/ttyACM0, 1 stop bit, no parity
+ * @return Error code (0 for success, 1 for failure)
+ */
+int port_configure(int port, int baud_rate);
 
 #endif // PORT_H

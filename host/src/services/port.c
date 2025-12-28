@@ -5,7 +5,6 @@
 #include <unistd.h>
 
 static speed_t numeric_to_baud(int rate);
-static int port_configure(int port, int speed);
 
 int port_open(const char *file_path) {
     if (file_path == NULL) {
@@ -13,7 +12,7 @@ int port_open(const char *file_path) {
     }
 
     int fd = open(file_path, O_RDWR);
-    if (fd < 0 || port_configure(fd, 115200) != 0) {
+    if (fd < 0) {
         return -1;
     }
 
@@ -28,7 +27,7 @@ static speed_t numeric_to_baud(int rate) {
     }
 }
 
-static int port_configure(int port, int speed) {
+int port_configure(int port, int speed) {
     speed_t baud_rate = numeric_to_baud(speed);
     if (baud_rate == B0) {
         return 1;

@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "services/port.h"
 #include "services/file_utils.h"
 #include "logic/analysis.h"
+#include "logic/port_mgr.h"
 
 #define BUFF_SIZE 32
 
@@ -17,7 +17,7 @@ int data_fd = -2;
 void signal_handler(int signum); 
 
 int main(void) {
-    port = port_open("/dev/ttyACM0");
+    port = port_mgr_init("/dev/ttyACM0");
     if (port < 0) {
         printf("Error with opening port");
         return EXIT_FAILURE;
