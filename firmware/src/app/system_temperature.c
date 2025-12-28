@@ -2,13 +2,13 @@
 
 #include "logic/therm_mgr.h"
 #include "logic/uart_mgr.h"
-#include "logic/protocol.h"
+#include "common/protocol.h"
 
 static uint16_t remove_decimal(float x);
 static DataPacket create_temp_packet(uint16_t temp);
 
 void system_send_temp(void) {
-    volatile static uint32_t ticks = 0;
+    static uint32_t ticks = 0;
     ++ticks;
 
     if (ticks >= 80000) {

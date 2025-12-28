@@ -22,6 +22,7 @@ target_include_directories(uart_driver
 )
 target_include_directories(uart_mgr
     PUBLIC include
+    PRIVATE ${CMAKE_SOURCE_DIR}/..
 )
 target_link_libraries(uart_mgr PRIVATE uart_driver)
 
@@ -37,8 +38,10 @@ add_library(system_temperature src/app/system_temperature.c)
 
 target_include_directories(system_temperature
     PUBLIC include
+    PRIVATE ${CMAKE_SOURCE_DIR}/..
 )
 target_link_libraries(system_temperature PRIVATE therm_mgr uart_mgr)
+
 
 add_executable(${PROJECT_NAME} src/main.c)
 target_link_libraries(${PROJECT_NAME} PRIVATE system_core)

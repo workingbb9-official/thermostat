@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "logic/protocol.h"
+typedef struct __attribute__((packed)) DataPacket DataPacket;
 
 /*
  * @brief Initialize UART for transmission

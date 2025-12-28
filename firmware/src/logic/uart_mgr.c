@@ -1,6 +1,7 @@
 #include "logic/uart_mgr.h"
 
 #include "drivers/uart.h"
+#include "common/protocol.h"
 
 void uart_mgr_init(void) {
     uart_init();
