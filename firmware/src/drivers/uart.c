@@ -24,7 +24,7 @@ void uart_init(void) {
     CLR_BIT(UCSR0B, UCSZ02);
 }
 
-void uart_transmit_c(uint8_t byte) {
+void uart_transmit_byte(uint8_t byte) {
 	while (!(UCSR0A & (1 << UDRE0)));   // Wait for buffer to clear
 	UDR0 = byte;
 }

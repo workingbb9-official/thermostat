@@ -10,10 +10,10 @@
 void uart_init(void);
 
 /**
- * @brief Transmit a char over UART
- * @param Char to transmit
+ * @brief Transmit a byte over UART
+ * @param Byte to transmit
  *
  */
-void uart_transmit_c(uint8_t byte);
+void uart_transmit_byte(uint8_t byte);
 
 #endif // UART_H
