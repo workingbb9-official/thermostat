@@ -2,19 +2,13 @@
 #define PORT_H
 
 /**
- * @brief Configures serial port
- * @param Id of port from open(), transmission speed (eg. 115200)
+ * @brief Opens and configures serial port
+ * @param File path of port
  *
- * Uses /dev/ttyACM0, 1 stop bit, no parity
- * @return Error code (0 for success, 1 for failure)
+ * See implementation for configuration settings
+ *
+ * @return File descriptor of port (negative for failure) 
  */
-int port_configure(int port, int baud_rate);
+int port_open(const char *file_path);
 
-/**
- * @brief Reads from serial port and converts to ASCII
- * @param Id of port from open()
- *
- * @return ASCII representation of binary from port
- */
-char* port_read(int port);
 #endif // PORT_H

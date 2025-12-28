@@ -17,7 +17,12 @@ int data_fd = -2;
 void signal_handler(int signum); 
 
 int main(void) {
-    port = open("/dev/ttyACM0", O_RDONLY);
+    port = port_open("/dev/ttyACM0");
+    if (port < 0) {
+        printf("Error with opening port");
+        return EXIT_FAILURE;
+    }
+
     data_fd = open("host/data/temperature.txt", O_RDWR | O_APPEND);
     
     float data[256];
@@ -55,16 +60,6 @@ int main(void) {
     if (sigaction(SIGINT, &sa, NULL) == -1) {
         perror("sigaction");
         exit(EXIT_FAILURE);
-    }
-
-    if (port < 0) {
-        printf("Error with opening port\n");
-        return EXIT_FAILURE;
-    }
-
-    if (port_configure(port, 115200) != 0) {
-        printf("Error with port_configure()\n");
-        return EXIT_FAILURE;
     }
 
     char buffer[BUFF_SIZE];

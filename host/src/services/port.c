@@ -1,9 +1,24 @@
 #include "services/port.h"
 
-#include <stdio.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
+
+static speed_t numeric_to_baud(int rate);
+static int port_configure(int port, int speed);
+
+int port_open(const char *file_path) {
+    if (file_path == NULL) {
+        return -1;
+    }
+
+    int fd = open(file_path, O_RDWR);
+    if (fd < 0 || port_configure(fd, 115200) != 0) {
+        return -1;
+    }
+
+    return fd;
+}
 
 static speed_t numeric_to_baud(int rate) {
     switch (rate) {
@@ -13,10 +28,9 @@ static speed_t numeric_to_baud(int rate) {
     }
 }
 
-int port_configure(int port, int speed) {
+static int port_configure(int port, int speed) {
     speed_t baud_rate = numeric_to_baud(speed);
     if (baud_rate == B0) {
-        printf("Invalid baud rate\n");
         return 1;
     }
 
@@ -24,7 +38,6 @@ int port_configure(int port, int speed) {
 
     // Get current attributes
     if (tcgetattr(port, &tty) != 0) {
-        printf("Error from tcgetattr\n");
         return 1;
     }
 
@@ -56,22 +69,8 @@ int port_configure(int port, int speed) {
 
     // Set new attributes
     if (tcsetattr(port, 0, &tty) != 0) {
-        printf("Error from tcsetattr\n");
         return 1;
     }
 
     return 0;
 }
-
-/* size_t port_read(int port) {
-    char binary[256];
-    int bytes = read(port, &binary, sizeof(binary));
-    if (bytes < 0) {
-        printf("Error from read\n");
-        return 1;
-    }
-    
-    size_t binary_size = sizeof(binary) / binary[0];
-    char output[256];
-    for (size_t i = 0; i < binary_size; ++i) {
-        output[i] = (char)binary[i] */
