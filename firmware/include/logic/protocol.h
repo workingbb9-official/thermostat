@@ -9,7 +9,7 @@
 #define TEMP 0x02
 #define STATS 0x03
 
-typedef struct DataPacket {
+typedef struct __attribute__((packed)) {
     uint8_t start_byte;
     uint8_t type;
     uint8_t length;
