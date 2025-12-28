@@ -25,13 +25,20 @@ target_include_directories(uart_mgr
 )
 target_link_libraries(uart_mgr PRIVATE uart_driver)
 
-# system core
+# system 
 add_library(system_core src/app/system_core.c)
 
 target_include_directories(system_core
     PUBLIC include
 )
 target_link_libraries(system_core PRIVATE therm_mgr uart_mgr)
+
+add_library(system_temperature src/app/system_temperature.c)
+
+target_include_directories(system_temperature
+    PUBLIC include
+)
+target_link_libraries(system_temperature PRIVATE therm_mgr uart_mgr)
 
 add_executable(${PROJECT_NAME} src/main.c)
 target_link_libraries(${PROJECT_NAME} PRIVATE system_core)
