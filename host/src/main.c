@@ -85,10 +85,10 @@ int main(void) {
 
 void signal_handler(int signum) { 
     if (signum == SIGINT) {
-        if (port != -1) {
+        if (port < 0) {
             close(port);
         }
-        if (data_fd != -2) {
+        if (data_fd < 0) {
             close(data_fd);
         }
         exit(EXIT_FAILURE);
