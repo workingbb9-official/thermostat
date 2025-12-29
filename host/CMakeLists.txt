@@ -29,12 +29,21 @@ target_include_directories(data_analysis
     PUBLIC include
 )
 
+# storage manager
+add_library(storage_mgr src/logic/storage_mgr.c)
+
+target_include_directories(storage_mgr
+    PUBLIC include
+)
+
+target_link_libraries(storage_mgr PRIVATE serial_port file_utils)
+
 if (TESTS)
     add_subdirectory(tests)
 endif()
 
 add_executable(${PROJECT_NAME} src/main.c)
-target_link_libraries(${PROJECT_NAME} PRIVATE port_mgr file_utils data_analysis)
+target_link_libraries(${PROJECT_NAME} PRIVATE port_mgr storage_mgr file_utils data_analysis)
 
 add_custom_target(run
     COMMAND ${PROJECT_NAME}

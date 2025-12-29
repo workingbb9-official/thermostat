@@ -13,7 +13,7 @@ int port_open(const char *file_path);
  * @brief Configures serial port
  * @param Fd of port, transmission speed (eg. 115200)
  *
- * Uses /dev/ttyACM0, 1 stop bit, no parity
+ * Uses 1 stop bit, no parity
  * @return Error code (0 for success, 1 for failure)
  */
 int port_configure(int port, int baud_rate);
