@@ -8,3 +8,7 @@ set_target_properties(test_file_utils PROPERTIES EXCLUDE_FROM_ALL TRUE)
 add_executable(test_analysis logic/test_analysis.c)
 target_link_libraries(test_analysis PRIVATE data_analysis)
 set_target_properties(test_analysis PROPERTIES EXCLUDE_FROM_ALL TRUE)
+
+add_executable(test_storage_mgr logic/test_storage_mgr.c)
+target_link_libraries(test_storage_mgr PRIVATE storage_mgr)
+set_target_properties(test_storage_mgr PROPERTIES EXCLUDE_FROM_ALL TRUE)
