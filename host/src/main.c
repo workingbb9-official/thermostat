@@ -11,19 +11,22 @@
 
 #define BUFF_SIZE 32
 
-int port = -1;
 int data_fd = -2;
 
 void signal_handler(int signum); 
 
 int main(void) {
-    port = port_mgr_init();
-    if (port < 0) {
+    if (port_mgr_init() < 0) {
         printf("Error with opening port");
         return EXIT_FAILURE;
     }
 
     data_fd = open("host/data/temperature.txt", O_RDWR | O_APPEND);
+    if (data_fd < 0) {
+        printf("Error with opening data file\n");
+        port_mgr_close();
+        return EXIT_FAILURE;
+    }
     
     float data[256];
     int line = 0;
@@ -65,7 +68,7 @@ int main(void) {
     char buffer[BUFF_SIZE];
     int pos = 0;
 
-    while (read(port, &buffer[pos], 1) == 1) {
+    while (port_mgr_read_byte(&buffer[pos]) == 0) {
         if (pos >= sizeof(buffer)) {
             printf("Reading was too large\n");
             if (port_mgr_close() != 0) {
@@ -78,7 +81,7 @@ int main(void) {
             file_write_line(data_fd, buffer, strlen(buffer) + 1);
             pos = 0;
         }
-
+        
         ++pos;
     }
     
@@ -91,7 +94,7 @@ int main(void) {
 
 void signal_handler(int signum) { 
     if (signum == SIGINT) {
-        if (port < 0 || port_mgr_close != 0) {
+        if (port_mgr_close() != 0) {
             printf("Error closing port\n");
             exit(EXIT_FAILURE);
         }

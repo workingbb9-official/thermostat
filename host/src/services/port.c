@@ -21,7 +21,7 @@ int port_open(const char *file_path) {
 
 int port_configure(int port, int speed) {
     speed_t baud_rate = numeric_to_baud(speed);
-    if (baud_rate == B0) {
+    if (baud_rate == B0 || port < 0) {
         return 1;
     }
 
@@ -56,10 +56,24 @@ int port_configure(int port, int speed) {
     );
     tty.c_oflag &= ~OPOST;
 
-    tty.c_cc[VMIN] = 1; // Fetch one char at a time
+    tty.c_cc[VMIN] = 1; // Fetch one byte at a time
 
     // Set new attributes
     if (tcsetattr(port, 0, &tty) != 0) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int port_read(int fd, char *buffer, int bytes) {
+    if (fd < 0 ||
+        buffer == NULL ||
+        bytes <= 0) {
+        return 1;
+    }
+
+    if (read(fd, buffer, bytes) != bytes) {
         return 1;
     }
 

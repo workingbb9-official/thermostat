@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(host LANGUAGES C)
 
-set(PROJECT_ROOT_DIR ${CMAKE_SOURCE_DIR})
+set(PROJECT_ROOT_DIR ${CMAKE_SOURCE_DIR}/..)
 option(TESTS OFF)
 
 # serial port

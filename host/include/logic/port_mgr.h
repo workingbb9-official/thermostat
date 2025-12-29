@@ -12,6 +12,14 @@
 int port_mgr_init(void);
 
 /*
+ * @brief Reads a byte from the port
+ * @param Buffer to read byte into
+ *
+ * @return Error code (0 for success, 1 for error)
+ */
+int port_mgr_read_byte(char *buffer); 
+
+/*
  * @brief Closes the port
  * 
  * Uses internal port fd for closing
@@ -19,9 +27,5 @@ int port_mgr_init(void);
  * @return Error code (0 for success, 1 for error)
  */
 int port_mgr_close(void);
-
-
-
-
 
 #endif // FILE_MGR_H

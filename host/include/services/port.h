@@ -18,6 +18,14 @@ int port_open(const char *file_path);
  */
 int port_configure(int port, int baud_rate);
 
+/*
+ * @brief Reads bytes from given port
+ * @param Fd of port, buffer to store data, # of bytes to read
+ *
+ * @return Error code (0 for success, 1 for failure)
+ */
+int port_read(int fd, char *buffer, int bytes);
+
 /**
  * @brief Closes serial port
  * @param Fd of port

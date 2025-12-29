@@ -2,6 +2,8 @@
 
 #include "services/port.h"
 
+#define NULL ((void *)0)
+
 static int port_fd = -1;
 
 int port_mgr_init(void) {
@@ -16,6 +18,18 @@ int port_mgr_init(void) {
     }
 
     return port_fd;
+}
+
+int port_mgr_read_byte(char *buffer) {
+    if (buffer == NULL) {
+        return 1;
+    }
+
+    if (port_read(port_fd, buffer, 1) != 0) {
+        return 1;
+    }
+
+    return 0;
 }
 
 int port_mgr_close(void) {
