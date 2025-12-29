@@ -1,22 +1,27 @@
 #include "services/port.h"
 
-#include <stdio.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
 
-static speed_t numeric_to_baud(int rate) {
-    switch (rate) {
-        case 9600: return B9600;
-        case 115200: return B115200;
-        default: return B0;
+static speed_t numeric_to_baud(int rate);
+
+int port_open(const char *file_path) {
+    if (file_path == NULL) {
+        return -1;
     }
+
+    int fd = open(file_path, O_RDWR);
+    if (fd < 0) {
+        return -1;
+    }
+
+    return fd;
 }
 
 int port_configure(int port, int speed) {
     speed_t baud_rate = numeric_to_baud(speed);
-    if (baud_rate == B0) {
-        printf("Invalid baud rate\n");
+    if (baud_rate == B0 || port < 0) {
         return 1;
     }
 
@@ -24,7 +29,6 @@ int port_configure(int port, int speed) {
 
     // Get current attributes
     if (tcgetattr(port, &tty) != 0) {
-        printf("Error from tcgetattr\n");
         return 1;
     }
 
@@ -52,26 +56,46 @@ int port_configure(int port, int speed) {
     );
     tty.c_oflag &= ~OPOST;
 
-    tty.c_cc[VMIN] = 1; // Fetch one char at a time
+    tty.c_cc[VMIN] = 1; // Fetch one byte at a time
 
     // Set new attributes
     if (tcsetattr(port, 0, &tty) != 0) {
-        printf("Error from tcsetattr\n");
         return 1;
     }
 
     return 0;
 }
 
-/* size_t port_read(int port) {
-    char binary[256];
-    int bytes = read(port, &binary, sizeof(binary));
-    if (bytes < 0) {
-        printf("Error from read\n");
+int port_read(int fd, char *buffer, int bytes) {
+    if (fd < 0 ||
+        buffer == NULL ||
+        bytes <= 0) {
         return 1;
     }
-    
-    size_t binary_size = sizeof(binary) / binary[0];
-    char output[256];
-    for (size_t i = 0; i < binary_size; ++i) {
-        output[i] = (char)binary[i] */
+
+    if (read(fd, buffer, bytes) != bytes) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int port_close(int fd) {
+    if (fd < 0) {
+        return 1;
+    }
+
+    if (close(fd) != 0) {
+        return 1;
+    }
+
+    return 0;
+}
+
+static speed_t numeric_to_baud(int rate) {
+    switch (rate) {
+        case 9600: return B9600;
+        case 115200: return B115200;
+        default: return B0;
+    }
+}

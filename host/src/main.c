@@ -5,20 +5,28 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "services/port.h"
 #include "services/file_utils.h"
 #include "logic/analysis.h"
+#include "logic/port_mgr.h"
 
 #define BUFF_SIZE 32
 
-int port = -1;
 int data_fd = -2;
 
 void signal_handler(int signum); 
 
 int main(void) {
-    port = open("/dev/ttyACM0", O_RDONLY);
+    if (port_mgr_init() < 0) {
+        printf("Error with opening port");
+        return EXIT_FAILURE;
+    }
+
     data_fd = open("host/data/temperature.txt", O_RDWR | O_APPEND);
+    if (data_fd < 0) {
+        printf("Error with opening data file\n");
+        port_mgr_close();
+        return EXIT_FAILURE;
+    }
     
     float data[256];
     int line = 0;
@@ -57,43 +65,40 @@ int main(void) {
         exit(EXIT_FAILURE);
     }
 
-    if (port < 0) {
-        printf("Error with opening port\n");
-        return EXIT_FAILURE;
-    }
-
-    if (port_configure(port, 115200) != 0) {
-        printf("Error with port_configure()\n");
-        return EXIT_FAILURE;
-    }
-
     char buffer[BUFF_SIZE];
     int pos = 0;
 
-    while (read(port, &buffer[pos], 1) == 1) {
+    while (port_mgr_read_byte(&buffer[pos]) == 0) {
         if (pos >= sizeof(buffer)) {
-            close(port);
             printf("Reading was too large\n");
+            if (port_mgr_close() != 0) {
+                printf("Error closing port\n");
+                return EXIT_FAILURE;
+            }
             return EXIT_FAILURE;
         }
         if (buffer[pos] == '\0') {
             file_write_line(data_fd, buffer, strlen(buffer) + 1);
             pos = 0;
         }
-
+        
         ++pos;
     }
     
-    close(port);
+    if (port_mgr_close() != 0) {
+        printf("Error closing port\n");
+        return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
 }
 
 void signal_handler(int signum) { 
     if (signum == SIGINT) {
-        if (port != -1) {
-            close(port);
+        if (port_mgr_close() != 0) {
+            printf("Error closing port\n");
+            exit(EXIT_FAILURE);
         }
-        if (data_fd != -2) {
+        if (data_fd < 0) {
             close(data_fd);
         }
         exit(EXIT_FAILURE);

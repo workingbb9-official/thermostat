@@ -9,6 +9,7 @@ test/data/*.txt
 *.hex
 *.map
 *.lss
+*.out
 
 CMakeCache.txt
 CMakeFiles/
