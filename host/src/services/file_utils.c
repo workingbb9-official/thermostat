@@ -1,6 +1,11 @@
 #include "services/file_utils.h"
 
 #include <unistd.h>
+#include <fcntl.h>
+
+int file_open(const char *file_path) {
+    return open(file_path, O_RDWR | O_APPEND);
+}
 
 ssize_t file_read_line(int fd, char *buffer, size_t buffer_size, int line) {
     if (fd < 0 || 
@@ -66,4 +71,8 @@ ssize_t file_write_line(int fd, const char *text, size_t text_size) {
     ssize_t new_line = write(fd, "\n", 1);
 
     return bytes_wrote;
+}
+
+int file_close(int fd) {
+    return close(fd);
 }

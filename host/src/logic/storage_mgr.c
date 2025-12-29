@@ -3,12 +3,11 @@
 #include <stdio.h>
 
 #include "services/file_utils.h"
-#include "services/port.h"
 
 static int temp_fd = -1;
 
 int storage_mgr_init(void) {
-    temp_fd = port_open("host/data/temperature.txt");
+    temp_fd = file_open("host/data/temperature.txt");
     if (temp_fd < 0) {
         return 1;
     }
@@ -28,7 +27,7 @@ int storage_mgr_write_temp(float data) {
 }
 
 int storage_mgr_close(void) {
-    if (port_close(temp_fd) != 0) {
+    if (file_close(temp_fd) != 0) {
         return 1;
     }
 

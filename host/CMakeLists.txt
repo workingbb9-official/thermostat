@@ -36,7 +36,7 @@ target_include_directories(storage_mgr
     PUBLIC include
 )
 
-target_link_libraries(storage_mgr PRIVATE serial_port file_utils)
+target_link_libraries(storage_mgr PRIVATE file_utils)
 
 if (TESTS)
     add_subdirectory(tests)
