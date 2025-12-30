@@ -6,8 +6,6 @@
 #include "common/protocol.h"
 #include "logic/port_mgr.h"
 
-static int calculate_checksum(const uint8_t *payload, uint8_t len);
-
 int system_receive_data(DataPacket *packet) {
     uint8_t first_byte;
     if (port_mgr_read_byte(&first_byte) != 0) {
@@ -63,19 +61,7 @@ int system_receive_data(DataPacket *packet) {
         return -2;
     }
 
-    if (calculate_checksum(packet->payload, checksum_byte) != 0) {
-        return -1;
-    }
     packet->checksum = checksum_byte;
-
-    return 0;
-}
-
-static int calculate_checksum(const uint8_t *payload, uint8_t len) {
-    size_t size = sizeof(payload) / sizeof(payload[0]);
-    if (size != (size_t) len) {
-        return -1;
-    }
 
     return 0;
 }

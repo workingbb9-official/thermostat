@@ -44,6 +44,7 @@ target_include_directories(system_data_receiver
     PUBLIC include
     PRIVATE ${CMAKE_SOURCE_DIR}/..
 )
+target_link_libraries(system_data_receiver PRIVATE port_mgr)
 
 if (TESTS)
     add_subdirectory(tests)
