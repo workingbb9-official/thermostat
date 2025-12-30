@@ -4,7 +4,7 @@
 #include <fcntl.h>
 
 int file_open(const char *file_path) {
-    return open(file_path, O_RDWR | O_APPEND);
+    return open(file_path, O_RDWR);
 }
 
 ssize_t file_read_line(int fd, char *buffer, size_t buffer_size, int line) {
@@ -40,10 +40,9 @@ ssize_t file_read_line(int fd, char *buffer, size_t buffer_size, int line) {
         if (bytes_read == 0) {
             if (pos > 0) {
                 buffer[pos] = '\0';
-                close(fd);
                 return pos;
             }
-
+            
             return 0; 
         } else if (bytes_read < 0) {
             return -1;
@@ -71,6 +70,20 @@ ssize_t file_write_line(int fd, const char *text, size_t text_size) {
     ssize_t new_line = write(fd, "\n", 1);
 
     return bytes_wrote;
+}
+
+int file_seek(int fd, int position) {
+    if (fd < 0) return -1;
+
+    if (position == START) {
+        lseek(fd, 0, SEEK_SET);
+    } else if (position == END) {
+        lseek(fd, 0, SEEK_END);
+    } else {
+        return -1;
+    }
+
+    return 0;
 }
 
 int file_close(int fd) {

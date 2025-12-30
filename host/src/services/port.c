@@ -11,7 +11,7 @@ int port_open(const char *file_path) {
         return -1;
     }
 
-    int fd = open(file_path, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    int fd = open(file_path, O_RDWR | O_NOCTTY);
     if (fd < 0) {
         return -1;
     }

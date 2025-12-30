@@ -1,6 +1,7 @@
 #include "logic/storage_mgr.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "services/file_utils.h"
 
@@ -18,12 +19,27 @@ int storage_mgr_init(void) {
 int storage_mgr_write_temp(float data) {
     char buffer[5];
     snprintf(buffer, sizeof(buffer), "%.2f", data);
+    
+    if (file_seek(temp_fd, END) != 0) return 1;
 
     if (file_write_line(temp_fd, buffer, sizeof(buffer)) < 0) {
         return 1;
     }
 
     return 0;
+}
+
+int storage_mgr_read_temp(float *buffer, int line) {
+    if (!buffer || line <= 0) return -1;
+    
+    if (file_seek(temp_fd, START) != 0) return -2;
+
+    char text[32];
+    if (file_read_line(temp_fd, text, sizeof(text), line) <= 0) return -2;
+    
+    *buffer = strtof(text, NULL);
+    return 0;
+
 }
 
 int storage_mgr_close(void) {
