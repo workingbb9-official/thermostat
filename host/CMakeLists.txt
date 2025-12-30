@@ -46,6 +46,13 @@ target_include_directories(system_data_receiver
 )
 target_link_libraries(system_data_receiver PRIVATE port_mgr)
 
+add_library(system_data_handler src/app/system_data_handler.c)
+target_include_directories(system_data_handler
+    PUBLIC include
+    PRIVATE ${CMAKE_SOURCE_DIR}/..
+)
+target_link_libraries(system_data_handler PRIVATE storage_mgr)
+
 if (TESTS)
     add_subdirectory(tests)
 endif()
