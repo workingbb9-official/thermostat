@@ -24,7 +24,7 @@ ssize_t file_read_line(int fd, char *buffer, size_t buffer_size, int line);
 
 /**
  * @brief Writes a line to a file followed by \n, based on seeker
- * @param Fd from open(), text to write, sizeof(text)
+ * @param Fd from open(), text to write, strlen(text)
  *
  * @return Bytes wrote, -1 for syserr, -2 for invalid param
  */

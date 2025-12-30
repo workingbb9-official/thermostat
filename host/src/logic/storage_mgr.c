@@ -17,12 +17,12 @@ int storage_mgr_init(void) {
 }
 
 int storage_mgr_write_temp(float data) {
-    char buffer[5];
+    char buffer[6];
     snprintf(buffer, sizeof(buffer), "%.2f", data);
     
     if (file_seek(temp_fd, END) != 0) return 1;
 
-    if (file_write_line(temp_fd, buffer, sizeof(buffer)) < 0) {
+    if (file_write_line(temp_fd, buffer, strlen(buffer)) < 0) {
         return 1;
     }
 

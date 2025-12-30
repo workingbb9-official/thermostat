@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "services/file_utils.h"
+#include "logic/storage_mgr.h"
 #include "logic/analysis.h"
 #include "logic/port_mgr.h"
 
@@ -21,9 +21,8 @@ int main(void) {
         return EXIT_FAILURE;
     }
 
-    data_fd = open("host/data/temperature.txt", O_RDWR | O_APPEND);
-    if (data_fd < 0) {
-        printf("Error with opening data file\n");
+    if (storage_mgr_init() != 0) {
+        printf("Error with storage init\n");
         port_mgr_close();
         return EXIT_FAILURE;
     }
@@ -35,15 +34,13 @@ int main(void) {
             break;
         }
 
-        char buffer[BUFF_SIZE];
-        file_read_line(data_fd, buffer, sizeof(buffer), line + 1);
-        if (file_read_line <= 0) {
+        float temp_line;
+        if (storage_mgr_read_temp(&temp_line, line + 1) != 0) {
             break;
         }
 
-        float data_line = strtof(buffer + 1, NULL);
-        printf("Data line: %f\n", data_line);
-        data[line] = data_line;
+        printf("Data line: %f\n", temp_line);
+        data[line] = temp_line;
         ++line;
     }
     
@@ -75,10 +72,20 @@ int main(void) {
                 printf("Error closing port\n");
                 return EXIT_FAILURE;
             }
+
+            if (storage_mgr_close() != 0) {
+                printf("Error closing storage manager\n");
+                return EXIT_FAILURE;
+            }
+
             return EXIT_FAILURE;
         }
         if (buffer[pos] == '\0') {
-            file_write_line(data_fd, buffer, strlen(buffer) + 1);
+            const float log = strtof(buffer + 1, NULL);
+            if (storage_mgr_write_temp(log) != 0) {
+                printf("Error writing temp\n");
+            }
+
             pos = 0;
         }
         
@@ -89,6 +96,12 @@ int main(void) {
         printf("Error closing port\n");
         return EXIT_FAILURE;
     }
+
+    if (storage_mgr_close() != 0) {
+        printf("Error closing storage manager\n");
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }
 
@@ -98,9 +111,12 @@ void signal_handler(int signum) {
             printf("Error closing port\n");
             exit(EXIT_FAILURE);
         }
-        if (data_fd < 0) {
-            close(data_fd);
+
+        if (storage_mgr_close() != 0) {
+            printf("Error closing storage manager\n");
+            exit(EXIT_FAILURE);
         }
-        exit(EXIT_FAILURE);
+
+        exit(EXIT_SUCCESS);
     }
 }
