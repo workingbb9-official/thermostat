@@ -7,7 +7,7 @@
  * This is a self-aware module, it knows what path to use
  * Specific settings are found in port.h
  *
- * @return The fd of the port, negative for errors
+ * @return The fd of the port, -1 for error
  */
 int port_mgr_init(void);
 
@@ -15,7 +15,7 @@ int port_mgr_init(void);
  * @brief Reads a byte from the port
  * @param Buffer to read byte into
  *
- * @return Error code (0 for success, 1 for error)
+ * @return 0 for success, -1 for invalid params, -2 for syserror
  */
 int port_mgr_read_byte(char *buffer); 
 
@@ -24,7 +24,7 @@ int port_mgr_read_byte(char *buffer);
  * 
  * Uses internal port fd for closing
  *
- * @return Error code (0 for success, 1 for error)
+ * @return 0 for success, -1 for error
  */
 int port_mgr_close(void);
 

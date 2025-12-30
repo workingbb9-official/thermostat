@@ -8,8 +8,6 @@
 
 #define BUFF_SIZE 32
 
-int data_fd = -2;
-
 void signal_handler(int signum); 
 
 int main(void) {
@@ -63,20 +61,6 @@ int main(void) {
     int pos = 0;
 
     while (port_mgr_read_byte(&buffer[pos]) == 0) {
-        if (pos >= sizeof(buffer)) {
-            printf("Reading was too large\n");
-            if (port_mgr_close() != 0) {
-                printf("Error closing port\n");
-                return EXIT_FAILURE;
-            }
-
-            if (storage_mgr_close() != 0) {
-                printf("Error closing storage manager\n");
-                return EXIT_FAILURE;
-            }
-
-            return EXIT_FAILURE;
-        }
         if (buffer[pos] == '\0') {
             const float log = strtof(buffer + 1, NULL);
             if (storage_mgr_write_temp(log) != 0) {
@@ -89,31 +73,26 @@ int main(void) {
         ++pos;
     }
     
-    if (port_mgr_close() != 0) {
-        printf("Error closing port\n");
+    const int port_close_status = port_mgr_close();
+    const int storage_close_status = storage_mgr_close();
+
+    if (port_close_status != 0 || storage_close_status != 0) {
+        printf("Error closing managers\n");
         return EXIT_FAILURE;
     }
-
-    if (storage_mgr_close() != 0) {
-        printf("Error closing storage manager\n");
-        return EXIT_FAILURE;
-    }
-
+    
     return EXIT_SUCCESS;
 }
 
 void signal_handler(int signum) { 
     if (signum == SIGINT) {
-        if (port_mgr_close() != 0) {
-            printf("Error closing port\n");
+        const int port_close_status = port_mgr_close();
+        const int storage_close_status = storage_mgr_close();
+
+        if (port_close_status != 0 || storage_close_status != 0) {
+            printf("Error closing managers\n");
             exit(EXIT_FAILURE);
         }
-
-        if (storage_mgr_close() != 0) {
-            printf("Error closing storage manager\n");
-            exit(EXIT_FAILURE);
-        }
-
         exit(EXIT_SUCCESS);
     }
 }

@@ -12,7 +12,7 @@ ssize_t file_read_line(int fd, char *buffer, size_t buffer_size, int line) {
         buffer_size < 0 || 
         !buffer ||
         line <= 0) {
-        return -2;
+        return -1;
     }
     
     int pos = 0;
@@ -25,7 +25,7 @@ ssize_t file_read_line(int fd, char *buffer, size_t buffer_size, int line) {
         if (bytes_read == 0) {
             return 0;
         } else if (bytes_read < 0) {
-            return -1;
+            return -2;
         } 
 
         if (c == '\n') {
@@ -45,7 +45,7 @@ ssize_t file_read_line(int fd, char *buffer, size_t buffer_size, int line) {
             
             return 0; 
         } else if (bytes_read < 0) {
-            return -1;
+            return -2;
         }
 
         if (buffer[pos] == '\n') {
@@ -56,24 +56,30 @@ ssize_t file_read_line(int fd, char *buffer, size_t buffer_size, int line) {
         ++pos;
     }
     
-    return -1;
+    return -2;
 }
 
 ssize_t file_write_line(int fd, const char *text, size_t text_size) {
     if (fd < 0 || 
         text_size <= 0 || 
         !text) {
-        return -2;
+        return -1;
     }
 
     ssize_t bytes_wrote = write(fd, text, text_size - 1);
     ssize_t new_line = write(fd, "\n", 1);
 
+    if (bytes_wrote < text_size - 1 || new_line < 1) {
+        return -2;
+    }
+
     return bytes_wrote;
 }
 
 int file_seek(int fd, int position) {
-    if (fd < 0) return -1;
+    if (fd < 0) {
+        return -1;
+    }
 
     if (position == START) {
         lseek(fd, 0, SEEK_SET);
