@@ -22,11 +22,11 @@ int port_mgr_init(void) {
 
 int port_mgr_read_byte(char *buffer) {
     if (buffer == NULL) {
-        return 1;
+        return -1;
     }
 
     if (port_read(port_fd, buffer, 1) != 0) {
-        return 1;
+        return -2;
     }
 
     return 0;
