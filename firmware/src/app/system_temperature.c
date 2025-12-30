@@ -56,7 +56,7 @@ static DataPacket create_temp_packet(uint16_t temp) {
     temp_packet.payload[0] = high_byte;
     temp_packet.payload[1] = low_byte;
     
-    temp_packet.checksum = 3 + 2;
+    temp_packet.checksum = 2 + 2;
     return temp_packet;
 }
 
