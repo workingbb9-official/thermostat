@@ -2,10 +2,12 @@
 #define SYSTEM_TEMPERATURE_H
 
 /*
- * @brief Handles sending temperature to host
+ * @brief Handles sending temperature to host at intervals
  *
- * Creates a temperature packet and sends each byte over UART
- * Turns float into int and splits that into high byte, low byte
+ * Creates a temperature packet and sends it with UART manager
+ * Turns float into int and splits that into (uint8_t) high byte, low byte
+ * Checksum not implemented yet (same as length)
+ * Arbitrary timer boundary set (around 5 seconds)
  *
  */
 void system_send_temp(void);

@@ -3,7 +3,7 @@
 
 #define EXIT_SUCCESS 0
 
-int main() {
+int main(void) {
     system_init();
 
 	while (1) {
