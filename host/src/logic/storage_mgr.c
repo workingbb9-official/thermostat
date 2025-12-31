@@ -18,14 +18,16 @@ int storage_mgr_init(void) {
 }
 
 int storage_mgr_write_temp(float data) {
-    char buffer[6];
-    snprintf(buffer, sizeof(buffer), "%.2f", data);
+    char buffer[16];
+    const int len = snprintf(buffer, sizeof(buffer) - 1, "%.2f", data);
+    buffer[len] = '\0';
+
     
     if (file_seek(temp_fd, END) != 0) {
         return -1;
     }
 
-    if (file_write_line(temp_fd, buffer, strlen(buffer)) < 0) {
+    if (file_write_line(temp_fd, buffer, len) < 0) {
         return -1;
     }
 
@@ -42,7 +44,7 @@ int storage_mgr_read_temp(float *buffer, int line) {
     }
 
     char text[32];
-    if (file_read_line(temp_fd, text, sizeof(text), line) <= 0) {
+    if (file_read_line(temp_fd, text, sizeof(text) - 1, line) <= 0) {
         return -2;
     }
     
