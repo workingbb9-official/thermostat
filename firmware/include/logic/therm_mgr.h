@@ -10,6 +10,10 @@ void therm_mgr_init(void);
 /*
  * @brief Calculate temperature
  *
+ * Takes raw binary value from thermistor
+ * Calculates resistance from the raw value
+ * Calculates temperature using Steinhart-hart equation
+ *
  * @return Current temperature in celsius
  */
 float therm_mgr_get_temp(void);
