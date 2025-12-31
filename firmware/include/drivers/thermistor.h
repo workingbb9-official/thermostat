@@ -10,9 +10,9 @@
 void therm_init(void);
 
 /**
- * @brief Gets the value that thermistor stores
+ * @brief Get the raw value that thermistor stores
  *
- * @return uint16_t A binary value from 0-1023
+ * @return A binary value from 0-1023
  */
 uint16_t therm_read(void);
 

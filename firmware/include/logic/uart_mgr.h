@@ -12,15 +12,11 @@ typedef struct __attribute__((packed)) DataPacket DataPacket;
 void uart_mgr_init(void);
 
 /*
- * @brief Transmit string over UART
- * @param String to transmit
- * 
- */
-void uart_mgr_transmit_string(const char *data);
-
-/*
  * @brief Transmit data packet over UART
  * @param Packet to transmit
+ * 
+ * Transmit each byte of the packet
+ * Loop over payload using the length provided
  *
  */
 void uart_mgr_transmit(const DataPacket *packet);

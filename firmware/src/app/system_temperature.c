@@ -4,18 +4,20 @@
 #include "logic/uart_mgr.h"
 #include "common/protocol.h"
 
+#define DELAY_TIME 1250000
+
 static uint16_t remove_decimal(float x);
 static DataPacket create_temp_packet(uint16_t temp);
 
 void system_send_temp(void) {
-    static volatile uint32_t ticks = 0;
+    static uint32_t ticks = 0;
     ++ticks;
 
-    if (ticks >= 1250000) {
+    if (ticks >= DELAY_TIME) {
         const float temp_c = therm_mgr_get_temp();
-        uint16_t temp_int = remove_decimal(temp_c);
+        const uint16_t temp_int = remove_decimal(temp_c);
     
-        DataPacket temp_packet = create_temp_packet(temp_int);
+        const DataPacket temp_packet = create_temp_packet(temp_int);
         uart_mgr_transmit(&temp_packet);
         ticks = 0;
     }

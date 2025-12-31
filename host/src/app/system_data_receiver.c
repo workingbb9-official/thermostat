@@ -1,7 +1,6 @@
 #include "app/system_data_receiver.h"
 
 #include <stdint.h>
-#include <stddef.h>
 
 #include "common/protocol.h"
 #include "logic/port_mgr.h"
@@ -48,7 +47,7 @@ int system_receive_data(DataPacket *packet) {
     packet->length = third_byte;
     
     for (uint8_t i = 0; i < packet->length; ++i) {
-        int8_t payload_byte;
+        uint8_t payload_byte;
         if (port_mgr_read_byte(&payload_byte) != 0) {
             return -2;
         }

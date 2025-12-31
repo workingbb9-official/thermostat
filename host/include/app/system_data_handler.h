@@ -4,10 +4,10 @@
 typedef struct __attribute__((packed)) DataPacket DataPacket;
 
 /*
- * @brief Take in a temperature packet and store it
+ * @brief Take in a temperature packet and store the log
  * @param Data packet with temperature data
- *
- * This will de-encrypt the temperature
+ * 
+ * This function will reconstruct the temperature as a float
  * Then it will store it in the file from storage manager
  *
  * @return 0 for success, -1 for invalid packet, -2 for syserror

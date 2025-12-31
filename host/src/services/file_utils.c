@@ -9,13 +9,12 @@ int file_open(const char *file_path) {
 
 ssize_t file_read_line(int fd, char *buffer, size_t buffer_size, int line) {
     if (fd < 0 || 
-        buffer_size < 0 || 
         !buffer ||
+        buffer_size == 0 ||
         line <= 0) {
         return -1;
     }
     
-    int pos = 0;
     int current_line = 1; 
 
     while (current_line < line) {
@@ -33,18 +32,20 @@ ssize_t file_read_line(int fd, char *buffer, size_t buffer_size, int line) {
         }
     }
 
+    int pos = 0;
+
     while (pos < buffer_size - 1) { 
-        ssize_t bytes_read;
-        bytes_read = read(fd, &buffer[pos], 1); 
+        ssize_t bytes_read = read(fd, &buffer[pos], 1); 
 
         if (bytes_read == 0) {
+            buffer[pos] = '\0';
             if (pos > 0) {
-                buffer[pos] = '\0';
                 return pos;
             }
             
             return 0; 
         } else if (bytes_read < 0) {
+            buffer[pos] = '\0';
             return -2;
         }
 
@@ -56,20 +57,20 @@ ssize_t file_read_line(int fd, char *buffer, size_t buffer_size, int line) {
         ++pos;
     }
     
-    return -2;
+    buffer[pos] = '\0';
+    return -1;
 }
 
-ssize_t file_write_line(int fd, const char *text, size_t text_size) {
+ssize_t file_write_line(int fd, const char *text, size_t text_len) {
     if (fd < 0 || 
-        text_size <= 0 || 
         !text) {
         return -1;
     }
 
-    ssize_t bytes_wrote = write(fd, text, text_size);
+    ssize_t bytes_wrote = write(fd, text, text_len);
     ssize_t new_line = write(fd, "\n", 1);
 
-    if (bytes_wrote < text_size - 1 || new_line < 1) {
+    if (bytes_wrote < 0 || new_line < 1) {
         return -2;
     }
 
