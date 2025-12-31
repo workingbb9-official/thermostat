@@ -38,12 +38,28 @@ target_include_directories(storage_mgr
 
 target_link_libraries(storage_mgr PRIVATE file_utils)
 
+# system data controllers
+add_library(system_data_receiver src/app/system_data_receiver.c)
+target_include_directories(system_data_receiver
+    PUBLIC include
+    PRIVATE ${CMAKE_SOURCE_DIR}/..
+)
+target_link_libraries(system_data_receiver PRIVATE port_mgr)
+
+add_library(system_data_handler src/app/system_data_handler.c)
+target_include_directories(system_data_handler
+    PUBLIC include
+    PRIVATE ${CMAKE_SOURCE_DIR}/..
+)
+target_link_libraries(system_data_handler PRIVATE storage_mgr)
+
 if (TESTS)
     add_subdirectory(tests)
 endif()
 
 add_executable(${PROJECT_NAME} src/main.c)
-target_link_libraries(${PROJECT_NAME} PRIVATE port_mgr storage_mgr file_utils data_analysis)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/..)
+target_link_libraries(${PROJECT_NAME} PRIVATE port_mgr storage_mgr data_analysis system_data_receiver system_data_handler)
 
 add_custom_target(run
     COMMAND ${PROJECT_NAME}

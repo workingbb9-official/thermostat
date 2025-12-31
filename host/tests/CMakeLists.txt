@@ -12,3 +12,8 @@ set_target_properties(test_analysis PROPERTIES EXCLUDE_FROM_ALL TRUE)
 add_executable(test_storage_mgr logic/test_storage_mgr.c)
 target_link_libraries(test_storage_mgr PRIVATE storage_mgr)
 set_target_properties(test_storage_mgr PROPERTIES EXCLUDE_FROM_ALL TRUE)
+
+add_executable(test_system_data_receiver app/test_system_data_receiver.c)
+target_link_libraries(test_system_data_receiver PRIVATE system_data_receiver)
+target_include_directories(test_system_data_receiver PRIVATE ${CMAKE_SOURCE_DIR}/..)
+set_target_properties(test_system_data_receiver PROPERTIES EXCLUDE_FROM_ALL TRUE)

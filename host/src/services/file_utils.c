@@ -66,7 +66,7 @@ ssize_t file_write_line(int fd, const char *text, size_t text_size) {
         return -1;
     }
 
-    ssize_t bytes_wrote = write(fd, text, text_size - 1);
+    ssize_t bytes_wrote = write(fd, text, text_size);
     ssize_t new_line = write(fd, "\n", 1);
 
     if (bytes_wrote < text_size - 1 || new_line < 1) {
