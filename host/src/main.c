@@ -1,122 +1,13 @@
-#include <stdio.h>
-#include <signal.h>
-#include <stdlib.h>
-
-#include "logic/storage_mgr.h"
-#include "logic/analysis.h"
-#include "logic/port_mgr.h"
-#include "common/protocol.h"
-#include "app/system_data_receiver.h"
-#include "app/system_data_handler.h"
-
-#define BUFF_SIZE 32
-
-void signal_handler(int signum); 
+#include "app/system_core.h"
 
 int main(void) {
-    if (port_mgr_init() < 0) {
-        printf("Error with opening port");
-        return EXIT_FAILURE;
+    system_init();
+    system_analyze();
+
+    for (;;) {
+        system_run();
     }
 
-    if (storage_mgr_init() != 0) {
-        printf("Error with storage init\n");
-        port_mgr_close();
-        return EXIT_FAILURE;
-    }
-    
-    float data[256];
-    int line = 0;
-    while (1) {
-        if (line > 256) {
-            break;
-        }
-
-        float temp_line;
-        if (storage_mgr_read_temp(&temp_line, line + 1) != 0) {
-            break;
-        }
-
-        printf("Data line: %f\n", temp_line);
-        data[line] = temp_line;
-        ++line;
-    }
-    
-    const float average = analyze_average(data, (size_t) line + 1);
-    const float max = analyze_max(data, (size_t) line + 1);
-    const float min = analyze_min(data, (size_t) line + 1); 
-
-    printf("Average: %f\n", average);
-    printf("Max: %f\n", max);
-    printf("Min: %f\n", min);
-
-    struct sigaction sa;
-    sa.sa_handler = signal_handler;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-
-    if (sigaction(SIGINT, &sa, NULL) == -1) {
-        perror("sigaction");
-        exit(EXIT_FAILURE);
-    }
-
-    /* char buffer[BUFF_SIZE];
-    int pos = 0;
-
-    while (port_mgr_read_byte(&buffer[pos]) == 0) {
-        if (buffer[pos] == '\0') {
-            const float log = strtof(buffer + 1, NULL);
-            if (storage_mgr_write_temp(log) != 0) {
-                printf("Error writing temp\n");
-            }
-
-            pos = 0;
-        }
-        
-        ++pos;
-    } */
-    
-    while (1) {
-        DataPacket packet = {0};
-        int receive_status = system_receive_data(&packet);
-        if (receive_status == -1) {
-            printf("Invalid packet\n");
-            break;
-        } else if (receive_status == -2) {
-            printf("Syserror with receiving\n");
-            break;
-        }
-
-        switch (packet.type) {
-        case TEMP:
-            system_handle_temp(&packet);
-            printf("Handled temp\n");
-            break;
-        default:
-            break;
-        }
-    }
-        
-    const int port_close_status = port_mgr_close();
-    const int storage_close_status = storage_mgr_close();
-
-    if (port_close_status != 0 || storage_close_status != 0) {
-        printf("Error closing managers\n");
-        return EXIT_FAILURE;
-    }
-    
-    return EXIT_SUCCESS;
-}
-
-void signal_handler(int signum) { 
-    if (signum == SIGINT) {
-        const int port_close_status = port_mgr_close();
-        const int storage_close_status = storage_mgr_close();
-
-        if (port_close_status != 0 || storage_close_status != 0) {
-            printf("Error closing managers\n");
-            exit(EXIT_FAILURE);
-        }
-        exit(EXIT_SUCCESS);
-    }
+    system_cleanup();
+    return 0;
 }
