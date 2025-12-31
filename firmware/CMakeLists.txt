@@ -44,7 +44,7 @@ target_link_libraries(system_temperature PRIVATE therm_mgr uart_mgr)
 
 
 add_executable(${PROJECT_NAME} src/main.c)
-target_link_libraries(${PROJECT_NAME} PRIVATE system_core)
+target_link_libraries(${PROJECT_NAME} PRIVATE system_core system_temperature)
 
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD

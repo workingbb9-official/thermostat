@@ -58,7 +58,8 @@ if (TESTS)
 endif()
 
 add_executable(${PROJECT_NAME} src/main.c)
-target_link_libraries(${PROJECT_NAME} PRIVATE port_mgr storage_mgr data_analysis)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/..)
+target_link_libraries(${PROJECT_NAME} PRIVATE port_mgr storage_mgr data_analysis system_data_receiver system_data_handler)
 
 add_custom_target(run
     COMMAND ${PROJECT_NAME}

@@ -10,10 +10,10 @@ void system_init(void) {
     uart_mgr_init();
 }
 
-void system_send_temp(void) {
+/* void system_send_temp(void) {
     const float temp_c = therm_mgr_get_temp();
 
     char buff[16];
     dtostrf(temp_c, 4, 2, buff);
     uart_mgr_transmit_string(buff);
-}
+} */

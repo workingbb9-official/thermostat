@@ -1,4 +1,5 @@
 #include "app/system_core.h"
+#include "app/system_temperature.h"
 
 #define EXIT_SUCCESS 0
 

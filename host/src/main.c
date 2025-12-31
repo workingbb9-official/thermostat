@@ -5,6 +5,9 @@
 #include "logic/storage_mgr.h"
 #include "logic/analysis.h"
 #include "logic/port_mgr.h"
+#include "common/protocol.h"
+#include "app/system_data_receiver.h"
+#include "app/system_data_handler.h"
 
 #define BUFF_SIZE 32
 
@@ -57,7 +60,7 @@ int main(void) {
         exit(EXIT_FAILURE);
     }
 
-    char buffer[BUFF_SIZE];
+    /* char buffer[BUFF_SIZE];
     int pos = 0;
 
     while (port_mgr_read_byte(&buffer[pos]) == 0) {
@@ -71,8 +74,29 @@ int main(void) {
         }
         
         ++pos;
-    }
+    } */
     
+    while (1) {
+        DataPacket packet = {0};
+        int receive_status = system_receive_data(&packet);
+        if (receive_status == -1) {
+            printf("Invalid packet\n");
+            break;
+        } else if (receive_status == -2) {
+            printf("Syserror with receiving\n");
+            break;
+        }
+
+        switch (packet.type) {
+        case TEMP:
+            system_handle_temp(&packet);
+            printf("Handled temp\n");
+            break;
+        default:
+            break;
+        }
+    }
+        
     const int port_close_status = port_mgr_close();
     const int storage_close_status = storage_mgr_close();
 
