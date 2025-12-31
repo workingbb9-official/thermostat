@@ -12,7 +12,7 @@ int system_handle_temp(const DataPacket *packet) {
         return -1;
     }
 
-    const int16_t value = (int16_t) (((uint16_t) (packet->payload[0] << 8)) | ((uint16_t) packet->payload[1]));
+    const int16_t value = (int16_t) (((uint16_t) packet->payload[0] << 8) | packet->payload[1]);
     const float data = reconstruct_float(value);
     if (storage_mgr_write_temp(data) != 0) {
         return -2;
