@@ -59,8 +59,7 @@ int port_configure(int port, int speed) {
 
 int port_read(int fd, char *buffer, int bytes) {
     if (fd < 0 ||
-        buffer == NULL ||
-        bytes <= 0) {
+        !buffer) {
         return -1;
     }
 
@@ -77,8 +76,8 @@ int port_close(int fd) {
 
 static speed_t numeric_to_baud(int rate) {
     switch (rate) {
-        case 9600: return B9600;
-        case 115200: return B115200;
-        default: return B0;
+    case 9600: return B9600;
+    case 115200: return B115200;
+    default: return B0;
     }
 }
