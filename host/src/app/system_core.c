@@ -126,7 +126,6 @@ static ThermStatus signal_init(void) {
     struct sigaction sa = {0};
     sa.sa_handler = signal_handler;
     sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
 
     if (sigaction(SIGINT, &sa, NULL) == -1) {
         return TSYS_SIGNAL_ERROR;
