@@ -1,15 +1,23 @@
 #ifndef SYSTEM_CORE_H
 #define SYSTEM_CORE_H
 
+typedef enum {
+    TSYS_OK = 0,
+    TSYS_PORT_ERROR = 1,
+    TSYS_STORAGE_ERROR = 2,
+    TSYS_SIGNAL_ERROR = 3,
+    TSYS_ANALYZE_ERROR = 4
+} ThermStatus;
 
 /*
  * @brief Initialize all managers and sigint
  *
  * This function will exit the program if init fails
  * It will printf() the specific errors
- * 
+ *
+ * @return TSYS_OK, TSYS_PORT_ERROR, TSYS_STORAGE_ERROR
  */
-void system_init(void);
+ThermStatus system_init(void);
 
 /*
  * @brief Run all system operations
@@ -27,8 +35,9 @@ void system_run(void);
  * This function exits the program
  * It will printf() errors if they come up
  *
+ * @return TSYS_OK, TSYS_PORT_ERROR, TSYS_STORAGE_ERROR
  */
-void system_cleanup(void);
+ThermStatus system_cleanup(void);
 
 /*
  * @brief Analyze all current storage data
@@ -37,8 +46,9 @@ void system_cleanup(void);
  * It requires the storage manager
  * It will print average, max, and min
  *
+ * @return TSYS_OK, TSYS_ANALYZE_ERROR
  */
-void system_analyze(void);
+ThermStatus system_analyze(void);
 
 /*
  * @brief Tell main when to shutdown
@@ -47,6 +57,7 @@ void system_analyze(void);
  * Used to exit the program with CTRL-C
  *
  * @return 0 for no, 1 for shutdown
+ */
 int system_should_shutdown(void);
 
 #endif // SYSTEM_CORE_H

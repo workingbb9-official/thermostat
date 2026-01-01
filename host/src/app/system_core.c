@@ -14,22 +14,21 @@
 
 static int signal_shutdown = 0;
 
-static void signal_init(void);
+static ThermStatus signal_init(void);
 static void signal_handler(int signum);
 
-void system_init(void) {
+
+ThermStatus system_init(void) {
     if (port_mgr_init() != 0) {
-        printf("Error init port manager\n");
-        exit(EXIT_FAILURE);
+        return TSYS_PORT_ERROR;
     }
 
     if (storage_mgr_init() != 0) {
-        printf("Error init storage manager\n");
         port_mgr_close();
-        exit(EXIT_FAILURE);
+        return TSYS_STORAGE_ERROR;
     }
-
-    signal_init();
+    
+    return signal_init();
 }
 
 void system_run(void) {
@@ -55,26 +54,29 @@ void system_run(void) {
     }
 }
 
-void system_cleanup(void) {
+ThermStatus system_cleanup(void) {
     int port_close_status = port_mgr_close();
     int storage_close_status = storage_mgr_close();
 
-    if (port_close_status != 0 || storage_close_status != 0) {
-        printf("Error cleanup managers\n");
-        exit(EXIT_FAILURE);
+    if (port_close_status != 0) {
+        return TSYS_PORT_ERROR;
     }
 
-    exit(EXIT_SUCCESS);
+    if (storage_close_status != 0) {
+        return TSYS_STORAGE_ERROR;
+    }
+
+    return TSYS_OK;
 }
 
-void system_analyze(void) {
+ThermStatus system_analyze(void) {
     size_t capacity = 256;
     size_t count = 0;
     float *data = malloc(capacity * sizeof(float));
 
     if (data == NULL) {
         printf("Error malloc\n");
-        system_cleanup();
+        return TSYS_ANALYZE_ERROR;
     }
 
     float temp_line;
@@ -89,7 +91,7 @@ void system_analyze(void) {
                 printf("Error realloc\n");
                 free(data);
                 data = NULL;
-                system_cleanup();
+                return TSYS_ANALYZE_ERROR;
             }
 
             capacity = new_capacity;
@@ -107,28 +109,30 @@ void system_analyze(void) {
     const float max = analyze_max(data, (size_t) count);
     const float min = analyze_min(data, (size_t) count);
 
-    printf("Average: %f\n", average);
-    printf("Max: %f\n", max);
-    printf("Min: %f\n", min);
+    printf("\n\n\nAverage: %.2f\n", average);
+    printf("Max: %.2f\n", max);
+    printf("Min: %.2f\n", min);
 
     free(data);
     data = NULL;
+    return TSYS_OK;
 }
 
 int system_should_shutdown(void) {
     return signal_shutdown;
 }
 
-static void signal_init(void) {
+static ThermStatus signal_init(void) {
     struct sigaction sa = {0};
     sa.sa_handler = signal_handler;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
 
     if (sigaction(SIGINT, &sa, NULL) == -1) {
-        printf("Error init signal\n");
-        exit(EXIT_FAILURE);
+        return TSYS_SIGNAL_ERROR;
     }
+
+    return TSYS_OK;
 }
 
 static void signal_handler(int signum) {
