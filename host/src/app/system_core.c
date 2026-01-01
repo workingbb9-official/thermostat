@@ -65,15 +65,13 @@ void system_cleanup(void) {
 void system_analyze(void) {
     float data[256];
     int line = 1;
-    while (1) {
+
+    while (storage_mgr_read_temp(&temp_line, line) != 0) {
         if (line - 1 > 256) {
             break;
         }
 
         float temp_line;
-        if (storage_mgr_read_temp(&temp_line, line) != 0) {
-            break;
-        }
 
         printf("Data line: %.2f\n", temp_line);
         data[line - 1] = temp_line;
