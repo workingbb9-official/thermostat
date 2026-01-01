@@ -12,6 +12,8 @@
 #include "app/system_data_receiver.h"
 #include "app/system_data_handler.h"
 
+static int signal_shutdown = 0;
+
 static void signal_init(void);
 static void signal_handler(int signum);
 
@@ -113,6 +115,10 @@ void system_analyze(void) {
     data = NULL;
 }
 
+int system_should_shutdown(void) {
+    return signal_shutdown;
+}
+
 static void signal_init(void) {
     struct sigaction sa = {0};
     sa.sa_handler = signal_handler;
@@ -127,6 +133,6 @@ static void signal_init(void) {
 
 static void signal_handler(int signum) {
     if (signum == SIGINT) {
-        system_cleanup();
+        signal_shutdown = 1;
     }
 }

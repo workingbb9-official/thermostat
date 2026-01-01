@@ -40,4 +40,13 @@ void system_cleanup(void);
  */
 void system_analyze(void);
 
+/*
+ * @brief Tell main when to shutdown
+ *
+ * This function will be true on signal interrupt
+ * Used to exit the program with CTRL-C
+ *
+ * @return 0 for no, 1 for shutdown
+int system_should_shutdown(void);
+
 #endif // SYSTEM_CORE_H

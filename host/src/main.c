@@ -4,7 +4,7 @@ int main(void) {
     system_init();
     system_analyze();
 
-    for (;;) {
+    while (!system_should_shutdown()) {
         system_run();
     }
 
