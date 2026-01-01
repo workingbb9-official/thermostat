@@ -34,7 +34,7 @@ void system_init(void) {
 
 void system_run(void) {
     DataPacket packet = {0};
-    const int receive_status = system_receive_data(&packet);
+    int receive_status = system_receive_data(&packet);
 
     if (receive_status == -1) {
         printf("Invalid packet\n");
@@ -56,8 +56,8 @@ void system_run(void) {
 }
 
 void system_cleanup(void) {
-    const int port_close_status = port_mgr_close();
-    const int storage_close_status = storage_mgr_close();
+    int port_close_status = port_mgr_close();
+    int storage_close_status = storage_mgr_close();
 
     if (port_close_status != 0 || storage_close_status != 0) {
         printf("Error cleanup managers\n");
