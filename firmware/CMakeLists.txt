@@ -37,19 +37,27 @@ create_lib(system_temperature src/app/system_temperature.c
     LINK_LIBS therm_mgr uart_mgr
 )
 
-add_executable(firmware src/main.c)
+function(add_avr_firmware TARGET_NAME SOURCE_FILES)
+    add_executable(${TARGET_NAME} ${SOURCE_FILES})
+    
+    # Generate Hex
+    add_custom_command(
+        TARGET ${TARGET_NAME} POST_BUILD
+        COMMAND ${CMAKE_OBJCOPY} -O ihex -R .eeprom $<TARGET_FILE:${TARGET_NAME}> ${TARGET_NAME}.hex
+        COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${TARGET_NAME}>
+    )
+
+    # Create a specific upload target for this test (e.g., make upload_test_lcd)
+    add_custom_target(upload_${TARGET_NAME}
+        COMMAND avrdude -v -p atmega328p -c arduino -P /dev/ttyACM0 -b 115200 -U flash:w:${TARGET_NAME}.hex:i
+        DEPENDS ${TARGET_NAME}
+        COMMENT "Uploading ${TARGET_NAME}.hex to Arduino"
+    )
+endfunction()
+
+if (TESTS)
+    add_subdirectory(tests)
+endif()
+
+add_avr_firmware(firmware src/main.c)
 target_link_libraries(firmware PRIVATE system_core system_temperature)
-
-add_custom_command(
-    TARGET firmware POST_BUILD
-    COMMAND ${CMAKE_OBJCOPY} -O ihex -R .eeprom $<TARGET_FILE:firmware> firmware.hex 
-    # Report size using avr-size
-    COMMAND ${CMAKE_SIZE} $<TARGET_FILE:firmware>
-    COMMENT "Generated firmware.hex and reported size."
-)
-
-add_custom_target(upload
-	COMMAND avrdude -v -p atmega328p -c arduino -P /dev/ttyACM0 -b 115200 -U flash:w:firmware.hex:i
-	DEPENDS firmware
-	COMMENT "Uploading firmware.hex to Arduino uno."
-)
