@@ -17,7 +17,7 @@ void lcd_init(void);
  * @brief Send a command to the lcd
  * @param Byte command to send
  *
- * This function clears the RS before sending byte
+ * This function clears RS before sending byte
  * Writes the full byte, then shifts left 4 and sends that
  *
  */

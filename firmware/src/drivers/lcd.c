@@ -3,6 +3,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#include "drivers/board_config.h"
 #include "drivers/bit_utils.h"
 
 static void lcd_send_4_bits(uint8_t data);
@@ -11,20 +12,20 @@ void lcd_init(void) {
 	_delay_ms(50); // Power-on
 
 	// Set all lcd pins to OUTPUT
-	SET_BIT(DDRD, DDD2);
-	SET_BIT(DDRD, DDD3);
-	SET_BIT(DDRD, DDD4);
-	SET_BIT(DDRC, DDC3);
-	SET_BIT(DDRC, DDC4);
-	SET_BIT(DDRC, DDC5);
+	SET_BIT(DDRD, LCD_DDR_RS);
+	SET_BIT(DDRD, LCD_DDR_E);
+	SET_BIT(DDRC, LCD_DDR_DP4);
+	SET_BIT(DDRC, LCD_DDR_DP5);
+	SET_BIT(DDRC, LCD_DDR_DP6);
+	SET_BIT(DDRD, LCD_DDR_DP7);
 
 	// Set all lcd pins to LOW
-	CLR_BIT(PORTD, PORTD2);
-	CLR_BIT(PORTD, PORTD3);
-	CLR_BIT(PORTD, PORTD4);
-	CLR_BIT(PORTC, PORTC3);
-	CLR_BIT(PORTC, PORTC4);
-	CLR_BIT(PORTC, PORTC5);
+	CLR_BIT(PORTD, LCD_DP7);
+	CLR_BIT(PORTD, LCD_E);
+	CLR_BIT(PORTD, LCD_RS);
+	CLR_BIT(PORTC, LCD_DP6);
+	CLR_BIT(PORTC, LCD_DP5);
+	CLR_BIT(PORTC, LCD_DP4);
 
 	// Ensure 8-bit mode
 	lcd_send_4_bits(0x30);	
@@ -46,14 +47,14 @@ void lcd_init(void) {
 }
 
 void lcd_send_cmd(uint8_t cmd) {
-    CLR_BIT(PORTD, PORTD4);
+    CLR_BIT(PORTD, LCD_RS);
 
     lcd_send_4_bits(cmd & 0xF0);
     lcd_send_4_bits(cmd << 4);
 }
 
 void lcd_write_byte(uint8_t byte) {
-    SET_BIT(PORTD, PORTD4);
+    SET_BIT(PORTD, LCD_RS);
 
     lcd_send_4_bits(byte & 0xF0);
     lcd_send_4_bits(byte << 4);
@@ -61,32 +62,32 @@ void lcd_write_byte(uint8_t byte) {
 
 static void lcd_send_4_bits(uint8_t data) {
     if (data & 0x80) {
-        SET_BIT(PORTD, PORTD2);
+        SET_BIT(PORTD, LCD_DP7);
     } else {
-        CLR_BIT(PORTD, PORTD2);
+        CLR_BIT(PORTD, LCD_DP7);
     }
 
     if (data & 0x40) {
-        SET_BIT(PORTC, PORTC3);
+        SET_BIT(PORTC, LCD_DP6);
     } else {
-        CLR_BIT(PORTC, PORTC3);
+        CLR_BIT(PORTC, LCD_DP6);
     }
 
     if (data & 0x20) {
-        SET_BIT(PORTC, PORTC4);
+        SET_BIT(PORTC, LCD_DP5);
     } else {
-        CLR_BIT(PORTC, PORTC4);
+        CLR_BIT(PORTC, LCD_DP5);
     }
 
     if (data & 0x10) {
-        SET_BIT(PORTC, PORTC5);
+        SET_BIT(PORTC, LCD_DP4);
     } else {
-        CLR_BIT(PORTC, PORTC5);
+        CLR_BIT(PORTC, LCD_DP4);
     }
 
-    SET_BIT(PORTD, PORTD3);
+    SET_BIT(PORTD, LCD_E);
     _delay_us(1);
 
-    CLR_BIT(PORTD, PORTD3);
+    CLR_BIT(PORTD, LCD_E);
     _delay_us(100);
 }
