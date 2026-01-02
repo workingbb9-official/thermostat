@@ -1,65 +1,49 @@
 cmake_minimum_required(VERSION 3.15)
 project(host LANGUAGES C)
 
-set(PROJECT_ROOT_DIR ${CMAKE_SOURCE_DIR}/..)
 option(TESTS OFF)
 
-# serial port
-add_library(serial_port src/services/port.c)
-add_library(port_mgr src/logic/port_mgr.c)
+function(create_lib name source)
+    set(multiValueArgs INCLUDE_DIRS LINK_LIBS)
+    cmake_parse_arguments(LIB "" "" "${multiValueArgs}" ${ARGN})
 
-target_include_directories(serial_port
-    PUBLIC include
+    add_library(${name} ${source})
+
+    target_include_directories(${name} PUBLIC include)
+    if(LIB_INCLUDE_DIRS)
+        target_include_directories(${name} PRIVATE ${LIB_INCLUDE_DIRS})
+    endif()
+
+    if(LIB_LINK_LIBS)
+        target_link_libraries(${name} PRIVATE ${LIB_LINK_LIBS})
+    endif()
+endfunction()
+
+# services
+create_lib(serial_port src/services/port.c)
+create_lib(file_utils src/services/file_utils.c)
+
+# logic
+create_lib(port_mgr src/logic/port_mgr.c
+    LINK_LIBS serial_port
 )
-target_include_directories(port_mgr
-    PUBLIC include
+create_lib(storage_mgr src/logic/storage_mgr.c
+    LINK_LIBS file_utils
 )
+create_lib(data_analysis src/logic/analysis.c)
 
-target_link_libraries(port_mgr PRIVATE serial_port)
-
-# file utils
-add_library(file_utils src/services/file_utils.c)
-target_include_directories(file_utils
-    PUBLIC include
+# system
+create_lib(system_data_receiver src/app/system_data_receiver.c
+    INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/..
+    LINK_LIBS port_mgr
 )
-
-# analysis
-add_library(data_analysis src/logic/analysis.c)
-target_include_directories(data_analysis
-    PUBLIC include
+create_lib(system_data_handler src/app/system_data_handler.c
+    INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/..
+    LINK_LIBS storage_mgr
 )
-
-# storage manager
-add_library(storage_mgr src/logic/storage_mgr.c)
-
-target_include_directories(storage_mgr
-    PUBLIC include
-)
-
-target_link_libraries(storage_mgr PRIVATE file_utils)
-
-# system data controllers
-add_library(system_data_receiver src/app/system_data_receiver.c)
-target_include_directories(system_data_receiver
-    PUBLIC include
-    PRIVATE ${CMAKE_SOURCE_DIR}/..
-)
-target_link_libraries(system_data_receiver PRIVATE port_mgr)
-
-add_library(system_data_handler src/app/system_data_handler.c)
-target_include_directories(system_data_handler
-    PUBLIC include
-    PRIVATE ${CMAKE_SOURCE_DIR}/..
-)
-target_link_libraries(system_data_handler PRIVATE storage_mgr)
-
-# system core
-add_library(system_core src/app/system_core.c)
-target_include_directories(system_core
-    PUBLIC include
-    PRIVATE ${CMAKE_SOURCE_DIR}/..
-)
-target_link_libraries(system_core PRIVATE 
+create_lib(system_core src/app/system_core.c
+    INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/..
+    LINK_LIBS 
     system_data_receiver system_data_handler 
     port_mgr storage_mgr data_analysis
 )
@@ -68,13 +52,12 @@ if (TESTS)
     add_subdirectory(tests)
 endif()
 
-add_executable(${PROJECT_NAME} src/main.c)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/..)
-target_link_libraries(${PROJECT_NAME} PRIVATE system_core)
+add_executable(host src/main.c)
+target_link_libraries(host PRIVATE system_core)
 
 add_custom_target(run
-    COMMAND ${PROJECT_NAME}
-    WORKING_DIRECTORY ${PROJECT_ROOT_DIR}
-    DEPENDS ${PROJECT_NAME}
-    COMMENT "Running ${PROJECT_NAME} executable"
+    COMMAND host
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
+    DEPENDS host
+    COMMENT "Running host executable"
 )
