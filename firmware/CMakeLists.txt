@@ -20,6 +20,7 @@ endfunction()
 # drivers
 create_lib(therm_driver src/drivers/thermistor.c)
 create_lib(uart_driver src/drivers/uart.c)
+create_lib(lcd_driver src/drivers/lcd.c)
 
 # logic
 create_lib(therm_mgr src/logic/therm_mgr.c
