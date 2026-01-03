@@ -4,9 +4,8 @@
 #include "logic/uart_mgr.h"
 #include "logic/lcd_mgr.h"
 #include "common/protocol.h"
-#include <util/delay.h>
 
-#define DELAY_TIME 1250000
+#define DELAY_TIME 1000000
 
 static int16_t remove_decimal(float x);
 static DataPacket create_temp_packet(uint16_t temp);
@@ -31,7 +30,6 @@ void system_send_temp(void) {
         itoa(fraction, temp_int % 100);
         
         lcd_mgr_clear();
-        _delay_ms(2);
         lcd_mgr_write("Temp: ");
         lcd_mgr_write(whole);
         lcd_mgr_write(".");
@@ -91,28 +89,3 @@ static void itoa(char *string, int16_t value) {
 
     *string = '\0';
 }
-/*
-static void itoa(char *string, int16_t value) {
-    if (value == 0) {
-        *string++ = '0';
-    } else {
-        uint16_t pos_val = (value < 0) ? -value : value;
-        if (value < 0) {
-            *string++ = '-';
-        }
-
-        char interim[5] = {0};
-        int i = 0;
-        while (pos_val > 0) {
-            interim[i++] = '0' + (pos_val % 10);
-            pos_val /= 10;
-        }
-
-        while (i > 0) {
-            *string++ = interim[--i];
-        }
-    }
-
-    *string = '\0';  // Ensure null termination.
-}
-*/

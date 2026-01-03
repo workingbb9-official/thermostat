@@ -8,6 +8,7 @@
  * Turns float into int and splits that into (uint8_t) high byte, low byte
  * Checksum not implemented yet (same as length)
  * Arbitrary timer boundary set (around 5 seconds)
+ * Displays temperature on LCD
  *
  */
 void system_send_temp(void);
