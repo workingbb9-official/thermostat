@@ -22,6 +22,9 @@ void lcd_mgr_write(const char *string) {
 }
 
 void lcd_mgr_set_cursor(uint8_t row, uint8_t col) {
+    if (row > 1 || col > 15) {
+        return;
+    }
     static const uint8_t row_base[] = {0x00, 0x40};
     lcd_send_cmd(0x80 | (row_base[row] + col));
 }

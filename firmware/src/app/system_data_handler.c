@@ -14,7 +14,7 @@ void system_send_temp(int16_t temp) {
     temp_packet.length = 2;
 
     const uint8_t high_byte = (uint8_t) (temp >> 8);
-    const uint8_t low_byte = (uint8_t) temp & 0xFF;
+    const uint8_t low_byte = (uint8_t) (temp & 0xFF);
 
     temp_packet.payload[0] = high_byte;
     temp_packet.payload[1] = low_byte;

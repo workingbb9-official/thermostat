@@ -6,7 +6,7 @@
 #include "app/system_data_handler.h"
 #include "app/system_display.h"
 
-#define TEMP_DELAY 1000000
+#define TEMP_DELAY 1250000
 
 void system_init(void) {
     system_temperature_init();

@@ -14,8 +14,9 @@ void system_data_handler_init(void);
  * @param Temperature as an integer
  *
  * This function will split temp into high and low bytes
- * Payload contains a size of 2
+ * Payload contains 2 bytes
  * Checksum not implemented yet (same as length)
+ *
  */
 void system_send_temp(int16_t temp);
 

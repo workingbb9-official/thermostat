@@ -19,4 +19,4 @@ void system_temperature_init(void);
  */
 int16_t system_get_temp(void);
 
-#endif // SYSTEM_TEMPERATURE_T
+#endif // SYSTEM_TEMPERATURE_H

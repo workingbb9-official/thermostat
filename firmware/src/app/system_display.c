@@ -48,30 +48,3 @@ static void itoa(char *string, int16_t value) {
 
     *string = '\0';
 }
-
-/* static void itoa(char *string, int16_t value) {
-    if (value < 0) {
-        *string++ = '-';
-    }
-
-    uint16_t pos_val = (value < 0) ? -value : value;
-    
-    if (pos_val == 0) {
-        *string++ = '0';
-    } else {
-        char interim[5];
-        uint8_t i = 0;
-        while (pos_val > 0) {
-            // Get digits as chars
-            interim[i++] = '0' + (pos_val % 10);
-            pos_val /= 10;
-        }
-        while (i > 0) {
-            // Reverse to get original int
-            *string++ = interim[--i];
-        }
-
-    }
-
-    *string = '\0';
-} */

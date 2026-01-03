@@ -11,6 +11,10 @@ void lcd_mgr_init(void);
 /*
  * @brief Clear the entire display
  *
+ * This function will move to top left
+ * Then it writes 16 spaces 
+ * Final position is top left (0, 0)
+ *
  */
 void lcd_mgr_clear(void);
 
