@@ -28,6 +28,8 @@ create_lib(therm_mgr src/logic/therm_mgr.c
 create_lib(uart_mgr src/logic/uart_mgr.c
     INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/..
     LINK_LIBS uart_driver)
+create_lib(lcd_mgr src/logic/lcd_mgr.c
+    LINK_LIBS lcd_driver)
 
 # system 
 create_lib(system_core src/app/system_core.c
