@@ -33,11 +33,11 @@ create_lib(lcd_mgr src/logic/lcd_mgr.c
 
 # system 
 create_lib(system_core src/app/system_core.c
-    LINK_LIBS therm_mgr uart_mgr
+    LINK_LIBS therm_mgr uart_mgr lcd_mgr
 )
 create_lib(system_temperature src/app/system_temperature.c
     INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/..
-    LINK_LIBS therm_mgr uart_mgr
+    LINK_LIBS therm_mgr uart_mgr lcd_mgr
 )
 
 function(add_avr_firmware TARGET_NAME SOURCE_FILES)
