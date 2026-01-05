@@ -1,6 +1,6 @@
-#include "app/system_display.h"
+#include "system_display.h"
 
-#include "lcd/lcd.h"
+#include "lcd.h"
 
 static void itoa(char *string, int16_t value);
 

@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include <signal.h>
 
-#include "logic/storage_mgr.h"
-#include "logic/analysis.h"
-#include "logic/port_mgr.h"
+#include "storage/storage.h"
+#include "analysis/analysis.h"
+#include "port/port.h"
 
-#include"common/protocol.h"
+#include "common/protocol.h"
 #include "app/system_data_receiver.h"
 #include "app/system_data_handler.h"
 

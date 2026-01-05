@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 #include "common/protocol.h"
-#include "logic/port_mgr.h"
+#include "port/port.h"
 
 int system_receive_data(DataPacket *packet) {
     uint8_t first_byte;

@@ -1,6 +1,6 @@
-#include "app/system_temperature.h"
+#include "system_temperature.h"
 
-#include "thermistor/thermistor.h"
+#include "thermistor.h"
 
 static int16_t remove_decimal(float x);
 

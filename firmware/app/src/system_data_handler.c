@@ -1,6 +1,6 @@
-#include "app/system_data_handler.h"
+#include "system_data_handler.h"
 
-#include "uart/uart.h"
+#include "uart.h"
 #include "common/protocol.h"
 
 void system_data_handler_init(void) {

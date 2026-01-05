@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 #include "common/protocol.h"
-#include "logic/storage_mgr.h"
+#include "storage/storage.h"
 
 static inline float reconstruct_float(int16_t value);
 
