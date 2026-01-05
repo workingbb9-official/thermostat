@@ -1,4 +1,4 @@
-#include "drivers/lcd.h"
+#include "lcd_hal.c"
 
 #include <stdint.h>
 #include <util/delay.h>

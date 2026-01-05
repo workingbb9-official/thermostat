@@ -1,4 +1,4 @@
-#include "logic/lcd_mgr.h"
+#include "lcd.h"
 
 #include <util/delay.h>
 
@@ -6,14 +6,14 @@
 
 int main(void) {
     lcd_mgr_init();
-    const char first_word[] = "Hold ";
-    const char next_word[] = "Planet ";
-    const char third_word[] = "Fitness ";
-    const char last_word[] = "2027";
+    const char first_word[] = "This ";
+    const char next_word[] = "is ";
+    const char third_word[] = "a ";
+    const char last_word[] = "test ";
     
     const char *sentence[] = {first_word, next_word, third_word, last_word};
     
-    int word = 0;
+    unsigned int word = 0;
     for (;;) {
         _delay_ms(500);
         lcd_mgr_write(sentence[word]);
