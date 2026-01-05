@@ -1,9 +1,9 @@
-#include "system_data_receiver.h"
+#include "app/system_data_receiver.h"
 
 #include <stdint.h>
 
 #include "common/protocol.h"
-#include "port.h"
+#include "port/port.h"
 
 int system_receive_data(DataPacket *packet) {
     uint8_t first_byte;

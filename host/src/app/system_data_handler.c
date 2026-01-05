@@ -1,9 +1,9 @@
-#include "system_data_handler.h"
+#include "app/system_data_handler.h"
 
 #include <stdint.h>
 
 #include "common/protocol.h"
-#include "storage.h"
+#include "storage/storage.h"
 
 static inline float reconstruct_float(int16_t value);
 

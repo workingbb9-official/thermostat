@@ -1,16 +1,16 @@
-#include "system_core.h"
+#include "app/system_core.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
 
-#include "storage.h"
-#include "analysis.h"
-#include "port.h"
+#include "storage/storage.h"
+#include "analysis/analysis.h"
+#include "port/port.h"
 
-#include"common/protocol.h"
-#include "system_data_receiver.h"
-#include "system_data_handler.h"
+#include "common/protocol.h"
+#include "app/system_data_receiver.h"
+#include "app/system_data_handler.h"
 
 static int signal_shutdown = 0;
 
