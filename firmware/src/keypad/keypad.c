@@ -1,9 +1,9 @@
-#include "drivers/keypad.h"
+#include "keypad/keypad.h"
 
 #include <avr/io.h>
 #include <util/delay.h>
 
-#include "drivers/bit_utils.h"
+#include "shared/bit_utils.h"
 
 static int8_t check_rows(const uint8_t *row_bits);
 
@@ -38,6 +38,8 @@ void keypad_init(void) {
 	SET_BIT(PORTD, PORTD5);
 	SET_BIT(PORTD, PORTD6);
 	SET_BIT(PORTD, PORTD7);
+
+    _delay_ms(20); // Time to settle
 }
 
 char keypad_read(void) {

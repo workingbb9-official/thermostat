@@ -8,6 +8,11 @@ void system_display_init(void) {
     lcd_mgr_init();
 }
 
+void system_display_password(const char *password) {
+    lcd_mgr_clear();
+    lcd_mgr_write(password);
+}
+
 void system_display_temp(int16_t temp) {
     
     char whole[8];

@@ -13,7 +13,7 @@ target_include_directories(thermostat
 
 target_link_libraries(thermostat
     PRIVATE 
-    lcd_lib therm_lib uart_lib
+    lcd_lib therm_lib uart_lib keypad_lib
 )
 
 add_firmware(thermostat)

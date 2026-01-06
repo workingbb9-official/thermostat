@@ -10,6 +10,16 @@
 void system_display_init(void);
 
 /*
+ * @brief Display password
+ * @param Password to write
+ *
+ * Clear the screen then rewrites password
+ * You can empty the screen by passing in spaces
+ *
+ */
+void system_display_password(const char *password);
+
+/*
  * @brief Display temperature
  * @param Temperature as an integer
  * 

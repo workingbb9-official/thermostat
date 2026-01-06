@@ -6,7 +6,7 @@
 #define NO_KEY '\0'
 
 /*
- * @brief Initialize keypad driver
+ * @brief Initialize keypad
  *
  * This function enables cols as outputs
  * Rows are input pullups
