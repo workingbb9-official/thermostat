@@ -1,7 +1,6 @@
 add_executable(thermostat
     main.c
     system_core.c
-    system_display.c
     system_temperature.c
     system_data_handler.c
 )

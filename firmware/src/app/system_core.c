@@ -4,8 +4,8 @@
 
 #include "app/system_temperature.h"
 #include "app/system_data_handler.h"
-#include "app/system_display.h"
 #include "keypad/keypad.h"
+#include "lcd/lcd.h"
 
 #define TEMP_DELAY 1250000
 
@@ -20,7 +20,7 @@ void system_init(void) {
     keypad_init();
     system_temperature_init();
     system_data_handler_init();
-    system_display_init();
+    lcd_mgr_init();
 }
 
 void system_run(void) {
@@ -52,22 +52,22 @@ static void login_loop(void) {
         return;
     }
     
+    password[password_pos] = key;
+    password[password_pos + 1] = '\0';
     last_key = key;
-    password[password_pos++] = key;
-    char password_terminated[password_pos - 1];
-    for (uint8_t i = 0; i < password_pos; ++i) {
-        password_terminated[i] = password[i];
-    }
+    ++password_pos;
 
-    password_terminated[password_pos] = '\0';
-    system_display_password(password_terminated);
+    lcd_mgr_clear();
+    lcd_mgr_write(password);
 
     if (password_pos >= PASSWORD_LEN) {
         if (check_password(password) == CORRECT) {
             current_state = HOME;
-            system_display_password("Validated");
+            lcd_mgr_clear();
+            lcd_mgr_write("Validated");
         } else {
-            system_display_password("Invalid");
+            lcd_mgr_clear();
+            lcd_mgr_write("Invalid");
         }
         
         password_pos = 0;
@@ -92,7 +92,18 @@ static void home_loop(void) {
     if (ticks >= TEMP_DELAY) {
         const int16_t temp_int = system_get_temp();
         system_send_temp(temp_int);
-        system_display_temp(temp_int);
+
+        int16_t whole = temp_int / 100;
+        int16_t fraction = temp_int % 100;
+       
+        lcd_mgr_clear();
+        lcd_mgr_write("Temp: ");
+        if (temp_int < 0) {
+            lcd_mgr_write("-");
+        }
+        lcd_mgr_write_int(whole);
+        lcd_mgr_write(".");
+        lcd_mgr_write_int(fraction);
 
         ticks = 0;
     }

@@ -32,4 +32,11 @@ void lcd_mgr_write(const char *string);
  */
 void lcd_mgr_set_cursor(uint8_t row, uint8_t col);
 
+/*
+ * @brief Clear the screen and write temp
+ * @param Integer to write onto screen
+ *
+ */
+void lcd_mgr_write_int(int16_t value);
+
 #endif // LCD_MGR_H
