@@ -2,9 +2,9 @@
 #define SYSTEM_CORE_H
 
 typedef enum {
-    LOGIN,
-    HOME,
-    STATS
+    STATE_LOGIN,
+    STATE_HOME,
+    STATE_STATS
 } SysState;
 
 #define WRONG -1

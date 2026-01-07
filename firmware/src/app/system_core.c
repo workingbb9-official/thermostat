@@ -3,38 +3,39 @@
 #include <stdint.h>
 
 #include "app/system_temperature.h"
-#include "app/system_data_handler.h"
-#include "keypad/keypad.h"
+#include "uart/uart.h"
 #include "lcd/lcd.h"
+#include "keypad/keypad.h"
+#include "common/protocol.h"
 
 #define TEMP_DELAY 1250000
 
-static SysState current_state = LOGIN;
+static SysState current_state = STATE_LOGIN;
 const char real_password[PASSWORD_LEN] = {'1', '2', '3', '4'};
 
 static void login_loop(void);
 static int8_t check_password(const char *password);
+
 static void home_loop(void);
+static void send_temp(int16_t temp);
 
 void system_init(void) {
     keypad_init();
     system_temperature_init();
-    system_data_handler_init();
+    uart_mgr_init();
     lcd_mgr_init();
 }
 
 void system_run(void) {
     switch (current_state) {
-    case LOGIN:
+    case STATE_LOGIN:
         login_loop();
         break;
-    case HOME:
+    case STATE_HOME:
         home_loop();
         break;
-    case STATS:
-        break;
     default:
-        current_state = LOGIN;
+        current_state = STATE_LOGIN;
         break;
     }
 }
@@ -62,7 +63,7 @@ static void login_loop(void) {
 
     if (password_pos >= PASSWORD_LEN) {
         if (check_password(password) == CORRECT) {
-            current_state = HOME;
+            current_state = STATE_HOME;
             lcd_mgr_clear();
             lcd_mgr_write("Validated");
         } else {
@@ -91,7 +92,7 @@ static void home_loop(void) {
 
     if (ticks >= TEMP_DELAY) {
         const int16_t temp_int = system_get_temp();
-        system_send_temp(temp_int);
+        send_temp(temp_int);
 
         int16_t whole = temp_int / 100;
         int16_t fraction = temp_int % 100;
@@ -107,4 +108,20 @@ static void home_loop(void) {
 
         ticks = 0;
     }
+}
+
+static void send_temp(int16_t temp) {
+    DataPacket temp_packet;
+    temp_packet.start_byte = START_BYTE;
+    temp_packet.type = TEMP;
+    temp_packet.length = 2;
+
+    const uint8_t high_byte = (uint8_t) (temp >> 8);
+    const uint8_t low_byte = (uint8_t) (temp & 0xFF);
+
+    temp_packet.payload[0] = high_byte;
+    temp_packet.payload[1] = low_byte;
+    temp_packet.checksum = 2;
+
+    uart_mgr_transmit(&temp_packet);
 }
