@@ -1,6 +1,7 @@
 add_executable(host
     main.c
     system_core.c
+    sys_utils.c
 )
 target_include_directories(host
     PUBLIC ${CMAKE_SOURCE_DIR}/include
