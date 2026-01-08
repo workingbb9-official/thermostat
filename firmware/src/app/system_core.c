@@ -2,13 +2,13 @@
 
 #include <stdint.h>
 
-#include "app/system_temperature.h"
+#include "thermistor/thermistor.h"
 #include "uart/uart.h"
 #include "lcd/lcd.h"
 #include "keypad/keypad.h"
 #include "common/protocol.h"
 
-#define TEMP_DELAY 1250000
+#define TEMP_DELAY 1250000UL
 
 static SysState current_state = STATE_LOGIN;
 const char real_password[PASSWORD_LEN] = {'1', '2', '3', '4'};
@@ -17,13 +17,15 @@ static void login_loop(void);
 static int8_t check_password(const char *password);
 
 static void home_loop(void);
+static int16_t get_temp(void);
+static int16_t remove_decimal(int x);
 static void send_temp(int16_t temp);
 
 void system_init(void) {
-    keypad_init();
-    system_temperature_init();
+    therm_mgr_init();
     uart_mgr_init();
     lcd_mgr_init();
+    keypad_init();
 }
 
 void system_run(void) {
@@ -91,7 +93,7 @@ static void home_loop(void) {
     ++ticks;
 
     if (ticks >= TEMP_DELAY) {
-        const int16_t temp_int = system_get_temp();
+        const int16_t temp_int = get_temp();
         send_temp(temp_int);
 
         int16_t whole = temp_int / 100;
@@ -107,6 +109,20 @@ static void home_loop(void) {
         lcd_mgr_write_int(fraction);
 
         ticks = 0;
+    }
+}
+
+static int16_t get_temp(void) {
+    const float temp_c = therm_mgr_get_temp();
+    const int16_t temp_int = remove_decimal(temp_c);
+    return temp_int;
+}
+
+static int16_t remove_decimal(int x) {
+    if (x >= 0.0f) {
+        return (int16_t) 100.0f * x + 0.5f;
+    } else {
+        return (int16_t) 100.0f * x - 0.5f;
     }
 }
 

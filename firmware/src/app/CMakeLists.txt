@@ -1,7 +1,6 @@
 add_executable(thermostat
     main.c
     system_core.c
-    system_temperature.c
 )
 
 target_include_directories(thermostat
