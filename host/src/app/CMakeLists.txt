@@ -1,7 +1,6 @@
 add_executable(host
     main.c
     system_core.c
-    system_data_handler.c
     system_data_receiver.c
 )
 target_include_directories(host

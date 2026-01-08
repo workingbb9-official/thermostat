@@ -7,15 +7,14 @@
 #include "storage/storage.h"
 #include "analysis/analysis.h"
 #include "port/port.h"
-
 #include "common/protocol.h"
 #include "app/system_data_receiver.h"
-#include "app/system_data_handler.h"
 
 static int signal_shutdown = 0;
 
 static ThermStatus signal_init(void);
 static void signal_handler(int signum);
+static void handle_temp(const DataPacket *packet);
 
 
 ThermStatus system_init(void) {
@@ -45,7 +44,7 @@ void system_run(void) {
 
     switch (packet.type) {
     case TEMP:
-        system_handle_temp(&packet);
+        handle_temp(&packet);
         printf("Handled temp\n");
         break;
     default:
@@ -138,4 +137,10 @@ static void signal_handler(int signum) {
     if (signum == SIGINT) {
         signal_shutdown = 1;
     }
+}
+
+static void handle_temp(const DataPacket *packet) {
+    const int16_t value = (int16_t) (((uint16_t) packet->payload[0] << 8) | packet->payload[1]);
+    const float data = value / 100.0f;
+    storage_mgr_write_temp(data);
 }
