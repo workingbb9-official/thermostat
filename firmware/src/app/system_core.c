@@ -7,14 +7,12 @@
 #include "lcd/lcd.h"
 #include "keypad/keypad.h"
 #include "common/protocol.h"
+#include "app/states.h"
+#include "app/state_login.h"
 
 #define TEMP_DELAY 1250000UL
 
-static SysState current_state = STATE_LOGIN;
-const char real_password[PASSWORD_LEN] = {'1', '2', '3', '4'};
-
-static void login_loop(void);
-static int8_t check_password(const char *password);
+static enum sys_state current_state = STATE_LOGIN;
 
 static void home_loop(void);
 static int16_t get_temp(void);
@@ -31,7 +29,7 @@ void system_init(void) {
 void system_run(void) {
     switch (current_state) {
     case STATE_LOGIN:
-        login_loop();
+        login_run(&current_state);
         break;
     case STATE_HOME:
         home_loop();
@@ -40,52 +38,6 @@ void system_run(void) {
         current_state = STATE_LOGIN;
         break;
     }
-}
-
-static void login_loop(void) {
-    static uint8_t password_pos = 0;
-    static char password[PASSWORD_LEN]; 
-    static char last_key;
-
-    const char key = keypad_read();
-    if (key == NO_KEY) {
-        last_key = NO_KEY;
-        return;
-    } else if (key == last_key) {
-        return;
-    }
-    
-    password[password_pos] = key;
-    password[password_pos + 1] = '\0';
-    last_key = key;
-    ++password_pos;
-
-    lcd_mgr_clear();
-    lcd_mgr_write(password);
-
-    if (password_pos >= PASSWORD_LEN) {
-        if (check_password(password) == CORRECT) {
-            current_state = STATE_HOME;
-            lcd_mgr_clear();
-            lcd_mgr_write("Validated");
-        } else {
-            lcd_mgr_clear();
-            lcd_mgr_write("Invalid");
-        }
-        
-        password_pos = 0;
-        password[0] = '\0';
-    }
-}
-
-static int8_t check_password(const char *password) {
-    for (uint8_t i = 0; i < PASSWORD_LEN; ++i) {
-        if (password[i] != real_password[i]) {
-            return WRONG;
-        }
-    }
-
-    return CORRECT;
 }
 
 static void home_loop(void) {
