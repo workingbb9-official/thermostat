@@ -2,6 +2,7 @@ add_executable(thermostat
     main.c
     system_core.c
     state_login.c
+    state_home.c
 )
 
 target_include_directories(thermostat
