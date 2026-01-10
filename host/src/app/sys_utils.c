@@ -1,4 +1,4 @@
-#include "app/sys_utils.h"
+#include "sys_utils.h"
 
 #include <stdint.h>
 

@@ -13,11 +13,6 @@
 
 static enum sys_state current_state = STATE_LOGIN;
 
-static void home_loop(void);
-static int16_t get_temp(void);
-static int16_t remove_decimal(int x);
-static void send_temp(int16_t temp);
-
 void system_init(void) {
     therm_mgr_init();
     uart_mgr_init();

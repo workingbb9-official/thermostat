@@ -26,7 +26,6 @@ void home_run(enum sys_state *current_state) {
         lcd_mgr_write(".");
         lcd_mgr_write_int(temp_int % 100); // Low part
 
-
         temp_timer = 0;
         *current_state = STATE_HOME;
     }

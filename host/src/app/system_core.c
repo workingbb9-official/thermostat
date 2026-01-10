@@ -7,7 +7,7 @@
 #include "storage/storage.h"
 #include "analysis/analysis.h"
 #include "port/port.h"
-#include "app/sys_utils.h"
+#include "sys_utils.h"
 
 static int signal_shutdown = 0;
 static ThermStatus signal_init(void);
