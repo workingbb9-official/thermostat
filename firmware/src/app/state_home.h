@@ -3,8 +3,6 @@
 
 #include "states.h"
 
-#define TEMP_DELAY 1250000UL
-
 /*
  * @brief Handle logic for the home/menu
  * @param Pointer to current system state

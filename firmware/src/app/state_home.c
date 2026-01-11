@@ -5,7 +5,11 @@
 #include <firmware/thermistor.h>
 #include <firmware/uart.h>
 #include <firmware/lcd.h>
+#include <firmware/keypad.h>
 #include <thermostat/protocol.h>
+#include "states.h"
+
+#define TEMP_DELAY 125000UL
 
 static int16_t format_temp(float temp);
 static struct data_packet create_temp_packet(int16_t temp_int);
@@ -27,7 +31,12 @@ void home_run(enum sys_state *current_state) {
         lcd_mgr_write_int(temp_int % 100); // Low part
 
         temp_timer = 0;
-        *current_state = STATE_HOME;
+    }
+    
+    const char key = keypad_read();
+    if (key == '#') {
+        temp_timer = (uint32_t) TEMP_DELAY; // Prime the timer
+        *current_state = STATE_STATS;
     }
 }
 

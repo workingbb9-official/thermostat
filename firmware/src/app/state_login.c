@@ -2,6 +2,7 @@
 
 #include <firmware/keypad.h>
 #include <firmware/lcd.h>
+#include "states.h"
 
 #define VALID 0
 #define INVALID 1

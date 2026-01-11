@@ -1,15 +1,13 @@
 #include <firmware/system_core.h>
 
-#include <stdint.h>
-
 #include <firmware/thermistor.h>
 #include <firmware/uart.h>
 #include <firmware/lcd.h>
 #include <firmware/keypad.h>
-
 #include "states.h"
 #include "state_login.h"
 #include "state_home.h"
+#include "state_stats.h"
 
 static enum sys_state current_state = STATE_LOGIN;
 
@@ -27,6 +25,9 @@ void system_run(void) {
         break;
     case STATE_HOME:
         home_run(&current_state);
+        break;
+    case STATE_STATS:
+        stats_run(&current_state);
         break;
     default:
         current_state = STATE_LOGIN;
