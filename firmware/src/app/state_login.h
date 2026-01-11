@@ -1,7 +1,7 @@
 #ifndef STATE_LOGIN_H
 #define STATE_LOGIN_H
 
-#include "app/states.h"
+#include "states.h"
 
 #define PASSWORD_LEN 4
 extern const char PASSWORD[PASSWORD_LEN];

@@ -7,9 +7,10 @@
 #include "lcd/lcd.h"
 #include "keypad/keypad.h"
 #include "common/protocol.h"
-#include "app/states.h"
-#include "app/state_login.h"
-#include "app/state_home.h"
+
+#include "states.h"
+#include "state_login.h"
+#include "state_home.h"
 
 static enum sys_state current_state = STATE_LOGIN;
 

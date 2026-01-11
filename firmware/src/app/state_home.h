@@ -1,7 +1,7 @@
 #ifndef STATE_HOME_H
 #define STATE_HOME_H
 
-#include "app/states.h"
+#include "states.h"
 
 #define TEMP_DELAY 1250000UL
 
