@@ -2,9 +2,9 @@
 
 #include <avr/io.h>
 
-#include "shared/board_config.h"
+#include <firmware/common/board_config.h>
 #include <util/setbaud.h>
-#include "shared/bit_utils.h"
+#include <firmware/common/bit_utils.h>
 
 void uart_init(void) {
     // Set baud rate

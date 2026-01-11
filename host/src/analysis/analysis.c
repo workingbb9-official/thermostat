@@ -1,4 +1,4 @@
-#include "analysis/analysis.h"
+#include <host/analysis.h>
 
 float analyze_average(const float *data, size_t length) {
     float total = 0.0f;

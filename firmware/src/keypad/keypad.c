@@ -1,9 +1,9 @@
-#include "keypad/keypad.h"
+#include <firmware/keypad.h>
 
 #include <avr/io.h>
 #include <util/delay.h>
 
-#include "shared/bit_utils.h"
+#include <firmware/common/bit_utils.h>
 
 static int8_t check_rows(const uint8_t *row_bits);
 

@@ -20,4 +20,21 @@ add_subdirectory(src/thermistor)
 add_subdirectory(src/uart)
 add_subdirectory(src/lcd)
 add_subdirectory(src/keypad)
-add_subdirectory(src/app)
+
+add_executable(thermostat
+    src/main.c
+    src/app/system_core.c
+    src/app/state_login.c
+    src/app/state_home.c
+)
+target_include_directories(thermostat
+    PUBLIC include
+    PRIVATE ../common
+    PRIVATE src/app
+)
+target_link_libraries(thermostat
+    PRIVATE
+    therm_lib uart_lib lcd_lib keypad_lib
+)
+
+add_firmware(thermostat)
