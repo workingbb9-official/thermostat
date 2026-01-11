@@ -1,4 +1,4 @@
-#include "app/system_core.h"
+#include <firmware/system_core.h>
 
 #include <stdint.h>
 
