@@ -1,13 +1,13 @@
 #ifndef SYSTEM_CORE_H
 #define SYSTEM_CORE_H
 
-typedef enum {
+enum therm_status {
     TSYS_OK = 0,
     TSYS_PORT_ERROR = 1,
     TSYS_STORAGE_ERROR = 2,
     TSYS_SIGNAL_ERROR = 3,
     TSYS_ANALYZE_ERROR = 4
-} ThermStatus;
+};
 
 /*
  * @brief Initialize all managers and sigint
@@ -17,7 +17,7 @@ typedef enum {
  *
  * @return TSYS_OK, TSYS_PORT_ERROR, TSYS_STORAGE_ERROR
  */
-ThermStatus system_init(void);
+enum therm_status system_init(void);
 
 /*
  * @brief Run all system operations
@@ -37,7 +37,7 @@ void system_run(void);
  *
  * @return TSYS_OK, TSYS_PORT_ERROR, TSYS_STORAGE_ERROR
  */
-ThermStatus system_cleanup(void);
+enum therm_status system_cleanup(void);
 
 /*
  * @brief Analyze all current storage data
@@ -48,7 +48,7 @@ ThermStatus system_cleanup(void);
  *
  * @return TSYS_OK, TSYS_ANALYZE_ERROR
  */
-ThermStatus system_analyze(void);
+enum therm_status system_analyze(void);
 
 /*
  * @brief Tell main when to shutdown

@@ -11,10 +11,10 @@
 #include "sys_utils.h"
 
 static int signal_shutdown = 0;
-static ThermStatus signal_init(void);
+static enum therm_status signal_init(void);
 static void signal_handler(int signum);
 
-ThermStatus system_init(void) {
+enum therm_status system_init(void) {
     if (port_mgr_init() != 0) {
         return TSYS_PORT_ERROR;
     }
@@ -50,7 +50,7 @@ void system_run(void) {
     }
 }
 
-ThermStatus system_cleanup(void) {
+enum therm_status system_cleanup(void) {
     int port_close_status = port_mgr_close();
     int storage_close_status = storage_mgr_close();
 
@@ -65,7 +65,7 @@ ThermStatus system_cleanup(void) {
     return TSYS_OK;
 }
 
-ThermStatus system_analyze(void) {
+enum therm_status system_analyze(void) {
     size_t capacity = 256;
     size_t count = 0;
     float *data = malloc(capacity * sizeof(float));
@@ -118,7 +118,7 @@ int system_should_shutdown(void) {
     return signal_shutdown;
 }
 
-static ThermStatus signal_init(void) {
+static enum therm_status signal_init(void) {
     struct sigaction sa = {0};
     sa.sa_handler = signal_handler;
     sigemptyset(&sa.sa_mask);
