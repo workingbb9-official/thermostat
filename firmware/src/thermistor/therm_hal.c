@@ -2,8 +2,8 @@
 
 #include <avr/io.h>
 
-#include "shared/board_config.h"
-#include "shared/bit_utils.h"
+#include <firmware/common/board_config.h>
+#include <firmware/common/bit_utils.h>
 
 void therm_init(void) {
 	// ADMUX |= (1 << REFS0);	

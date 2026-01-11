@@ -1,4 +1,4 @@
-#include "lcd/lcd.h"
+#include <firmware/lcd.h>
 
 #include "lcd_hal.h"
 

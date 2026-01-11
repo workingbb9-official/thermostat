@@ -1,7 +1,7 @@
-#include "keypad/keypad.h"
+#include <firmware/keypad.h>
 
-#include "lcd/lcd.h"
 #include <util/delay.h>
+#include <firmware/lcd.h>
 
 int main(void) {
     keypad_init();

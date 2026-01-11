@@ -1,7 +1,7 @@
 #include "state_login.h"
 
-#include "keypad/keypad.h"
-#include "lcd/lcd.h"
+#include <firmware/keypad.h>
+#include <firmware/lcd.h>
 
 #define VALID 0
 #define INVALID 1

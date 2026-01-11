@@ -1,4 +1,4 @@
-#include "thermistor/thermistor.h"
+#include <firmware/thermistor.h>
 
 #include <stdint.h>
 #include <math.h>

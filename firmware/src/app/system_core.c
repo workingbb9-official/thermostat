@@ -2,11 +2,11 @@
 
 #include <stdint.h>
 
-#include "thermistor/thermistor.h"
-#include "uart/uart.h"
-#include "lcd/lcd.h"
-#include "keypad/keypad.h"
-#include "common/protocol.h"
+#include <firmware/thermistor.h>
+#include <firmware/uart.h>
+#include <firmware/lcd.h>
+#include <firmware/keypad.h>
+#include <common/protocol.h>
 
 #include "states.h"
 #include "state_login.h"
