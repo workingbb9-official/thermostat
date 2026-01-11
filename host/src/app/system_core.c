@@ -1,12 +1,12 @@
-#include "app/system_core.h"
+#include <host/system_core.h>
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
 
-#include "storage/storage.h"
-#include "analysis/analysis.h"
-#include "port/port.h"
+#include <host/storage.h>
+#include <host/analysis.h>
+#include <host/port.h>
 #include "sys_utils.h"
 
 static int signal_shutdown = 0;

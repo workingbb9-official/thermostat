@@ -2,8 +2,8 @@
 
 #include <stdint.h>
 
-#include "storage/storage.h"
-#include "port/port.h"
+#include <host/storage.h>
+#include <host/port.h>
 
 int receive_data(DataPacket *packet) {
     uint8_t first_byte;

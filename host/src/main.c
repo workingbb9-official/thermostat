@@ -1,4 +1,4 @@
-#include "app/system_core.h"
+#include <host/system_core.h>
 #include <stdio.h>
 
 int main(void) {
