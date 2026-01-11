@@ -8,7 +8,7 @@
 #include <thermostat/protocol.h>
 
 static int16_t format_temp(float temp);
-static struct DataPacket create_temp_packet(int16_t temp_int);
+static struct data_packet create_temp_packet(int16_t temp_int);
 
 void home_run(enum sys_state *current_state) {
     static volatile uint32_t temp_timer = 0;
@@ -17,7 +17,7 @@ void home_run(enum sys_state *current_state) {
     if (temp_timer >= TEMP_DELAY) {
         const float temp = therm_mgr_get_temp();
         const int16_t temp_int = format_temp(temp);
-        const struct DataPacket temp_packet = create_temp_packet(temp_int);
+        const struct data_packet temp_packet = create_temp_packet(temp_int);
         uart_mgr_transmit(&temp_packet);
 
         lcd_mgr_clear();
@@ -39,8 +39,8 @@ static int16_t format_temp(float temp) {
     }
 }
 
-static struct DataPacket create_temp_packet(int16_t temp_int) {
-    struct DataPacket temp_packet;
+static struct data_packet create_temp_packet(int16_t temp_int) {
+    struct data_packet temp_packet;
     temp_packet.start_byte = START_BYTE;
     temp_packet.type = TEMP;
     temp_packet.length = 2;

@@ -7,7 +7,7 @@ void uart_mgr_init(void) {
     uart_init();
 }
 
-void uart_mgr_transmit(const DataPacket *packet) {
+void uart_mgr_transmit(const struct data_packet *packet) {
     uart_transmit_byte(packet->start_byte);
     uart_transmit_byte(packet->type);
     uart_transmit_byte(packet->length);

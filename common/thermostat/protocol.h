@@ -9,12 +9,12 @@
 #define TEMP 0x02
 #define STATS 0x03
 
-typedef struct __attribute__((packed)) DataPacket {
+struct data_packet {
     uint8_t start_byte;
     uint8_t type;
     uint8_t length;
     uint8_t payload[MAX_PAYLOAD];
     uint8_t checksum;
-} DataPacket;
+} __attribute__((packed));
 
 #endif // PROTOCOL_H

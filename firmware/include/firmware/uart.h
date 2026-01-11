@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-typedef struct __attribute__((packed)) DataPacket DataPacket;
+struct data_packet;
 
 /*
  * @brief Initialize UART for transmission
@@ -19,6 +19,6 @@ void uart_mgr_init(void);
  * Loop over payload using the length provided
  *
  */
-void uart_mgr_transmit(const DataPacket *packet);
+void uart_mgr_transmit(const struct data_packet *packet);
 
 #endif // UART_MGR_H

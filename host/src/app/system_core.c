@@ -28,7 +28,7 @@ ThermStatus system_init(void) {
 }
 
 void system_run(void) {
-    DataPacket packet = {0};
+    struct data_packet packet = {0};
     int receive_status = receive_data(&packet);
 
     if (receive_status == -1) {

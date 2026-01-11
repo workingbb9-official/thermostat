@@ -6,7 +6,7 @@
 #include <host/port.h>
 #include <thermostat/protocol.h>
 
-int receive_data(DataPacket *packet) {
+int receive_data(struct data_packet *packet) {
     uint8_t first_byte;
     if (port_mgr_read_byte(&first_byte) != 0) {
         return -2;
@@ -66,7 +66,7 @@ int receive_data(DataPacket *packet) {
     return 0;
 }
 
-int store_temp(const DataPacket *packet) {
+int store_temp(const struct data_packet *packet) {
     const int16_t value = (int16_t) (((uint16_t) packet->payload[0] << 8) | packet->payload[1]);
     const float data = value / 100.0f;
     return storage_mgr_write_temp(data);
