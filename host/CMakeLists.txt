@@ -14,7 +14,7 @@ add_executable(host
 target_include_directories(host
     PUBLIC include
     PRIVATE src/app
-    PRIVATE ..
+    PRIVATE ../common
 )
 target_link_libraries(host
     PRIVATE

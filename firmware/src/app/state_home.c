@@ -5,7 +5,7 @@
 #include <firmware/thermistor.h>
 #include <firmware/uart.h>
 #include <firmware/lcd.h>
-#include <common/protocol.h>
+#include <thermostat/protocol.h>
 
 static int16_t format_temp(float temp);
 static struct DataPacket create_temp_packet(int16_t temp_int);

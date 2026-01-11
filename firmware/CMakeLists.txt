@@ -29,7 +29,7 @@ add_executable(thermostat
 )
 target_include_directories(thermostat
     PUBLIC include
-    PRIVATE ..
+    PRIVATE ../common
     PRIVATE src/app
 )
 target_link_libraries(thermostat

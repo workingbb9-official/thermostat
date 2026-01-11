@@ -1,7 +1,7 @@
 #ifndef SYS_UTILS_H
 #define SYS_UTILS_H
 
-#include <common/protocol.h>
+typedef struct __attribute__((packed)) DataPacket DataPacket;
 
 /* @brief Receive data from serial port
  * @param 0-initialized Data packet

@@ -7,6 +7,7 @@
 #include <host/storage.h>
 #include <host/analysis.h>
 #include <host/port.h>
+#include <thermostat/protocol.h>
 #include "sys_utils.h"
 
 static int signal_shutdown = 0;

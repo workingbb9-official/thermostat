@@ -4,6 +4,7 @@
 
 #include <host/storage.h>
 #include <host/port.h>
+#include <thermostat/protocol.h>
 
 int receive_data(DataPacket *packet) {
     uint8_t first_byte;

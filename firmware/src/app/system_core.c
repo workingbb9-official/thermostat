@@ -6,7 +6,6 @@
 #include <firmware/uart.h>
 #include <firmware/lcd.h>
 #include <firmware/keypad.h>
-#include <common/protocol.h>
 
 #include "states.h"
 #include "state_login.h"

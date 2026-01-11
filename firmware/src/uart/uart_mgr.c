@@ -1,7 +1,7 @@
 #include <firmware/uart.h>
 
 #include "uart_hal.h"
-#include <common/protocol.h>
+#include <thermostat/protocol.h>
 
 void uart_mgr_init(void) {
     uart_init();
