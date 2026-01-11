@@ -45,8 +45,8 @@ static struct data_packet create_temp_packet(int16_t temp_int) {
     temp_packet.type = TEMP;
     temp_packet.length = 2;
 
-    uint8_t high_byte = (uint8_t) temp_int >> 8;
-    uint8_t low_byte = (uint8_t) temp_int & 0xFF;
+    uint8_t high_byte = (uint8_t) (temp_int >> 8);
+    uint8_t low_byte = (uint8_t) (temp_int & 0xFF);
     temp_packet.payload[0] = high_byte;
     temp_packet.payload[1] = low_byte;
 
