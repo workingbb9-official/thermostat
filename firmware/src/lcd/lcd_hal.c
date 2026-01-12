@@ -28,7 +28,7 @@ void lcd_init(void) {
 	CLR_BIT(PORTC, LCD_DP4);
 
 	// Ensure 8-bit mode
-	lcd_send_4_bits(0x30);	
+	lcd_send_4_bits(0x30);
 	_delay_us(500);
 	lcd_send_4_bits(0x30);
 	_delay_us(200);

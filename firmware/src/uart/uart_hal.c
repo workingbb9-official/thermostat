@@ -26,3 +26,8 @@ void uart_transmit_byte(uint8_t byte) {
 	while (!(UCSR0A & (1 << UDRE0)));   // Wait for buffer to clear
 	UDR0 = byte;
 }
+
+uint8_t uart_receive_byte(void) {
+    while (!(UCSR0A & (1 << RXC0)));
+    return UDR0;
+}

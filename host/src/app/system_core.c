@@ -14,6 +14,14 @@ static int signal_shutdown = 0;
 static enum therm_status signal_init(void);
 static void signal_handler(int signum);
 
+struct statistics {
+    float average;
+    float max;
+    float min;
+};
+
+static struct statistics global_stats = {0};
+
 enum therm_status system_init(void) {
     if (port_mgr_init() != 0) {
         return TSYS_PORT_ERROR;
@@ -23,7 +31,7 @@ enum therm_status system_init(void) {
         port_mgr_close();
         return TSYS_STORAGE_ERROR;
     }
-    
+
     return signal_init();
 }
 
@@ -43,6 +51,17 @@ void system_run(void) {
     case TEMP:
         store_temp(&packet);
         printf("Handled temp\n");
+        break;
+    case STATS:
+        if (system_analyze() != TSYS_OK) {
+            printf("Error analyze\n");
+            break;
+        }
+        if (send_stats(global_stats.average) != 0) {
+            printf("Error sending stats\n");
+            break;
+        }
+        printf("Sent stats\n");
         break;
     default:
         printf("Invalid type\n");
@@ -94,20 +113,21 @@ enum therm_status system_analyze(void) {
             data = temp_ptr;
         }
 
-        printf("Data line: %.2f\n", temp_line);
         data[count] = temp_line;
 
         ++count;
         ++line;
     }
 
-    const float average = analyze_average(data, (size_t) count);
-    const float max = analyze_max(data, (size_t) count);
-    const float min = analyze_min(data, (size_t) count);
+    global_stats.average = analyze_average(data, (size_t) count);
+    global_stats.max = analyze_max(data, (size_t) count);
+    global_stats.min = analyze_min(data, (size_t) count);
 
-    printf("\n\n\nAverage: %.2f\n", average);
-    printf("Max: %.2f\n", max);
-    printf("Min: %.2f\n", min);
+
+
+    printf("Average: %.2f\n", global_stats.average);
+    printf("Max: %.2f\n", global_stats.max);
+    printf("Min: %.2f\n", global_stats.min);
 
     free(data);
     data = NULL;

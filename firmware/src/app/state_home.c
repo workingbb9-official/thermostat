@@ -32,7 +32,7 @@ void home_run(enum sys_state *current_state) {
 
         temp_timer = 0;
     }
-    
+
     const char key = keypad_read();
     if (key == '#') {
         temp_timer = (uint32_t) TEMP_DELAY; // Prime the timer

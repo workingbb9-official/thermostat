@@ -7,8 +7,10 @@
  * @brief Display stats
  *
  * INCOMPLETE
- * This function only switches text
+ * This function only writes average
+ * Host should send average as payload[0] and payload[1]
  * Press 'A' to go back home
+ *
  */
 void stats_run(enum sys_state *current_state);
 

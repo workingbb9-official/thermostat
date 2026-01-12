@@ -30,6 +30,10 @@ int port_mgr_read_byte(char *buffer) {
     return 0;
 }
 
+int port_mgr_write_byte(char byte) {
+    return port_write(port_fd, &byte, 1);
+}
+
 int port_mgr_close(void) {
     return port_close(port_fd);
 }

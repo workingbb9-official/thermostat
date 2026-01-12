@@ -21,15 +21,23 @@ int port_open(const char *file_path);
 int port_configure(int port, int baud_rate);
 
 /*
- * @brief Reads bytes from given port
+ * @brief Read bytes from given port
  * @param Fd of port, buffer to store data, # of bytes to read
  *
  * @return 0 for success, -1 for invalid params, -2 for syserror
  */
 int port_read(int fd, char *buffer, int bytes);
 
+/*
+ * @brief Write bytes to given port
+ * @param Fd of port, buffer to write, # of bytes to write
+ *
+ * @return 0 for success, -1 for invalid params, -2 for syserror
+ */
+int port_write(int fd, const char *buffer, int bytes);
+
 /**
- * @brief Closes serial port
+ * @brief Close serial port
  * @param Fd of port
  *
  * @return 0 for success, -1 for error

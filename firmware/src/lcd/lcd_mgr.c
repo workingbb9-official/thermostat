@@ -32,7 +32,7 @@ void lcd_mgr_set_cursor(uint8_t row, uint8_t col) {
 }
 
 void lcd_mgr_write_int(int16_t value) {
-    
+
     char string[8];
     itoa(string, value);
 

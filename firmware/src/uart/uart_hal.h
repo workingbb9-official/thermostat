@@ -16,4 +16,11 @@ void uart_init(void);
  */
 void uart_transmit_byte(uint8_t byte);
 
+/**
+ * @brief Receive a byte over UART
+ *
+ *@return Byte received
+ */
+ uint8_t uart_receive_byte(void);
+
 #endif // UART_H
