@@ -4,12 +4,13 @@
 #include <firmware/lcd.h>
 #include "states.h"
 
-#define VALID 0
-#define INVALID 1
+enum password_state {
+    VALID = 0
+    INVALID
+} __attribute__((packed));
 
 const char PASSWORD[PASSWORD_LEN] = "1234";
-
-static uint8_t validate_input(const char *user_input);
+static enum password_state validate_input(const char *user_input);
 
 void login_run(enum sys_state *current_state) {
     static char user_input[PASSWORD_LEN] = {0};
@@ -27,25 +28,23 @@ void login_run(enum sys_state *current_state) {
     ++pos;
     last_key = key;
 
+    lcd_mgr_clear();
     if (pos != PASSWORD_LEN) {
-        lcd_mgr_clear();
         lcd_mgr_write(user_input);
         return;
     }
 
     if (validate_input(user_input) == VALID) {
-        lcd_mgr_clear();
         lcd_mgr_write("Logging you in");
         pos = 0;
         *current_state = STATE_HOME;
     } else {
-        lcd_mgr_clear();
         lcd_mgr_write("Invalid password");
         pos = 0;
     }
 }
 
-static uint8_t validate_input(const char *user_input) {
+static enum password_state validate_input(const char *user_input) {
     for (uint8_t i = 0; i < PASSWORD_LEN; ++i) {
         if (user_input[i] != PASSWORD[i]) {
             return INVALID;

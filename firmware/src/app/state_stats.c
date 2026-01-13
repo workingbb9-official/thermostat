@@ -15,7 +15,7 @@
 enum extreme {
     MAX = 0,
     MIN
-};
+} __attribute__((packed));
 
 static void ask_for_stats(void);
 static void receive_and_display_stats(enum extreme current_extreme);
