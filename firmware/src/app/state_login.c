@@ -2,6 +2,7 @@
 
 #include <firmware/keypad.h>
 #include <firmware/lcd.h>
+#include "states.h"
 
 #define VALID 0
 #define INVALID 1
@@ -19,19 +20,19 @@ void login_run(enum sys_state *current_state) {
     if (key == NO_KEY || key == last_key) {
         return;
     }
-    
+
     // Store key and terminate string
     user_input[pos] = key;
     user_input[pos + 1] = '\0';
     ++pos;
     last_key = key;
-    
+
     if (pos != PASSWORD_LEN) {
         lcd_mgr_clear();
         lcd_mgr_write(user_input);
         return;
     }
-        
+
     if (validate_input(user_input) == VALID) {
         lcd_mgr_clear();
         lcd_mgr_write("Logging you in");

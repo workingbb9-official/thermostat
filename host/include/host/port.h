@@ -2,7 +2,7 @@
 #define PORT_MGR_H
 
 /*
- * @brief Handles opening and config of port
+ * @brief Open and configure port
  *
  * Module holds internal port data such as path
  * Specific settings are found in port.h
@@ -12,7 +12,7 @@
 int port_mgr_init(void);
 
 /*
- * @brief Reads a byte from the port
+ * @brief Read a byte from the port
  * @param Buffer to read byte into
  *
  * @return 0 for success, -1 for invalid params, -2 for syserror
@@ -20,7 +20,15 @@ int port_mgr_init(void);
 int port_mgr_read_byte(char *buffer); 
 
 /*
- * @brief Closes the port
+ * @brief Write a byte to the port
+ * @param Byte to write
+ *
+ * @return 0 for success, -2 for syserror
+ */
+int port_mgr_write_byte(char byte);
+
+/*
+ * @brief Close the port
  * 
  * @return 0 for success, -1 for error
  */

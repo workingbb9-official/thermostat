@@ -22,7 +22,7 @@ int storage_mgr_write_temp(float data) {
     const int len = snprintf(buffer, sizeof(buffer) - 1, "%.2f", data);
     buffer[len] = '\0';
 
-    
+
     if (file_seek(temp_fd, END) != 0) {
         return -1;
     }
@@ -38,7 +38,7 @@ int storage_mgr_read_temp(float *buffer, int line) {
     if (!buffer || line <= 0) {
         return -1;
     }
-    
+
     if (file_seek(temp_fd, START) != 0) {
         return -2;
     }
@@ -47,7 +47,7 @@ int storage_mgr_read_temp(float *buffer, int line) {
     if (file_read_line(temp_fd, text, sizeof(text) - 1, line) <= 0) {
         return -2;
     }
-    
+
     *buffer = strtof(text, NULL);
 
     return 0;

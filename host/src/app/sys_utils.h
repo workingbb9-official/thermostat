@@ -24,4 +24,17 @@ int receive_data(struct data_packet *packet);
  */
 int store_temp(const struct data_packet *packet);
 
+/*
+ * @brief Send stats to serial port
+ * @param Average, max, min
+ *
+ * Constructs data packet
+ * Average is split into packet[0] and [1]
+ * Max split same way in [2] and [3]
+ * Min split into [4] and [5]
+ *
+ * @return 0 for success, negative for errors
+ */
+int send_stats(float avg, float max, float min);
+
 #endif // SYS_UTILS_H

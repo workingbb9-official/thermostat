@@ -15,7 +15,7 @@ const char key_map[ROWS][COLS] = {
 };
 
 void keypad_init(void) {
-	// Col type 
+	// Col type
 	SET_BIT(DDRB, DDB1);
 	SET_BIT(DDRB, DDB2);
 	SET_BIT(DDRB, DDB3);
@@ -26,8 +26,8 @@ void keypad_init(void) {
 	SET_BIT(PORTB, PORTB2);
 	SET_BIT(PORTB, PORTB3);
 	SET_BIT(PORTB, PORTB4);
-	
-	// Row type 
+
+	// Row type
 	CLR_BIT(DDRB, DDB0);
 	CLR_BIT(DDRD, DDD5);
 	CLR_BIT(DDRD, DDD6);
@@ -44,7 +44,7 @@ void keypad_init(void) {
 
 char keypad_read(void) {
     static const uint8_t col_bits[COLS] = {PORTB1, PORTB2, PORTB3, PORTB4};
-    
+
     // Omit a row because it sits on a diff reg (pinb)
     static const uint8_t row_bits[ROWS - 1] = {PIND5, PIND6, PIND7};
 
@@ -56,7 +56,7 @@ char keypad_read(void) {
             SET_BIT(PORTB, col_bits[col]);
             return key_map[pressed_row][col];
         }
-        
+
         // Check the other one
         if (READ_BIT(PINB, PINB0)) {
             SET_BIT(PORTB, col_bits[col]);

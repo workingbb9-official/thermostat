@@ -70,6 +70,19 @@ int port_read(int fd, char *buffer, int bytes) {
     return 0;
 }
 
+int port_write(int fd, const char *buffer, int bytes) {
+    if (fd < 0 ||
+        !buffer) {
+        return -1;
+    }
+    
+    if (write(fd, buffer, bytes) != bytes) {
+        return -2;
+    }
+    
+    return 0;
+}
+
 int port_close(int fd) {
     return close(fd);
 }

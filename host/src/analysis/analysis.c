@@ -6,7 +6,7 @@ float analyze_average(const float *data, size_t length) {
         total += data[i];
     }
     return total / length;
-} 
+}
 
 float analyze_max(const float *data, size_t length) {
     float max = -89.2f;

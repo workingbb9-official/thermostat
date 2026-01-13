@@ -3,14 +3,13 @@
 
 #include "states.h"
 
-#define TEMP_DELAY 1250000UL
-
 /*
  * @brief Handle logic for the home/menu
  * @param Pointer to current system state
  *
  * This function will read temp from thermistor
  * It will format that data and send it to host
+ * Press '#' to go to stats screen
  *
  */
 void home_run(enum sys_state *current_state);
