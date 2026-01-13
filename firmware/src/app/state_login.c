@@ -5,7 +5,7 @@
 #include "states.h"
 
 enum password_state {
-    VALID = 0
+    VALID = 0,
     INVALID
 } __attribute__((packed));
 
