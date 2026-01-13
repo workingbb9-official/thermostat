@@ -10,6 +10,7 @@
 #include "states.h"
 
 #define TEMP_DELAY 125000UL
+#define GO_STATS '#'
 
 static int16_t format_temp(float temp);
 static struct data_packet create_temp_packet(int16_t temp_int);
@@ -34,7 +35,7 @@ void home_run(enum sys_state *current_state) {
     }
 
     const char key = keypad_read();
-    if (key == '#') {
+    if (key == GO_STATS) {
         temp_timer = (uint32_t) TEMP_DELAY; // Prime the timer
         *current_state = STATE_STATS;
     }

@@ -57,7 +57,7 @@ void system_run(void) {
             printf("Error analyze\n");
             break;
         }
-        if (send_stats(global_stats.average) != 0) {
+        if (send_stats(global_stats.average, global_stats.max, global_stats.min) != 0) {
             printf("Error sending stats\n");
             break;
         }

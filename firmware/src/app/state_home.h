@@ -9,6 +9,7 @@
  *
  * This function will read temp from thermistor
  * It will format that data and send it to host
+ * Press '#' to go to stats screen
  *
  */
 void home_run(enum sys_state *current_state);

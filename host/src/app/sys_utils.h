@@ -35,6 +35,6 @@ int store_temp(const struct data_packet *packet);
  *
  * @return 0 for success, negative for errors
  */
-int send_stats(float avg);
+int send_stats(float avg, float max, float min);
 
 #endif // SYS_UTILS_H

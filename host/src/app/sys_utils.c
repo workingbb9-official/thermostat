@@ -74,11 +74,11 @@ int store_temp(const struct data_packet *packet) {
     return storage_mgr_write_temp(data);
 }
 
-int send_stats(float avg) {
+int send_stats(float avg, float max, float min) {
     struct data_packet stats_packet = {0};
     stats_packet.start_byte = START_BYTE;
     stats_packet.type = STATS;
-    stats_packet.length = 2;
+    stats_packet.length = 6;
 
     int16_t avg_scaled = (int16_t) (100.0f * avg);
     uint8_t avg_high = (uint8_t) (avg_scaled >> 8);
@@ -86,7 +86,19 @@ int send_stats(float avg) {
     stats_packet.payload[0] = avg_high;
     stats_packet.payload[1] = avg_low;
 
-    stats_packet.checksum = 2;
+    int16_t max_scaled = (int16_t) (100.0f * max);
+    uint8_t max_high = (uint8_t) (max_scaled >> 8);
+    uint8_t max_low = (uint8_t) (max_scaled & 0xFF);
+    stats_packet.payload[2] = max_high;
+    stats_packet.payload[3] = max_low;
+
+    int16_t min_scaled = (int16_t) (100.0f * min);
+    uint8_t min_high = (uint8_t) (min_scaled >> 8);
+    uint8_t min_low = (uint8_t) (min_scaled & 0xFF);
+    stats_packet.payload[4] = min_high;
+    stats_packet.payload[5] = min_low;
+
+    stats_packet.checksum = 6;
     return send_packet(&stats_packet);
 }
 

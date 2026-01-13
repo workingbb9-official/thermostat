@@ -13,6 +13,10 @@ void lcd_mgr_clear(void) {
     for (uint8_t i = 0; i < 16; ++i) {
         lcd_write_byte(' ');
     }
+    lcd_mgr_set_cursor(1, 0);
+    for (uint8_t i = 0; i < 16; ++i) {
+        lcd_write_byte(' ');
+    }
     lcd_mgr_set_cursor(0, 0);
 }
 
