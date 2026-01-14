@@ -15,7 +15,7 @@ void system_init(void) {
     therm_mgr_init();
     uart_mgr_init();
     lcd_mgr_init();
-    keypad_init();
+    keypad_mgr_init();
 }
 
 void system_run(void) {
