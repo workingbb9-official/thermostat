@@ -8,7 +8,7 @@
 #include <thermostat/protocol.h>
 #include "states.h"
 
-#define STATS_DELAY 1000000UL
+#define STATS_DELAY 700000UL
 #define GO_HOME 'A'
 #define SWITCH_EXTREME 'B'
 
@@ -41,6 +41,11 @@ void stats_run(enum sys_state *current_state) {
     }
 
     const struct keypad_state keypad = keypad_mgr_read();
+    if (keypad.current_key == NO_KEY ||
+        keypad.current_key == keypad.last_key) {
+        return;
+    }
+
     if (keypad.current_key == GO_HOME) {
         stats_timer = (uint32_t) STATS_DELAY;
         *current_state = STATE_HOME;

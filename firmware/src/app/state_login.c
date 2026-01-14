@@ -15,11 +15,10 @@ static enum password_state validate_input(const char *user_input);
 void login_run(enum sys_state *current_state) {
     static char user_input[PASSWORD_LEN] = {0};
     static int pos = 0;
-    static char last_key = NO_KEY;
 
     const struct keypad_state keypad = keypad_mgr_read();
     if (keypad.current_key == NO_KEY || 
-        keypad.current_key == last_key) {
+        keypad.current_key == keypad.last_key) {
         return;
     }
 
@@ -27,7 +26,6 @@ void login_run(enum sys_state *current_state) {
     user_input[pos] = keypad.current_key;
     user_input[pos + 1] = '\0';
     ++pos;
-    last_key = keypad.current_key;
 
     lcd_mgr_clear();
     if (pos != PASSWORD_LEN) {
