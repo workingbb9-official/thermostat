@@ -1,6 +1,7 @@
-add_library(keypad_lib STATIC keypad.c)
+add_library(keypad_lib STATIC keypad_hal.c keypad_mgr.c)
 target_include_directories(keypad_lib
     PUBLIC ${CMAKE_SOURCE_DIR}/include
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 if (TESTS)

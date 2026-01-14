@@ -1,28 +1,27 @@
-#ifndef KEYPAD_H
-#define KEYPAD_H
+#ifndef KEYPAD_MGR_H
+#define KEYPAD_MGR_H
 
-#define ROWS 4
-#define COLS 4
 #define NO_KEY '\0'
+struct keypad_state {
+    char last_key;
+    char current_key;
+} __attribute__((packed));
 
 /*
  * @brief Initialize keypad
  *
- * This function enables cols as outputs
- * Rows are input pullups
- *
  */
-void keypad_init(void);
+void keypad_mgr_init(void);
 
 /*
- * @brief Read from keypad
+ * @brief Get the keypad state
  *
- * This function sets each column to 0
- * If a row is also 0, that key is pressed
+ * Access struct fields to see last and current key
+ * This can be used for debouncing / stop key spam
  *
- * @return Pressed key, (NO_KEY if not pressed)
+ * @return Current keypad state (definition above)
  */
-char keypad_read(void);
+struct keypad_state keypad_mgr_read(void);
 
 
-#endif // KEYPAD_H
+#endif // KEYPAD_MGR_H

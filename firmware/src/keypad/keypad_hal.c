@@ -1,4 +1,4 @@
-#include <firmware/keypad.h>
+#include "keypad_hal.h"
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -72,7 +72,7 @@ char keypad_read(void) {
         return key_map[3][col];
     }
 
-    return NO_KEY;
+    return '\0';
 }
 
 static int8_t check_rows(const uint8_t *row_bits) {

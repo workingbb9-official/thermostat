@@ -34,8 +34,8 @@ void home_run(enum sys_state *current_state) {
         temp_timer = 0;
     }
 
-    const char key = keypad_read();
-    if (key == GO_STATS) {
+    const struct keypad_state keypad = keypad_mgr_read();
+    if (keypad.current_key == GO_STATS) {
         temp_timer = (uint32_t) TEMP_DELAY; // Prime the timer
         *current_state = STATE_STATS;
     }
