@@ -7,7 +7,7 @@ struct data_packet;
 enum packet_status {
     INVALID_PACKET = 0,
     VALID_PACKET
-};
+} __attribute__((packed));
 
 /*
  * @brief Initialize UART for transmission
