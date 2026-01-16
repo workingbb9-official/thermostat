@@ -11,6 +11,18 @@
 
 #define TEMP_DELAY 125000UL
 #define GO_STATS '#'
+#define FALSE 0
+#define TRUE (!FALSE)
+
+static struct {
+    uint32_t timer;
+    int16_t temp;
+    uint8_t display_temp : 1;
+    uint8_t send_temp : 1;
+} home_data = {
+    .timer = 0,
+    .temp = 0
+};
 
 static int16_t format_temp(float temp);
 static struct data_packet create_temp_packet(int16_t temp_int);
@@ -63,3 +75,61 @@ static struct data_packet create_temp_packet(int16_t temp_int) {
     temp_packet.checksum = 2;
     return temp_packet;
 }
+
+static void home_init(void) {
+    home_data.timer = TEMP_DELAY;
+}
+
+static void home_keypress(enum sys_state *current_state) {
+    const struct keypad_state keypad = keypad_mgr_read();
+    switch (keypad.current_key) {
+    case GO_STATS:
+        *current_state = STATE_STATS;
+        break;
+    default:
+        break;
+    }
+}
+
+static void home_display(void) {
+    if (home_data.display_temp) {
+        lcd_mgr_clear();
+        lcd_mgr_write("Temp: ");
+        lcd_mgr_write_int(home_data.temp / 100); // High part
+        lcd_mgr_write(".");
+        lcd_mgr_write_int(home_data.temp % 100); // Low part
+        home_data.display_temp = FALSE;
+    }
+}
+
+static void home_process(void) {
+    if (++home_data.timer >= TEMP_DELAY) {
+        const float raw_temp = therm_mgr_get_temp();
+        home_data.temp = format_temp(raw_temp);
+        home_data.display_temp = TRUE;
+        home_data.send_temp = TRUE;
+        home_data.timer = 0;
+    }
+}
+
+static void home_send(void) {
+    if (home_data.send_temp) {
+        struct data_packet temp_packet = create_temp_packet(home_data.temp);
+        uart_mgr_transmit(&temp_packet);
+        home_data.send_temp = FALSE;
+    }
+}
+
+static void home_exit(void) {
+    home_data.timer = TEMP_DELAY;
+}
+
+const struct state_actions home_state = {
+    .init = &home_init,
+    .on_keypress = &home_keypress,
+    .display = &home_display,
+    .process = &home_process,
+    .send = &home_send,
+    .receive = 0,
+    .exit = &home_exit
+};

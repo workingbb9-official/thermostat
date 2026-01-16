@@ -98,3 +98,5 @@ static void display_stats(const struct stats *current_stats, enum extreme curren
         lcd_mgr_write_int(current_stats->min % 100);
     }
 }
+
+const struct state_actions stats_state = {0};

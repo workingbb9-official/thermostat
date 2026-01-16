@@ -52,3 +52,5 @@ static enum password_state validate_input(const char *user_input) {
 
     return VALID;
 }
+
+const struct state_actions login_state = {0};

@@ -24,7 +24,10 @@ void system_run(void) {
         login_run(&current_state);
         break;
     case STATE_HOME:
-        home_run(&current_state);
+        home_state.process();
+        home_state.on_keypress(&current_state);
+        home_state.display();
+        home_state.send();
         break;
     case STATE_STATS:
         stats_run(&current_state);
