@@ -1,5 +1,3 @@
-#include "state_stats.h"
-
 #include <stdint.h>
 
 #include <firmware/keypad.h>
@@ -11,6 +9,8 @@
 #define STATS_DELAY 700000UL
 #define GO_HOME 'A'
 #define SWITCH_EXTREME 'B'
+#define FALSE 0
+#define TRUE (!FALSE)
 
 enum extreme {
     MAX = 0,
@@ -21,25 +21,45 @@ struct stats {
    int16_t avg;
    int16_t max;
    int16_t min;
-} __attribute__((packed));
+}; 
 
-static void ask_for_stats(void);
+static struct {
+    uint32_t timer;
+    enum extreme current_extreme;
+    struct stats current_stats;
+    uint8_t display_stats : 1;
+    uint8_t receive_stats : 1;
+    uint8_t request_stats : 1;
+    uint8_t go_home : 1;
+} stats_data;
+
+void stats_init(void);
+void stats_keypress(void);
+void stats_process(void);
+void stats_display(void);
+void stats_send(void);
+void stats_receive(void);
+void stats_exit(void);
+
+const struct state_actions stats_state = {
+    .init = &stats_init,
+    .on_keypress = &stats_keypress,
+    .process = &stats_process,
+    .display = &stats_display,
+    .send = &stats_send,
+    .receive = &stats_receive,
+    .exit = 0
+};
+
 static void receive_stats(struct stats *stats_out);
 static void display_stats(const struct stats *current_stats, enum extreme current_extreme);
 
-void stats_run(enum sys_state *current_state) {
-    static struct stats current_stats= {0};
-    static enum extreme current_extreme = MAX;
-    static volatile uint32_t stats_timer = (uint32_t) STATS_DELAY;
-    ++stats_timer;
+void stats_init(void) {
+    stats_data.timer = STATS_DELAY;
+    stats_data.current_extreme = MAX;
+}
 
-    if (stats_timer >= STATS_DELAY) {
-        ask_for_stats();
-        receive_stats(&current_stats);
-        display_stats(&current_stats, current_extreme);
-        stats_timer = 0;
-    }
-
+void stats_keypress(void) {
     const struct keypad_state keypad = keypad_mgr_read();
     if (keypad.current_key == NO_KEY ||
         keypad.current_key == keypad.last_key) {
@@ -47,22 +67,55 @@ void stats_run(enum sys_state *current_state) {
     }
 
     if (keypad.current_key == GO_HOME) {
-        stats_timer = (uint32_t) STATS_DELAY;
-        *current_state = STATE_HOME;
+        stats_data.go_home = TRUE;
     } else if (keypad.current_key == SWITCH_EXTREME) {
-        current_extreme = !current_extreme;
-        display_stats(&current_stats, current_extreme);
+        stats_data.current_extreme = !stats_data.current_extreme;
+        stats_data.display_stats = TRUE;
     }
 }
 
-static void ask_for_stats(void) {
-    struct data_packet request_packet = {0};
-    request_packet.start_byte = START_BYTE;
-    request_packet.type = STATS;
-    request_packet.length = 1;
-    request_packet.payload[0] = START_BYTE;
-    request_packet.checksum = 1;
-    uart_mgr_transmit(&request_packet);
+void stats_process(void) {
+    if (stats_data.go_home) {
+        sys_change_state(&home_state);
+        stats_data.go_home = FALSE;
+        return;
+    }
+    
+    ++stats_data.timer;
+    if (stats_data.timer >= STATS_DELAY) {
+        stats_data.request_stats = TRUE;
+        stats_data.timer = 0;
+    }
+}
+
+void stats_display(void) {
+    if (stats_data.display_stats) {
+        display_stats(&stats_data.current_stats, stats_data.current_extreme);
+        stats_data.display_stats = FALSE;
+    }
+}
+
+void stats_send(void) {
+    if (stats_data.request_stats) {
+        struct data_packet stats_req = {
+            .start_byte = START_BYTE,
+            .type = STATS,
+            .length = 1,
+            .payload[0] = START_BYTE,
+            .checksum = 1
+        };
+        uart_mgr_transmit(&stats_req);
+        stats_data.request_stats = FALSE;
+        stats_data.receive_stats = TRUE;
+    }
+}
+
+void stats_receive(void) {
+    if (stats_data.receive_stats) {
+        receive_stats(&stats_data.current_stats);
+        stats_data.receive_stats = FALSE;
+        stats_data.display_stats = TRUE;
+    }
 }
 
 static void receive_stats(struct stats *stats_out) {
@@ -98,5 +151,3 @@ static void display_stats(const struct stats *current_stats, enum extreme curren
         lcd_mgr_write_int(current_stats->min % 100);
     }
 }
-
-const struct state_actions stats_state = {0};

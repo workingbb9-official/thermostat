@@ -26,7 +26,7 @@ static struct {
 };
 
 static void login_init(void);
-static void login_keypress(enum sys_state *current_state);
+static void login_keypress(void);
 static void login_process(void);
 static void login_display(void);
 
@@ -49,7 +49,7 @@ static void login_init(void) {
     login_data.display_invalid = FALSE;
 }
 
-static void login_keypress(enum sys_state *current_state) {
+static void login_keypress(void) {
     const struct keypad_state keypad = keypad_mgr_read();
     if (keypad.current_key == NO_KEY ||
         keypad.current_key == keypad.last_key) {

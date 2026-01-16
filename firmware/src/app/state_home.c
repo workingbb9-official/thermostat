@@ -23,7 +23,7 @@ static struct {
 };
 
 static void home_init(void);
-static void home_keypress(enum sys_state *current_state);
+static void home_keypress(void);
 static void home_process(void);
 static void home_display(void);
 static void home_send(void);
@@ -46,10 +46,10 @@ static void home_init(void) {
     home_data.timer = TEMP_DELAY;
 }
 
-static void home_keypress(enum sys_state *current_state) {
+static void home_keypress(void) {
     const struct keypad_state keypad = keypad_mgr_read();
     if (keypad.current_key == GO_STATS) {
-        *current_state = STATE_STATS;
+        sys_change_state(&stats_state);
     }
 }
 
