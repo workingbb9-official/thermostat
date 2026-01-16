@@ -1,5 +1,3 @@
-#include "state_home.h"
-
 #include <stdint.h>
 
 #include <firmware/thermistor.h>
@@ -24,57 +22,25 @@ static struct {
     .temp = 0
 };
 
+static void home_init(void);
+static void home_keypress(enum sys_state *current_state);
+static void home_process(void);
+static void home_display(void);
+static void home_send(void);
+static void home_exit(void);
+
+const struct state_actions home_state = {
+    .init = &home_init,
+    .on_keypress = &home_keypress,
+    .display = &home_display,
+    .process = &home_process,
+    .send = &home_send,
+    .receive = 0,
+    .exit = &home_exit
+};
+
 static int16_t format_temp(float temp);
 static struct data_packet create_temp_packet(int16_t temp_int);
-
-void home_run(enum sys_state *current_state) {
-    static volatile uint32_t temp_timer = 0;
-    ++temp_timer;
-
-    if (temp_timer >= TEMP_DELAY) {
-        const float temp = therm_mgr_get_temp();
-        const int16_t temp_int = format_temp(temp);
-        const struct data_packet temp_packet = create_temp_packet(temp_int);
-        uart_mgr_transmit(&temp_packet);
-
-        lcd_mgr_clear();
-        lcd_mgr_write("Temp: ");
-        lcd_mgr_write_int(temp_int / 100); // High part
-        lcd_mgr_write(".");
-        lcd_mgr_write_int(temp_int % 100); // Low part
-
-        temp_timer = 0;
-    }
-
-    const struct keypad_state keypad = keypad_mgr_read();
-    if (keypad.current_key == GO_STATS) {
-        temp_timer = (uint32_t) TEMP_DELAY; // Prime the timer
-        *current_state = STATE_STATS;
-    }
-}
-
-static int16_t format_temp(float temp) {
-    if (temp > 0.0f) {
-        return (int16_t) 100.0f * temp + 0.5f;
-    } else {
-        return (int16_t) 100.0f * temp - 0.5f;
-    }
-}
-
-static struct data_packet create_temp_packet(int16_t temp_int) {
-    struct data_packet temp_packet;
-    temp_packet.start_byte = START_BYTE;
-    temp_packet.type = TEMP;
-    temp_packet.length = 2;
-
-    uint8_t high_byte = (uint8_t) (temp_int >> 8);
-    uint8_t low_byte = (uint8_t) (temp_int & 0xFF);
-    temp_packet.payload[0] = high_byte;
-    temp_packet.payload[1] = low_byte;
-
-    temp_packet.checksum = 2;
-    return temp_packet;
-}
 
 static void home_init(void) {
     home_data.timer = TEMP_DELAY;
@@ -82,12 +48,19 @@ static void home_init(void) {
 
 static void home_keypress(enum sys_state *current_state) {
     const struct keypad_state keypad = keypad_mgr_read();
-    switch (keypad.current_key) {
-    case GO_STATS:
+    if (keypad.current_key == GO_STATS) {
         *current_state = STATE_STATS;
-        break;
-    default:
-        break;
+    }
+}
+
+static void home_process(void) {
+    ++home_data.timer;
+    if (home_data.timer >= TEMP_DELAY) {
+        const float raw_temp = therm_mgr_get_temp();
+        home_data.temp = format_temp(raw_temp);
+        home_data.display_temp = TRUE;
+        home_data.send_temp = TRUE;
+        home_data.timer = 0;
     }
 }
 
@@ -99,16 +72,6 @@ static void home_display(void) {
         lcd_mgr_write(".");
         lcd_mgr_write_int(home_data.temp % 100); // Low part
         home_data.display_temp = FALSE;
-    }
-}
-
-static void home_process(void) {
-    if (++home_data.timer >= TEMP_DELAY) {
-        const float raw_temp = therm_mgr_get_temp();
-        home_data.temp = format_temp(raw_temp);
-        home_data.display_temp = TRUE;
-        home_data.send_temp = TRUE;
-        home_data.timer = 0;
     }
 }
 
@@ -124,12 +87,24 @@ static void home_exit(void) {
     home_data.timer = TEMP_DELAY;
 }
 
-const struct state_actions home_state = {
-    .init = &home_init,
-    .on_keypress = &home_keypress,
-    .display = &home_display,
-    .process = &home_process,
-    .send = &home_send,
-    .receive = 0,
-    .exit = &home_exit
-};
+static int16_t format_temp(float temp) {
+    if (temp > 0.0f) {
+        return (int16_t) 100.0f * temp + 0.5f;
+    } else {
+        return (int16_t) 100.0f * temp - 0.5f;
+    }
+}
+
+static struct data_packet create_temp_packet(int16_t temp_int) {
+    struct data_packet temp_packet;
+    temp_packet.start_byte = START_BYTE;
+    temp_packet.type = TEMP; temp_packet.length = 2;
+
+    uint8_t high_byte = (uint8_t) (temp_int >> 8);
+    uint8_t low_byte = (uint8_t) (temp_int & 0xFF);
+    temp_packet.payload[0] = high_byte;
+    temp_packet.payload[1] = low_byte;
+
+    temp_packet.checksum = 2;
+    return temp_packet;
+}
