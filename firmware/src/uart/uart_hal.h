@@ -21,6 +21,6 @@ void uart_transmit_byte(uint8_t byte);
  *
  *@return Byte received
  */
- uint8_t uart_receive_byte(void);
+int16_t uart_receive_byte(void);
 
 #endif // UART_H

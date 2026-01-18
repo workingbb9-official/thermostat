@@ -126,7 +126,7 @@ static void configure_temp_packet(void) {
     struct data_packet *packet = &home_ctx.temp.packet;
 
     packet->start_byte = START_BYTE;
-    packet->type = TEMP; 
+    packet->type = HOME; 
     packet->length = 2;
 
     packet->payload[0] = (uint8_t) (home_ctx.temp.value >> 8);

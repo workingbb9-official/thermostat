@@ -28,8 +28,8 @@ int receive_data(struct data_packet *packet) {
     case LOGIN:
         packet->type = LOGIN;
         break;
-    case TEMP:
-        packet->type = TEMP;
+    case HOME:
+        packet->type = HOME;
         break;
     case STATS:
         packet->type = STATS;

@@ -15,7 +15,7 @@ static struct {
     uint32_t ticks;
     char input;
     
-    enum {
+    enum { 
         MAX = 0,
         MIN
     } __attribute__((packed)) limit; 
@@ -63,7 +63,9 @@ const struct state_ops state_stats = {
 static void stats_init(void) {
     stats_ctx.ticks = STATS_DELAY_TICKS;
     stats_ctx.limit = MAX;
+
     stats_ctx.flags.all = 0;
+    stats_ctx.flags.lcd_dirty = 1;
 }
 
 static void stats_keypress(void) {
@@ -97,12 +99,12 @@ static void stats_process(void) {
         stats_ctx.flags.tx_complete = 0;
         stats_ctx.flags.rx_req = 1;
     }
-
+    
     if (stats_ctx.flags.rx_complete) {
         stats_ctx.flags.rx_complete = 0;
         stats_ctx.flags.lcd_dirty = 1;
     }
-    
+
     if (++stats_ctx.ticks < STATS_DELAY_TICKS)
         return;
 
@@ -159,15 +161,15 @@ static void stats_receive(void) {
     if (!stats_ctx.flags.rx_req)
         return;
     
-    stats_ctx.flags.rx_req = 0;
-
-    struct data_packet stats_packet;
-    if (uart_mgr_receive(&stats_packet) != VALID_PACKET)
+    
+    struct data_packet *pkt = uart_mgr_receive();
+    if (pkt == 0)
         return;
 
-    stats_ctx.stats.avg = (int16_t) (((uint16_t) stats_packet.payload[0] << 8) | stats_packet.payload[1]);
-    stats_ctx.stats.max = (int16_t) (((uint16_t) stats_packet.payload[2] << 8) | stats_packet.payload[3]);
-    stats_ctx.stats.min = (int16_t) (((uint16_t) stats_packet.payload[4] << 8) | stats_packet.payload[5]);
+    stats_ctx.stats.avg = (int16_t) (((uint16_t) pkt->payload[0] << 8) | pkt->payload[1]);
+    stats_ctx.stats.max = (int16_t) (((uint16_t) pkt->payload[2] << 8) | pkt->payload[3]);
+    stats_ctx.stats.min = (int16_t) (((uint16_t) pkt->payload[4] << 8) | pkt->payload[5]);
 
+    stats_ctx.flags.rx_req = 0;
     stats_ctx.flags.rx_complete = 1;
 }

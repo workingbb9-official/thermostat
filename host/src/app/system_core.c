@@ -48,7 +48,7 @@ void system_run(void) {
     }
 
     switch (packet.type) {
-    case TEMP:
+    case HOME:
         store_temp(&packet);
         printf("Handled temp\n");
         break;

@@ -4,10 +4,6 @@
 #include <stdint.h>
 
 struct data_packet;
-enum packet_status {
-    INVALID_PACKET = 0,
-    VALID_PACKET
-} __attribute__((packed));
 
 /*
  * @brief Initialize UART for transmission
@@ -29,11 +25,12 @@ void uart_mgr_transmit(const struct data_packet *packet);
  * @brief Receive data packet over UART
  * @param Packet to store received data
  *
- * This function will receive each byte
- * It will store in packet as it receives
+ * 4 stages (start byte, type, payload)
+ * Each call moves through one stage
+ * Validated after checksum
  *
- * @return VALID_PACKET or INVALID_PACKET
+ * @return Pointer to pkt, 0 if invalid
  */
-enum packet_status uart_mgr_receive(struct data_packet *packet_out);
+struct data_packet* uart_mgr_receive(void);
 
 #endif // UART_MGR_H
