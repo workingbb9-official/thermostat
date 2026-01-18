@@ -3,6 +3,10 @@
 #include "uart_hal.h"
 #include <thermostat/protocol.h>
 
+#ifndef NULL
+    #define NULL ((void *) 0)
+#endif
+
 static uint8_t validate_packet(const struct data_packet *packet);
 
 void uart_mgr_init(void) {
@@ -22,13 +26,13 @@ void uart_mgr_transmit(const struct data_packet *packet) {
 }
 
 struct data_packet* uart_mgr_receive(void) {
-    static struct data_packet pkt;
+    static struct data_packet pkt = {0};
     static uint8_t stage = 0;
     static uint8_t payload_idx = 0;
 
     int16_t rx = uart_receive_byte();
     if (rx == -1)
-        return 0;
+        return NULL;
     
     uint8_t byte = (uint8_t) rx;
 
@@ -59,10 +63,10 @@ struct data_packet* uart_mgr_receive(void) {
         if (validate_packet(&pkt))
             return &pkt;
         
-        return 0;
+        return NULL;
     }
 
-    return 0;
+    return NULL;
 }
 
 static uint8_t validate_packet(const struct data_packet *packet) {

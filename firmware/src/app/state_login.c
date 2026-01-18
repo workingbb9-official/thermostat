@@ -42,9 +42,9 @@ const struct state_ops state_login = {
     .on_keypress    = login_keypress,
     .process        = login_process,
     .display        = login_display,
-    .send           = 0,
-    .receive        = 0,
-    .exit           = 0
+    .send           = NULL,
+    .receive        = NULL,
+    .exit           = NULL
 };
 
 static enum pwd_state pwd_validate(void);

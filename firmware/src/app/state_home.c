@@ -44,8 +44,8 @@ const struct state_ops state_home = {
     .display        = home_display,
     .process        = home_process,
     .send           = home_send,
-    .receive        = 0,
-    .exit           = 0
+    .receive        = NULL,
+    .exit           = NULL
 };
 
 static int16_t format_temp(float temp);

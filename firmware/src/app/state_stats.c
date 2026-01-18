@@ -57,7 +57,7 @@ const struct state_ops state_stats = {
     .display        = stats_display,
     .send           = stats_send,
     .receive        = stats_receive,
-    .exit           = 0
+    .exit           = NULL
 };
 
 static void stats_init(void) {
@@ -161,9 +161,8 @@ static void stats_receive(void) {
     if (!stats_ctx.flags.rx_req)
         return;
     
-    
     struct data_packet *pkt = uart_mgr_receive();
-    if (pkt == 0)
+    if (pkt == NULL)
         return;
 
     stats_ctx.stats.avg = (int16_t) (((uint16_t) pkt->payload[0] << 8) | pkt->payload[1]);
