@@ -26,6 +26,13 @@ void lcd_mgr_clear(void);
 void lcd_mgr_write(const char *string);
 
 /*
+ * @brief Write a PSTR string on the display
+ * @param PSTR(string literal)
+ *
+ */
+void lcd_mgr_write_p(const char *string);
+
+/*
  * @brief Set the cursor where writing starts from
  * @param Row (0 to 1), Col (0 to 15)
  *

@@ -27,7 +27,9 @@ void uart_transmit_byte(uint8_t byte) {
 	UDR0 = byte;
 }
 
-uint8_t uart_receive_byte(void) {
-    while (!(UCSR0A & (1 << RXC0)));
+int16_t uart_receive_byte(void) {
+    if (!(UCSR0A & (1 << RXC0)))
+        return -1;
+
     return UDR0;
 }

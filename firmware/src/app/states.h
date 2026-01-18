@@ -1,6 +1,10 @@
 #ifndef STATES_H
 #define STATES_H
 
+#ifndef NULL
+    #define NULL ((void *) 0)
+#endif
+
 struct state_ops {
     void (*init)(void);
     void (*on_keypress)(void);

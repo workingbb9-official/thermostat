@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <avr/pgmspace.h>
 
 #include <firmware/thermistor.h>
 #include <firmware/uart.h>
@@ -43,8 +44,8 @@ const struct state_ops state_home = {
     .display        = home_display,
     .process        = home_process,
     .send           = home_send,
-    .receive        = 0,
-    .exit           = 0
+    .receive        = NULL,
+    .exit           = NULL
 };
 
 static int16_t format_temp(float temp);
@@ -97,7 +98,7 @@ static void home_display(void) {
     home_ctx.flags.lcd_dirty = 0;
 
     lcd_mgr_clear();
-    lcd_mgr_write("Temp: ");
+    lcd_mgr_write_p(PSTR("Temp: "));
     lcd_mgr_write_int(home_ctx.temp.value / 100);
     lcd_mgr_write(".");
     lcd_mgr_write_int(home_ctx.temp.value % 100);
@@ -125,7 +126,7 @@ static void configure_temp_packet(void) {
     struct data_packet *packet = &home_ctx.temp.packet;
 
     packet->start_byte = START_BYTE;
-    packet->type = TEMP; 
+    packet->type = HOME; 
     packet->length = 2;
 
     packet->payload[0] = (uint8_t) (home_ctx.temp.value >> 8);

@@ -42,9 +42,9 @@ const struct state_ops state_login = {
     .on_keypress    = login_keypress,
     .process        = login_process,
     .display        = login_display,
-    .send           = 0,
-    .receive        = 0,
-    .exit           = 0
+    .send           = NULL,
+    .receive        = NULL,
+    .exit           = NULL
 };
 
 static enum pwd_state pwd_validate(void);
@@ -102,11 +102,11 @@ static void login_display(void) {
     if (login_ctx.flags.auth_failed) {
         login_ctx.flags.auth_failed = 0;
 
-        lcd_mgr_write("Invalid password");
+        lcd_mgr_write_p(PSTR("Invalid password"));
         lcd_mgr_set_cursor(1, 0);
-        lcd_mgr_write("3 more tries");
+        lcd_mgr_write_p(PSTR("3 more tries"));
     } else {
-        lcd_mgr_write("Enter password");
+        lcd_mgr_write_p(PSTR("Enter password"));
         lcd_mgr_set_cursor(1, 0);
         lcd_mgr_write(login_ctx.pwd.buf);
     }
