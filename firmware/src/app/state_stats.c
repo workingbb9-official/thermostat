@@ -1,5 +1,3 @@
-#include "state_stats.h"
-
 #include <stdint.h>
 
 #include <firmware/keypad.h>
@@ -8,93 +6,167 @@
 #include <thermostat/protocol.h>
 #include "states.h"
 
-#define STATS_DELAY 700000UL
-#define GO_HOME 'A'
-#define SWITCH_EXTREME 'B'
+#define STATS_DELAY_TICKS       700000UL
+#define STATS_KEY_HOME          'A'
+#define STATS_KEY_SWITCH_LIMIT  'B'
 
-enum extreme {
-    MAX = 0,
-    MIN
-} __attribute__((packed));
+static struct {
+    uint32_t ticks;
+    char input;
+    
+    enum {
+        MAX = 0,
+        MIN
+    } __attribute__((packed)) limit; 
 
-struct stats {
-   int16_t avg;
-   int16_t max;
-   int16_t min;
-} __attribute__((packed));
+    struct {
+        int16_t avg;
+        int16_t max;
+        int16_t min;
+    } stats;
+    
+    union {
+        uint8_t all;
 
-static void ask_for_stats(void);
-static void receive_stats(struct stats *stats_out);
-static void display_stats(const struct stats *current_stats, enum extreme current_extreme);
+        struct {
+            uint8_t lcd_dirty       : 1;
+            uint8_t tx_req          : 1;
+            uint8_t rx_req          : 1;
 
-void stats_run(enum sys_state *current_state) {
-    static struct stats current_stats= {0};
-    static enum extreme current_extreme = MAX;
-    static volatile uint32_t stats_timer = (uint32_t) STATS_DELAY;
-    ++stats_timer;
+            uint8_t input_pending   : 1;
+            uint8_t tx_complete     : 1;
+            uint8_t rx_complete     : 1;
 
-    if (stats_timer >= STATS_DELAY) {
-        ask_for_stats();
-        receive_stats(&current_stats);
-        display_stats(&current_stats, current_extreme);
-        stats_timer = 0;
-    }
+            uint8_t reserved        : 2;
+        };
+    } flags;
+} stats_ctx;
 
+static void stats_init(void);
+static void stats_keypress(void);
+static void stats_process(void);
+static void stats_display(void);
+static void stats_send(void);
+static void stats_receive(void);
+
+const struct state_ops state_stats = {
+    .init           = stats_init,
+    .on_keypress    = stats_keypress,
+    .process        = stats_process,
+    .display        = stats_display,
+    .send           = stats_send,
+    .receive        = stats_receive,
+    .exit           = 0
+};
+
+static void stats_init(void) {
+    stats_ctx.ticks = STATS_DELAY_TICKS;
+    stats_ctx.limit = MAX;
+    stats_ctx.flags.all = 0;
+}
+
+static void stats_keypress(void) {
     const struct keypad_state keypad = keypad_mgr_read();
     if (keypad.current_key == NO_KEY ||
-        keypad.current_key == keypad.last_key) {
+        keypad.current_key == keypad.last_key)
         return;
-    }
-
-    if (keypad.current_key == GO_HOME) {
-        stats_timer = (uint32_t) STATS_DELAY;
-        *current_state = STATE_HOME;
-    } else if (keypad.current_key == SWITCH_EXTREME) {
-        current_extreme = !current_extreme;
-        display_stats(&current_stats, current_extreme);
-    }
+    
+    stats_ctx.flags.input_pending = 1;
+    stats_ctx.input = keypad.current_key;
 }
 
-static void ask_for_stats(void) {
-    struct data_packet request_packet = {0};
-    request_packet.start_byte = START_BYTE;
-    request_packet.type = STATS;
-    request_packet.length = 1;
-    request_packet.payload[0] = START_BYTE;
-    request_packet.checksum = 1;
-    uart_mgr_transmit(&request_packet);
-}
+static void stats_process(void) {
+    if (stats_ctx.flags.input_pending) {
+        stats_ctx.flags.input_pending = 0;
 
-static void receive_stats(struct stats *stats_out) {
-    struct data_packet stats_packet = {0};
-    if (uart_mgr_receive(&stats_packet) != VALID_PACKET) {
-        lcd_mgr_clear();
-        lcd_mgr_write("Invalid packet");
+        switch (stats_ctx.input) {
+        case STATS_KEY_HOME:
+            sys_change_state(&state_home);
+            return;
+        case STATS_KEY_SWITCH_LIMIT:
+            stats_ctx.limit = !stats_ctx.limit;
+            stats_ctx.flags.lcd_dirty = 1;
+            break;
+        default:
+            break;
+        }
+    }
+    
+    if (stats_ctx.flags.tx_complete) {
+        stats_ctx.flags.tx_complete = 0;
+        stats_ctx.flags.rx_req = 1;
+    }
+
+    if (stats_ctx.flags.rx_complete) {
+        stats_ctx.flags.rx_complete = 0;
+        stats_ctx.flags.lcd_dirty = 1;
+    }
+    
+    if (++stats_ctx.ticks < STATS_DELAY_TICKS)
         return;
-    }
 
-    stats_out->avg = (int16_t) (((uint16_t) stats_packet.payload[0] << 8) | stats_packet.payload[1]);
-    stats_out->max = (int16_t) (((uint16_t) stats_packet.payload[2] << 8) | stats_packet.payload[3]);
-    stats_out->min = (int16_t) (((uint16_t) stats_packet.payload[4] << 8) | stats_packet.payload[5]);
+    stats_ctx.ticks = 0;
+
+    stats_ctx.flags.tx_req = 1;
 }
 
-static void display_stats(const struct stats *current_stats, enum extreme current_extreme) {
+static void stats_display(void) {
+    if (!stats_ctx.flags.lcd_dirty)
+        return;
+
+    stats_ctx.flags.lcd_dirty = 0;
+
     lcd_mgr_clear();
     lcd_mgr_write("Average: ");
-    lcd_mgr_write_int(current_stats->avg / 100);
+    lcd_mgr_write_int(stats_ctx.stats.avg / 100);
     lcd_mgr_write(".");
-    lcd_mgr_write_int(current_stats->avg % 100);
-
+    lcd_mgr_write_int(stats_ctx.stats.avg % 100);
     lcd_mgr_set_cursor(1, 0);
-    if (current_extreme == MAX) {
+
+    if (stats_ctx.limit == MAX) {
         lcd_mgr_write("Max: ");
-        lcd_mgr_write_int(current_stats->max / 100);
+        lcd_mgr_write_int(stats_ctx.stats.max / 100);
         lcd_mgr_write(".");
-        lcd_mgr_write_int(current_stats->max % 100);
+        lcd_mgr_write_int(stats_ctx.stats.max % 100);
     } else {
         lcd_mgr_write("Min: ");
-        lcd_mgr_write_int(current_stats->min / 100);
+        lcd_mgr_write_int(stats_ctx.stats.min / 100);
         lcd_mgr_write(".");
-        lcd_mgr_write_int(current_stats->min % 100);
+        lcd_mgr_write_int(stats_ctx.stats.min % 100);
     }
+}
+
+static void stats_send(void) {
+    if (!stats_ctx.flags.tx_req)
+        return;
+
+    stats_ctx.flags.tx_req = 0;
+
+    struct data_packet stats_req = {
+        .start_byte = START_BYTE,
+        .type       = STATS,
+        .length     = 1,
+        .payload[0] = 0x01,
+        .checksum   = 1
+    };
+
+    uart_mgr_transmit(&stats_req);
+    stats_ctx.flags.tx_complete = 1;
+}
+
+static void stats_receive(void) {
+    if (!stats_ctx.flags.rx_req)
+        return;
+    
+    stats_ctx.flags.rx_req = 0;
+
+    struct data_packet stats_packet;
+    if (uart_mgr_receive(&stats_packet) != VALID_PACKET)
+        return;
+
+    stats_ctx.stats.avg = (int16_t) (((uint16_t) stats_packet.payload[0] << 8) | stats_packet.payload[1]);
+    stats_ctx.stats.max = (int16_t) (((uint16_t) stats_packet.payload[2] << 8) | stats_packet.payload[3]);
+    stats_ctx.stats.min = (int16_t) (((uint16_t) stats_packet.payload[4] << 8) | stats_packet.payload[5]);
+
+    stats_ctx.flags.rx_complete = 1;
 }

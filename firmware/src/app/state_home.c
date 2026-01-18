@@ -1,5 +1,3 @@
-#include "state_home.h"
-
 #include <stdint.h>
 
 #include <firmware/thermistor.h>
@@ -9,36 +7,110 @@
 #include <thermostat/protocol.h>
 #include "states.h"
 
-#define TEMP_DELAY 125000UL
-#define GO_STATS '#'
+#define HOME_DELAY_TICKS 125000UL
+#define HOME_KEY_STATS   '#'
+
+static struct {
+    uint32_t ticks;
+    char input;
+
+    struct {
+        int16_t value;
+        struct data_packet packet;
+    } temp;
+
+    union {
+        uint8_t all;
+        struct {
+            uint8_t lcd_dirty       : 1;
+            uint8_t tx_req          : 1;
+
+            uint8_t input_pending   : 1;
+            uint8_t reserved        : 4;
+        }; 
+    } flags;
+} home_ctx;
+
+static void home_init(void);
+static void home_keypress(void);
+static void home_process(void);
+static void home_display(void);
+static void home_send(void);
+
+const struct state_ops state_home = {
+    .init           = home_init,
+    .on_keypress    = home_keypress,
+    .display        = home_display,
+    .process        = home_process,
+    .send           = home_send,
+    .receive        = 0,
+    .exit           = 0
+};
 
 static int16_t format_temp(float temp);
-static struct data_packet create_temp_packet(int16_t temp_int);
+static void configure_temp_packet(void);
 
-void home_run(enum sys_state *current_state) {
-    static volatile uint32_t temp_timer = 0;
-    ++temp_timer;
+static void home_init(void) {
+    home_ctx.ticks = HOME_DELAY_TICKS;
+    home_ctx.flags.all = 0;
+}
 
-    if (temp_timer >= TEMP_DELAY) {
-        const float temp = therm_mgr_get_temp();
-        const int16_t temp_int = format_temp(temp);
-        const struct data_packet temp_packet = create_temp_packet(temp_int);
-        uart_mgr_transmit(&temp_packet);
-
-        lcd_mgr_clear();
-        lcd_mgr_write("Temp: ");
-        lcd_mgr_write_int(temp_int / 100); // High part
-        lcd_mgr_write(".");
-        lcd_mgr_write_int(temp_int % 100); // Low part
-
-        temp_timer = 0;
-    }
-
+static void home_keypress(void) {
     const struct keypad_state keypad = keypad_mgr_read();
-    if (keypad.current_key == GO_STATS) {
-        temp_timer = (uint32_t) TEMP_DELAY; // Prime the timer
-        *current_state = STATE_STATS;
+    if (keypad.current_key == NO_KEY ||
+        keypad.current_key == keypad.last_key)
+        return;
+    
+    home_ctx.flags.input_pending = 1;
+    home_ctx.input = keypad.current_key;
+}
+
+static void home_process(void) {
+    if (home_ctx.flags.input_pending) {
+        home_ctx.flags.input_pending = 0;
+
+        switch (home_ctx.input) {
+        case HOME_KEY_STATS:
+            sys_change_state(&state_stats);
+            return;
+        default:
+            break;
+        }
     }
+
+    if (++home_ctx.ticks < HOME_DELAY_TICKS)
+        return;
+
+    home_ctx.ticks = 0;
+
+    const float raw_temp = therm_mgr_get_temp();
+    home_ctx.temp.value = format_temp(raw_temp);
+
+    home_ctx.flags.lcd_dirty = 1;
+    home_ctx.flags.tx_req = 1;
+}
+
+static void home_display(void) {
+    if (!home_ctx.flags.lcd_dirty)
+        return;
+
+    home_ctx.flags.lcd_dirty = 0;
+
+    lcd_mgr_clear();
+    lcd_mgr_write("Temp: ");
+    lcd_mgr_write_int(home_ctx.temp.value / 100);
+    lcd_mgr_write(".");
+    lcd_mgr_write_int(home_ctx.temp.value % 100);
+}
+
+static void home_send(void) {
+    if (!home_ctx.flags.tx_req)
+        return;
+
+    home_ctx.flags.tx_req = 0;
+
+    configure_temp_packet();
+    uart_mgr_transmit(&home_ctx.temp.packet);
 }
 
 static int16_t format_temp(float temp) {
@@ -49,17 +121,15 @@ static int16_t format_temp(float temp) {
     }
 }
 
-static struct data_packet create_temp_packet(int16_t temp_int) {
-    struct data_packet temp_packet;
-    temp_packet.start_byte = START_BYTE;
-    temp_packet.type = TEMP;
-    temp_packet.length = 2;
+static void configure_temp_packet(void) {
+    struct data_packet *packet = &home_ctx.temp.packet;
 
-    uint8_t high_byte = (uint8_t) (temp_int >> 8);
-    uint8_t low_byte = (uint8_t) (temp_int & 0xFF);
-    temp_packet.payload[0] = high_byte;
-    temp_packet.payload[1] = low_byte;
+    packet->start_byte = START_BYTE;
+    packet->type = TEMP; 
+    packet->length = 2;
 
-    temp_packet.checksum = 2;
-    return temp_packet;
+    packet->payload[0] = (uint8_t) (home_ctx.temp.value >> 8);
+    packet->payload[1] = (uint8_t) (home_ctx.temp.value & 0xFF);
+
+    packet->checksum = 2;
 }
