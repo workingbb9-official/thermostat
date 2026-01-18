@@ -17,7 +17,7 @@ static struct {
     enum {
         MAX = 0,
         MIN
-    } limit __attribute__((packed));
+    } __attribute__((packed)) limit; 
 
     struct {
         int16_t avg;
@@ -49,7 +49,7 @@ static void stats_display(void);
 static void stats_send(void);
 static void stats_receive(void);
 
-const struct state_actions stats_state = {
+const struct state_ops state_stats = {
     .init           = stats_init,
     .on_keypress    = stats_keypress,
     .process        = stats_process,
@@ -81,7 +81,7 @@ static void stats_process(void) {
 
         switch (stats_ctx.input) {
         case STATS_KEY_HOME:
-            sys_change_state(&home_state);
+            sys_change_state(&state_home);
             return;
         case STATS_KEY_SWITCH_LIMIT:
             stats_ctx.limit = !stats_ctx.limit;

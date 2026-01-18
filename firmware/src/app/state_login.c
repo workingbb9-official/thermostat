@@ -28,7 +28,7 @@ static struct {
 
             uint8_t input_pending   : 1;
             uint8_t reserved        : 5;
-        }
+        };
     } flags;
 } login_ctx;
 
@@ -37,7 +37,7 @@ static void login_keypress(void);
 static void login_process(void);
 static void login_display(void);
 
-const struct state_actions login_state = {
+const struct state_ops state_login = {
     .init           = login_init,
     .on_keypress    = login_keypress,
     .process        = login_process,
@@ -51,6 +51,8 @@ static enum pwd_state pwd_validate(void);
 
 static void login_init(void) {
     login_ctx.flags.all = 0;
+    login_ctx.flags.lcd_dirty = 1;
+
     login_ctx.pwd.buf[0] = '\0';
     login_ctx.pwd.idx = 0;
 }
@@ -70,7 +72,7 @@ static void login_process(void) {
         login_ctx.flags.input_pending = 0;
 
         login_ctx.pwd.buf[login_ctx.pwd.idx] = login_ctx.input;
-        login_ctx.pwd.buf[login_ctx.pwd.idx + 1] = login_ctx.input;
+        login_ctx.pwd.buf[login_ctx.pwd.idx + 1] = '\0';
         ++login_ctx.pwd.idx;
 
         login_ctx.flags.lcd_dirty = 1;
@@ -80,7 +82,7 @@ static void login_process(void) {
         return;
 
     if (pwd_validate() == PWD_VALID) {
-        sys_change_state(&home_state);
+        sys_change_state(&state_home);
     } else {
         login_ctx.pwd.idx = 0;
         login_ctx.pwd.buf[0] = '\0';

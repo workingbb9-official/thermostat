@@ -23,7 +23,7 @@ add_subdirectory(src/keypad)
 
 add_executable(thermostat
     src/main.c
-    src/app/system_core.c
+    src/app/sys_core.c
     src/app/state_login.c
     src/app/state_home.c
     src/app/state_stats.c

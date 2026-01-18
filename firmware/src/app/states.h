@@ -1,7 +1,7 @@
 #ifndef STATES_H
 #define STATES_H
 
-struct state_actions {
+struct state_ops {
     void (*init)(void);
     void (*on_keypress)(void);
     void (*process)(void);
@@ -11,10 +11,10 @@ struct state_actions {
     void (*exit)(void);
 };
 
-extern const struct state_actions login_state;
-extern const struct state_actions home_state;
-extern const struct state_actions stats_state;
+extern const struct state_ops state_login;
+extern const struct state_ops state_home;
+extern const struct state_ops state_stats;
 
-void sys_change_state(const struct state_actions *new_state);
+void sys_change_state(const struct state_ops *new_state);
 
 #endif // STATES_H

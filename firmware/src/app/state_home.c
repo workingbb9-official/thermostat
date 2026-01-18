@@ -37,7 +37,7 @@ static void home_process(void);
 static void home_display(void);
 static void home_send(void);
 
-const struct state_actions home_state = {
+const struct state_ops state_home = {
     .init           = home_init,
     .on_keypress    = home_keypress,
     .display        = home_display,
@@ -71,7 +71,7 @@ static void home_process(void) {
 
         switch (home_ctx.input) {
         case HOME_KEY_STATS:
-            sys_change_state(&stats_state);
+            sys_change_state(&state_stats);
             return;
         default:
             break;

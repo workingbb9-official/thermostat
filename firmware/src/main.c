@@ -1,10 +1,10 @@
-#include <firmware/system_core.h>
+#include <firmware/sys_core.h>
 
 int main(void) {
-    system_init();
+    sys_init();
 
 	for (;;) {
-        system_run();
+        sys_run();
 	}
 
 	return 0;
