@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <avr/pgmspace.h>
 
 #include <firmware/keypad.h>
 #include <firmware/lcd.h>
@@ -117,19 +118,19 @@ static void stats_display(void) {
     stats_ctx.flags.lcd_dirty = 0;
 
     lcd_mgr_clear();
-    lcd_mgr_write("Average: ");
+    lcd_mgr_write_p(PSTR("Average: "));
     lcd_mgr_write_int(stats_ctx.stats.avg / 100);
     lcd_mgr_write(".");
     lcd_mgr_write_int(stats_ctx.stats.avg % 100);
     lcd_mgr_set_cursor(1, 0);
 
     if (stats_ctx.limit == MAX) {
-        lcd_mgr_write("Max: ");
+        lcd_mgr_write_p(PSTR("Max: "));
         lcd_mgr_write_int(stats_ctx.stats.max / 100);
         lcd_mgr_write(".");
         lcd_mgr_write_int(stats_ctx.stats.max % 100);
     } else {
-        lcd_mgr_write("Min: ");
+        lcd_mgr_write_p(PSTR("Min: "));
         lcd_mgr_write_int(stats_ctx.stats.min / 100);
         lcd_mgr_write(".");
         lcd_mgr_write_int(stats_ctx.stats.min % 100);

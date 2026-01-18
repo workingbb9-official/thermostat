@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <avr/pgmspace.h>
 
 #include <firmware/thermistor.h>
 #include <firmware/uart.h>
@@ -97,7 +98,7 @@ static void home_display(void) {
     home_ctx.flags.lcd_dirty = 0;
 
     lcd_mgr_clear();
-    lcd_mgr_write("Temp: ");
+    lcd_mgr_write_p(PSTR("Temp: "));
     lcd_mgr_write_int(home_ctx.temp.value / 100);
     lcd_mgr_write(".");
     lcd_mgr_write_int(home_ctx.temp.value % 100);

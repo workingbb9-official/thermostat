@@ -1,5 +1,7 @@
 #include <firmware/lcd.h>
 
+#include <avr/pgmspace.h>
+
 #include "lcd_hal.h"
 
 static void itoa(char *string, int16_t value);
@@ -24,6 +26,13 @@ void lcd_mgr_write(const char *string) {
     while (*string != '\0') {
         lcd_write_byte(*string);
         ++string;
+    }
+}
+
+void lcd_mgr_write_p(const char *string) {
+    char c;
+    while ((c = pgm_read_byte(string++))) {
+        lcd_write_byte(c);
     }
 }
 
