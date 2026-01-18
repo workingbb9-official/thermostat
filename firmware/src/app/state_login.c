@@ -23,10 +23,11 @@ static struct {
     union {
         uint8_t all;
         struct {
-            uint8_t lcd_dirty   : 1;
-            uint8_t input_pending : 1;
-            uint8_t auth_failed : 1;
-            uint8_t reserved    : 5;
+            uint8_t lcd_dirty       : 1;
+            uint8_t auth_failed     : 1;
+
+            uint8_t input_pending   : 1;
+            uint8_t reserved        : 5;
         }
     } flags;
 } login_ctx;
@@ -37,13 +38,13 @@ static void login_process(void);
 static void login_display(void);
 
 const struct state_actions login_state = {
-    .init        = login_init,
-    .on_keypress = login_keypress,
-    .process     = login_process,
-    .display     = login_display,
-    .send        = 0,
-    .receive     = 0,
-    .exit        = 0
+    .init           = login_init,
+    .on_keypress    = login_keypress,
+    .process        = login_process,
+    .display        = login_display,
+    .send           = 0,
+    .receive        = 0,
+    .exit           = 0
 };
 
 static enum pwd_state pwd_validate(void);
@@ -66,7 +67,6 @@ static void login_keypress(void) {
 
 static void login_process(void) {
     if (login_ctx.flags.input_pending) {
-
         login_ctx.flags.input_pending = 0;
 
         login_ctx.pwd.buf[login_ctx.pwd.idx] = login_ctx.input;
@@ -82,8 +82,8 @@ static void login_process(void) {
     if (pwd_validate() == PWD_VALID) {
         sys_change_state(&home_state);
     } else {
-
         login_ctx.pwd.idx = 0;
+        login_ctx.pwd.buf[0] = '\0';
 
         login_ctx.flags.lcd_dirty = 1;
         login_ctx.flags.auth_failed = 1;
@@ -98,7 +98,6 @@ static void login_display(void) {
 
     lcd_mgr_clear();
     if (login_ctx.flags.auth_failed) {
-
         login_ctx.flags.auth_failed = 0;
 
         lcd_mgr_write("Invalid password");
