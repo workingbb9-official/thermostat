@@ -7,21 +7,29 @@
 #include <thermostat/protocol.h>
 #include "states.h"
 
-#define TEMP_DELAY  125000UL
-#define GO_STATS    '#'
+#define HOME_DELAY_TICKS 125000UL
+#define HOME_KEY_STATS   '#'
 
 static struct {
-    uint32_t timer;
-    int16_t temp;
-    char key;
-    struct data_packet temp_packet;
+    uint32_t ticks;
+    char input;
+
     struct {
-        uint8_t lcd_dirty : 1;
-        uint8_t tx_pending : 1;
-        uint8_t key_pending : 1;
-        uint8_t stats_pending : 1;
+        int16_t value;
+        struct data_packet packet;
+    } temp;
+
+    union {
+        uint8_t all;
+        struct {
+            uint8_t lcd_dirty       : 1;
+            uint8_t tx_req          : 1;
+
+            uint8_t input_pending   : 1;
+            uint8_t reserved        : 4;
+        }; 
     } flags;
-} home_data;
+} home_ctx;
 
 static void home_init(void);
 static void home_keypress(void);
@@ -30,24 +38,21 @@ static void home_display(void);
 static void home_send(void);
 
 const struct state_actions home_state = {
-    .init        = home_init,
-    .on_keypress = home_keypress,
-    .display     = home_display,
-    .process     = home_process,
-    .send        = home_send,
-    .receive     = 0,
-    .exit        = 0
+    .init           = home_init,
+    .on_keypress    = home_keypress,
+    .display        = home_display,
+    .process        = home_process,
+    .send           = home_send,
+    .receive        = 0,
+    .exit           = 0
 };
 
 static int16_t format_temp(float temp);
-static void configure_temp_packet(int16_t temp_int, struct data_packet *pkt_out);
+static void configure_temp_packet(void);
 
 static void home_init(void) {
-    home_data.timer = TEMP_DELAY;
-    home_data.flags.lcd_dirty = 0;
-    home_data.flags.tx_pending = 0;
-    home_data.flags.key_pending = 0;
-    home_data.flags.stats_pending = 0;
+    home_ctx.ticks = HOME_DELAY_TICKS;
+    home_ctx.flags.all = 0;
 }
 
 static void home_keypress(void) {
@@ -55,52 +60,57 @@ static void home_keypress(void) {
     if (keypad.current_key == NO_KEY ||
         keypad.current_key == keypad.last_key)
         return;
-
-    home_data.flags.key_pending = 1;
-    home_data.key = keypad.current_key;
+    
+    home_ctx.flags.input_pending = 1;
+    home_ctx.input = keypad.current_key;
 }
 
 static void home_process(void) {
-    if (home_data.flags.key_pending) {
-        home_data.flags.key_pending = 0;
-        switch (home_data.key) {
-        case GO_STATS:
+    if (home_ctx.flags.input_pending) {
+        home_ctx.flags.input_pending = 0;
+
+        switch (home_ctx.input) {
+        case HOME_KEY_STATS:
             sys_change_state(&stats_state);
             return;
         default:
             break;
+        }
     }
 
-    ++home_data.timer;
-    if (home_data.timer < TEMP_DELAY)
+    if (++home_ctx.ticks < HOME_DELAY_TICKS)
         return;
-    
-    home_data.timer = 0;
+
+    home_ctx.ticks = 0;
+
     const float raw_temp = therm_mgr_get_temp();
-    home_data.temp = format_temp(raw_temp);
-    home_data.flags.lcd_dirty = 1;
-    home_data.flags.tx_pending = 1;
+    home_ctx.temp.value = format_temp(raw_temp);
+
+    home_ctx.flags.lcd_dirty = 1;
+    home_ctx.flags.tx_req = 1;
 }
 
 static void home_display(void) {
-    if (!home_data.flags.lcd_dirty)
+    if (!home_ctx.flags.lcd_dirty)
         return;
 
-    home_data.flags.lcd_dirty = 0;
+    home_ctx.flags.lcd_dirty = 0;
+
     lcd_mgr_clear();
     lcd_mgr_write("Temp: ");
-    lcd_mgr_write_int(home_data.temp / 100); // High part
+    lcd_mgr_write_int(home_ctx.temp.value / 100);
     lcd_mgr_write(".");
-    lcd_mgr_write_int(home_data.temp % 100); // Low part
+    lcd_mgr_write_int(home_ctx.temp.value % 100);
 }
 
 static void home_send(void) {
-    if (!home_data.flags.tx_pending)
+    if (!home_ctx.flags.tx_req)
         return;
 
-    home_data.flags.tx_pending = 0;
-    configure_temp_packet(home_data.temp, &home_data.temp_packet);
-    uart_mgr_transmit(&home_data.temp_packet);
+    home_ctx.flags.tx_req = 0;
+
+    configure_temp_packet();
+    uart_mgr_transmit(&home_ctx.temp.packet);
 }
 
 static int16_t format_temp(float temp) {
@@ -111,14 +121,15 @@ static int16_t format_temp(float temp) {
     }
 }
 
-static void configure_temp_packet(int16_t temp_int, struct data_packet *pkt_out) {
-    pkt_out->start_byte = START_BYTE;
-    pkt_out->type = TEMP; pkt_out->length = 2;
+static void configure_temp_packet(void) {
+    struct data_packet *packet = &home_ctx.temp.packet;
 
-    uint8_t high_byte = (uint8_t) (temp_int >> 8);
-    uint8_t low_byte = (uint8_t) (temp_int & 0xFF);
-    pkt_out->payload[0] = high_byte;
-    pkt_out->payload[1] = low_byte;
+    packet->start_byte = START_BYTE;
+    packet->type = TEMP; 
+    packet->length = 2;
 
-    pkt_out->checksum = 2;
+    packet->payload[0] = (uint8_t) (home_ctx.temp.value >> 8);
+    packet->payload[1] = (uint8_t) (home_ctx.temp.value & 0xFF);
+
+    packet->checksum = 2;
 }
