@@ -5,6 +5,7 @@ option(TESTS OFF)
 add_subdirectory(src/storage)
 add_subdirectory(src/analysis)
 add_subdirectory(src/port)
+add_subdirectory(src/network)
 
 add_executable(host
     src/main.c
