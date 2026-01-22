@@ -6,6 +6,7 @@ add_subdirectory(src/storage)
 add_subdirectory(src/analysis)
 add_subdirectory(src/port)
 add_subdirectory(src/network)
+add_subdirectory(src/weather)
 
 add_executable(host
     src/main.c
