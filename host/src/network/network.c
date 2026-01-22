@@ -8,41 +8,55 @@
 #include <string.h>
 #include <stdio.h>
 
-int net_dev_init(struct net_device *dev, const struct net_driver *drv, 
-                 const char *host, const char *path)
-{
-    if (!dev || !drv || ! host || !path)
-        return -1;
+/* Private definition */
+struct net_ops {
+    int (*fetch)(const struct net_device *dev, 
+                 char *buf, 
+                 size_t buf_size);
+};
 
-    dev->drv = drv;
+/* Public API */
+int net_dev_init(struct net_device *dev, 
+                 const struct net_ops *ops, 
+                 const char *host, 
+                 const char *path)
+{
+    if (!dev || !ops || !host || !path)
+        return NET_EINVAL;
+
+    dev->ops = ops;
     dev->host = host;
     dev->path = path;
     
-    return 0;
+    return NET_OK;
 }
 
-
-
-
-/* For the http driver */
-static int http_fetch(const struct net_device *dev, 
-                      char *buf, size_t buf_size);
-
-const struct net_driver g_http_drv = {
-    .fetch = http_fetch
-};
-
-static int http_fetch(const struct net_device *dev, 
-                      char *buf, size_t buf_size)
+int net_dev_fetch(const struct net_device *dev,
+                  char *buf,
+                  size_t buf_size)
 {
+    if (!dev || !buf || !dev->ops || !dev->ops->fetch)
+        return NET_EINVAL;
+
+    return dev->ops->fetch(dev, buf, buf_size);
+}
+
+/* HTTP ops */
+static int http_fetch(const struct net_device *dev, 
+                      char *buf, 
+                      size_t buf_size)
+{
+    if (!dev || !buf)
+        return NET_EINVAL;
+
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0)
-        return -1;
+        return NET_EIO;
 
     struct hostent *he = gethostbyname(dev->host);
     if (!he) {
         close(sock);
-        return -1;
+        return NET_EIO;
     }
 
     struct sockaddr_in server = {0};
@@ -52,13 +66,20 @@ static int http_fetch(const struct net_device *dev,
 
     if (connect(sock, (struct sockaddr *) &server, sizeof(server)) < 0) {
         close(sock);
-        return -1;
+        return NET_EIO;
     }
 
     char request[1024] = {0};
-    sprintf(request, "GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", 
-            dev->path, dev->host);
-    write(sock, request, strlen(request));
+    snprintf(request, 
+            sizeof(request),
+            "GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n",
+            dev->path, 
+            dev->host);
+    
+    if (write(sock, request, strlen(request)) < 0) {
+        close(sock);
+        return NET_EIO;
+    }
     
     size_t total = 0;
     ssize_t n;
@@ -71,5 +92,9 @@ static int http_fetch(const struct net_device *dev,
     buf[total] = '\0';
 
     close(sock);
-    return 0;
+    return NET_OK;
 }
+
+const struct net_ops http_ops = {
+    .fetch  = http_fetch
+};

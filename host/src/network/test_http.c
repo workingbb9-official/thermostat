@@ -4,26 +4,41 @@
 #define BUF_SIZE 1024
 
 int main(void) {
-    struct net_device http_dev = {0};
-    net_dev_init(&http_dev, &g_http_drv, "httpbin.org", "/get");
+    /* Test for fetch failure*/
+    struct net_device http_dev_fail = {0};
+    
+    if (net_dev_init(&http_dev_fail, 
+                     &http_ops, 
+                     "fakewebsite.invalid", 
+                     "/fake") < 0) 
+    {
+        printf("Failed to init dev_fail\n\n");
+        return 1;
+    }
 
     char buf[BUF_SIZE] = {0};
-    if (http_dev.drv->fetch(&http_dev, buf, BUF_SIZE) < 0) {
-        printf("Failed to fetch dev1\n");
-        return 1;
-    }
+    if (net_dev_fetch(&http_dev_fail, buf, BUF_SIZE) < 0)
+        printf("Failed to fetch dev_fail\n");
+    else
+        printf("From dev_fail: %s\n", buf);
     
-    printf("From dev1: %s\n", buf);
-
-    struct net_device http_dev2 = {0};
-    net_dev_init(&http_dev2, &g_http_drv, "httpbin.org", "/post");
-
-    if (http_dev2.drv->fetch(&http_dev2, buf, BUF_SIZE) < 0) {
-        printf("Failed to fetch dev2\n");
+    /* Test for fetch success */
+    struct net_device http_dev_success = {0};
+    if (net_dev_init(&http_dev_success, 
+                     &http_ops, 
+                     "httpbin.org", 
+                     "/post") < 0) 
+    {
+        printf("Failed to init dev_success\n");
         return 1;
     }
 
-    printf("From dev2: %s\n", buf);
+    if (net_dev_fetch(&http_dev_success, buf, BUF_SIZE) < 0) {
+        printf("Failed to fetch dev_success\n");
+        return 1;
+    }
+
+    printf("From dev_success: %s\n", buf);
 
     return 0;
 }
