@@ -5,11 +5,14 @@ option(TESTS OFF)
 add_subdirectory(src/storage)
 add_subdirectory(src/analysis)
 add_subdirectory(src/port)
+add_subdirectory(src/network)
+add_subdirectory(src/weather)
 
 add_executable(host
     src/main.c
     src/app/system_core.c
     src/app/sys_utils.c
+    src/app/weather_client.c
 )
 target_include_directories(host
     PUBLIC include
@@ -18,5 +21,5 @@ target_include_directories(host
 )
 target_link_libraries(host
     PRIVATE
-    storage_lib analysis_lib port_lib
+    storage_lib analysis_lib port_lib weather_lib network_lib
 )
