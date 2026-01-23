@@ -2,27 +2,28 @@
 
 #include "cJSON.h"
 
-enum json_status weather_get_temp(const char *raw_json,
-                                  struct weather_device *dev)
-{
+int weather_get_temp(const char *raw_json, struct weather_data *data_out) {
+    if (!raw_json || !data_out)
+        return WEATHER_EINVAL;
+
     cJSON *root = cJSON_Parse(raw_json);
     if (!root)
-        return JSON_ERR_ROOT;
+        return WEATHER_ENOMEM;
 
     cJSON *current = cJSON_GetObjectItem(root, "current");
     if (!current) {
         cJSON_Delete(root);
-        return JSON_ERR_CUR;
+        return WEATHER_EJSON;
     }
 
     cJSON *temp = cJSON_GetObjectItem(current, "temperature");
     if (!cJSON_IsNumber(temp)) {
         cJSON_Delete(root);
-        return JSON_ERR_TEMP;
+        return WEATHER_EJSON;
     }
 
-    dev->temp = temp->valuedouble;
+    data_out->temp = temp->valuedouble;
     
     cJSON_Delete(root);
-    return JSON_OK;
+    return WEATHER_OK;
 }

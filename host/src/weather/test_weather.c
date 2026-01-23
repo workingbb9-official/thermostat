@@ -2,7 +2,23 @@
 #include <stdio.h>
 
 int main(void) {
-    const char *raw_json = 
+    struct weather_data data = {0};
+
+    /* Test for failure */
+    const char *json_fail = 
+        "{"
+        " \"hiko\": {"
+        "   \"InhumanReactions\": 4"
+        " }"
+        "}";
+
+    if (weather_get_temp(json_fail, &data) < 0)
+        printf("Failed to parse json_fail\n");
+    else
+        printf("From json_fail: %f", data.temp);
+
+    /* Test for success */
+    const char *json_success = 
         "{"
         "  \"current\": {"
         "    \"time\": \"2024-03-20T12:00\","
@@ -11,9 +27,11 @@ int main(void) {
         "  }"
         "}";
     
-    struct weather_device dev = {0};
-    weather_get_temp(raw_json, &dev);
+    if (weather_get_temp(json_success, &data) < 0) {
+        printf("Failed to parse json_success\n");
+        return 1;
+    }
 
-    printf("Temp: %f\n", dev.temp);
+    printf("From json_success: %f\n", data.temp);
     return 0;
 }
