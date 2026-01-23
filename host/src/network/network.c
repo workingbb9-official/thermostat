@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 /* Private definition */
-struct net_ops {
+__attribute__((visibility("hidden"))) struct net_ops {
     int (*fetch)(const struct net_device *dev, 
                  char *buf, 
                  size_t buf_size);
@@ -22,7 +22,7 @@ int net_dev_init(struct net_device *dev,
                  const char *path)
 {
     if (!dev || !ops || !host || !path)
-        return NET_EINVAL;
+        return NET_E_INVAL;
 
     dev->ops = ops;
     dev->host = host;
@@ -36,7 +36,7 @@ int net_dev_fetch(const struct net_device *dev,
                   size_t buf_size)
 {
     if (!dev || !buf || !dev->ops || !dev->ops->fetch)
-        return NET_EINVAL;
+        return NET_E_INVAL;
 
     return dev->ops->fetch(dev, buf, buf_size);
 }
@@ -47,16 +47,16 @@ static int http_fetch(const struct net_device *dev,
                       size_t buf_size)
 {
     if (!dev || !buf)
-        return NET_EINVAL;
+        return NET_E_INVAL;
 
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0)
-        return NET_EIO;
+        return NET_E_IO;
 
     struct hostent *he = gethostbyname(dev->host);
     if (!he) {
         close(sock);
-        return NET_EIO;
+        return NET_E_IO;
     }
 
     struct sockaddr_in server = {0};
@@ -66,7 +66,7 @@ static int http_fetch(const struct net_device *dev,
 
     if (connect(sock, (struct sockaddr *) &server, sizeof(server)) < 0) {
         close(sock);
-        return NET_EIO;
+        return NET_E_IO;
     }
 
     char request[1024] = {0};
@@ -78,7 +78,7 @@ static int http_fetch(const struct net_device *dev,
     
     if (write(sock, request, strlen(request)) < 0) {
         close(sock);
-        return NET_EIO;
+        return NET_E_IO;
     }
     
     size_t total = 0;

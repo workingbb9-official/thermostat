@@ -7,11 +7,17 @@
 #include <host/storage.h>
 #include <host/analysis.h>
 #include <host/port.h>
+#include <host/network.h>
+#include <host/weather.h>
+#include <host/weather_client.h>
 #include <thermostat/protocol.h>
 #include "sys_utils.h"
 
+#define API_URL "/v1/forecast?latitude=39&longitude=-97"    \
+                "&current=temperature_2m&forecast_days=1"   \
+
 static int signal_shutdown = 0;
-static enum therm_status signal_init(void);
+static int signal_init(void);
 static void signal_handler(int signum);
 
 struct statistics {
@@ -21,17 +27,40 @@ struct statistics {
 };
 
 static struct statistics global_stats = {0};
+static struct net_device http_dev = {0};
+static struct weather_data data = {0};
 
-enum therm_status system_init(void) {
+int system_init(void) {
     if (port_mgr_init() != 0) {
-        return TSYS_PORT_ERROR;
+        return TSYS_E_PORT;
     }
 
     if (storage_mgr_init() != 0) {
         port_mgr_close();
-        return TSYS_STORAGE_ERROR;
+        return TSYS_E_STORAGE;
     }
 
+    if (net_dev_init(&http_dev, &http_ops, "api.open-meteo.com", API_URL)) {
+        port_mgr_close();
+        storage_mgr_close();
+        return TSYS_E_NETWORK;
+    }
+
+    int outdoor_temp_status = weather_client_get_temp(&http_dev, &data);
+    switch (outdoor_temp_status) {
+    case WEATHER_CLIENT_OK:
+        printf("Outdoor temp: %.2f *C\n", data.temp);
+        break;
+    case WEATHER_CLIENT_E_NET:
+        printf("Network error\n");
+        break;
+    case WEATHER_CLIENT_E_WEATHER:
+        printf("Weather error\n");
+        break;
+    default:
+        break;
+    }
+    
     return signal_init();
 }
 
@@ -46,6 +75,22 @@ void system_run(void) {
         printf("Error receive data\n");
         return;
     }
+    
+    
+    int outdoor_temp_status = weather_client_get_temp(&http_dev, &data);
+    switch (outdoor_temp_status) {
+    case WEATHER_CLIENT_OK:
+        printf("Outdoor temp: %.2f *C\n", data.temp);
+        break;
+    case WEATHER_CLIENT_E_NET:
+        printf("Network error\n");
+        break;
+    case WEATHER_CLIENT_E_WEATHER:
+        printf("Weather error\n");
+        break;
+    default:
+        break;
+    }
 
     switch (packet.type) {
     case HOME:
@@ -53,7 +98,7 @@ void system_run(void) {
         printf("Handled temp\n");
         break;
     case STATS:
-        if (system_analyze() != TSYS_OK) {
+        if (system_analyze() < 0) {
             printf("Error analyze\n");
             break;
         }
@@ -69,29 +114,29 @@ void system_run(void) {
     }
 }
 
-enum therm_status system_cleanup(void) {
+int system_cleanup(void) {
     int port_close_status = port_mgr_close();
     int storage_close_status = storage_mgr_close();
 
     if (port_close_status != 0) {
-        return TSYS_PORT_ERROR;
+        return TSYS_E_PORT;
     }
 
     if (storage_close_status != 0) {
-        return TSYS_STORAGE_ERROR;
+        return TSYS_E_STORAGE;
     }
 
     return TSYS_OK;
 }
 
-enum therm_status system_analyze(void) {
+int system_analyze(void) {
     size_t capacity = 256;
     size_t count = 0;
     float *data = malloc(capacity * sizeof(float));
 
     if (data == NULL) {
         printf("Error malloc\n");
-        return TSYS_ANALYZE_ERROR;
+        return TSYS_E_ANALYZE;
     }
 
     float temp_line;
@@ -106,7 +151,7 @@ enum therm_status system_analyze(void) {
                 printf("Error realloc\n");
                 free(data);
                 data = NULL;
-                return TSYS_ANALYZE_ERROR;
+                return TSYS_E_ANALYZE;
             }
 
             capacity = new_capacity;
@@ -138,13 +183,13 @@ int system_should_shutdown(void) {
     return signal_shutdown;
 }
 
-static enum therm_status signal_init(void) {
+static int signal_init(void) {
     struct sigaction sa = {0};
     sa.sa_handler = signal_handler;
     sigemptyset(&sa.sa_mask);
 
     if (sigaction(SIGINT, &sa, NULL) == -1) {
-        return TSYS_SIGNAL_ERROR;
+        return TSYS_E_SIGNAL;
     }
 
     return TSYS_OK;

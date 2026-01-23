@@ -3,11 +3,11 @@
 
 #include <stddef.h>
 
-#define NET_OK       0
-#define NET_EINVAL  -1
-#define NET_EIO     -2
+#define NET_OK        0
+#define NET_E_INVAL  -1
+#define NET_E_IO     -2
 
-struct net_ops;
+__attribute__((visibility("hidden"))) struct net_ops;
 extern const struct net_ops http_ops;
 
 struct net_device {

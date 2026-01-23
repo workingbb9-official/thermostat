@@ -12,6 +12,7 @@ add_executable(host
     src/main.c
     src/app/system_core.c
     src/app/sys_utils.c
+    src/app/weather_client.c
 )
 target_include_directories(host
     PUBLIC include
@@ -20,5 +21,5 @@ target_include_directories(host
 )
 target_link_libraries(host
     PRIVATE
-    storage_lib analysis_lib port_lib
+    storage_lib analysis_lib port_lib weather_lib network_lib
 )
