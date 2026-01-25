@@ -13,26 +13,26 @@
 static float calc_resistance(uint16_t reading);
 static float calc_temp(float resistance);
 
-void therm_mgr_init(void) {
-    therm_init();
+void therm_init(void) {
+    therm_hal_init();
 }
 
-float therm_mgr_get_temp(void) {
-    const uint16_t reading = therm_read();
+float therm_get_temp(void) {
+    const uint16_t reading = therm_hal_read();
     const float resistance = calc_resistance(reading);
     return calc_temp(resistance);
 }
 
 static float calc_resistance(uint16_t reading) {
-	const float ratio = (float) reading / 1023.0f;
-	const float resistance = 10000.0f * ratio / (1.0f - ratio);
-	return resistance;
+    const float ratio = (float) reading / 1023.0f;
+    const float resistance = 10000.0f * ratio / (1.0f - ratio);
+    return resistance;
 }
 
 static float calc_temp(float resistance) {
     const float r = resistance;
     // Steinhart-hart equation to get temp from resistance
-	const float temp_k = 1.0f / (A + B * log(r) + C * log(r) * log(r) * log(r));
-	const float temp_c = temp_k - 273.15f;
-	return temp_c;
+    const float temp_k = 1.0f / (A + B * log(r) + C * log(r) * log(r) * log(r));
+    const float temp_c = temp_k - 273.15f;
+    return temp_c;
 }

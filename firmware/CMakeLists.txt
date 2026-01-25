@@ -27,6 +27,7 @@ add_executable(thermostat
     src/app/state_login.c
     src/app/state_home.c
     src/app/state_stats.c
+    src/app/strings.c
 )
 target_include_directories(thermostat
     PUBLIC include

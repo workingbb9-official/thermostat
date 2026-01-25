@@ -1,6 +1,8 @@
 #ifndef PORT_MGR_H
 #define PORT_MGR_H
 
+#include <thermostat/protocol.h>
+
 /*
  * @brief Open and configure port
  *
@@ -20,12 +22,12 @@ int port_mgr_init(void);
 int port_mgr_read_byte(char *buffer); 
 
 /*
- * @brief Write a byte to the port
- * @param Byte to write
+ * @brief Send a data packet to the port
+ * @param Packet to send
  *
  * @return 0 for success, -2 for syserror
  */
-int port_mgr_write_byte(char byte);
+int port_mgr_send_packet(struct data_packet *packet);
 
 /*
  * @brief Close the port

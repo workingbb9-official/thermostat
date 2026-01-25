@@ -22,7 +22,7 @@ int weather_get_temp(const char *raw_json, struct weather_data *data_out) {
         return WEATHER_E_JSON;
     }
 
-    data_out->temp = temp->valuedouble;
+    data_out->temp = (float) temp->valuedouble;
     
     cJSON_Delete(root);
     return WEATHER_OK;

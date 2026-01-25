@@ -1,28 +1,25 @@
-#ifndef KEYPAD_H
-#define KEYPAD_H
+#ifndef KEYPAD_HAL_H
+#define KEYPAD_HAL_H
 
-#define ROWS 4
-#define COLS 4
-#define NO_KEY '\0'
+#define KEYPAD_ROWS 4
+#define KEYPAD_COLS 4
 
-/*
+/**
  * @brief Initialize keypad
  *
  * This function enables cols as outputs
  * Rows are input pullups
- *
  */
-void keypad_init(void);
+void keypad_hal_init(void);
 
-/*
- * @brief Read from keypad
+/**
+ * @brief Read a pressed key
  *
  * This function sets each column to 0
  * If a row is also 0, that key is pressed
  *
- * @return Pressed key, ('\0' if not pressed)
+ * @return Pressed key or '\0'
  */
-char keypad_read(void);
+char keypad_hal_read(void);
 
-
-#endif // KEYPAD_H
+#endif // KEYPAD_HAL_H

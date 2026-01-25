@@ -6,8 +6,6 @@
 #include <host/port.h>
 #include <thermostat/protocol.h>
 
-static int send_packet(struct data_packet *packet);
-
 int receive_data(struct data_packet *packet) {
     uint8_t first_byte;
     if (port_mgr_read_byte(&first_byte) != 0) {
@@ -99,29 +97,5 @@ int send_stats(float avg, float max, float min) {
     stats_packet.payload[5] = min_low;
 
     stats_packet.checksum = 6;
-    return send_packet(&stats_packet);
-}
-
-static int send_packet(struct data_packet *packet) {
-    if (port_mgr_write_byte(packet->start_byte) != 0) {
-        return -2;
-    }
-    if (port_mgr_write_byte(packet->type) != 0) {
-        return -2;
-    }
-    if (port_mgr_write_byte(packet->length) != 0) {
-        return -2;
-    }
-
-    for (uint8_t i = 0; i < packet->length; ++i) {
-        if (port_mgr_write_byte(packet->payload[i]) != 0) {
-            return -2;
-        }
-    }
-    
-    if (port_mgr_write_byte(packet->checksum) != 0) {
-        return -2;
-    }
-
-    return 0;
+    return port_mgr_send_packet(&stats_packet);
 }

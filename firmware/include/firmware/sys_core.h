@@ -3,7 +3,6 @@
 
 /*
  * @brief Initialize all systems
- *
  */
 void sys_init(void);
 
@@ -14,7 +13,6 @@ void sys_init(void);
  * The state ops struct holds func ptrs
  * This function will run those func ptrs
  * States decide when to transition
- *
  */
 void sys_run(void);
 

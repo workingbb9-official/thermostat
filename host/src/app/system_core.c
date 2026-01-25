@@ -28,7 +28,7 @@ struct statistics {
 
 static struct statistics global_stats = {0};
 static struct net_device http_dev = {0};
-static struct weather_data data = {0};
+static struct weather_data weather = {0};
 
 int system_init(void) {
     if (port_mgr_init() != 0) {
@@ -46,10 +46,10 @@ int system_init(void) {
         return TSYS_E_NETWORK;
     }
 
-    int outdoor_temp_status = weather_client_get_temp(&http_dev, &data);
+    int outdoor_temp_status = weather_client_get_temp(&http_dev, &weather);
     switch (outdoor_temp_status) {
     case WEATHER_CLIENT_OK:
-        printf("Outdoor temp: %.2f *C\n", data.temp);
+        printf("Outdoor temp: %.2f *C\n", weather.temp);
         break;
     case WEATHER_CLIENT_E_NET:
         printf("Network error\n");
@@ -77,10 +77,10 @@ void system_run(void) {
     }
     
     
-    int outdoor_temp_status = weather_client_get_temp(&http_dev, &data);
+    int outdoor_temp_status = weather_client_get_temp(&http_dev, &weather);
     switch (outdoor_temp_status) {
     case WEATHER_CLIENT_OK:
-        printf("Outdoor temp: %.2f *C\n", data.temp);
+        printf("\nOutdoor temp: %.2f *C\n", weather.temp);
         break;
     case WEATHER_CLIENT_E_NET:
         printf("Network error\n");
@@ -95,7 +95,16 @@ void system_run(void) {
     switch (packet.type) {
     case HOME:
         store_temp(&packet);
-        printf("Handled temp\n");
+        printf("Stored temp\n");
+        if (outdoor_temp_status != WEATHER_OK)
+            return;
+
+        if (weather_client_send_weather(&weather) < 0) {
+            printf("Failed to send weather\n");
+            return;
+        }
+
+        printf("Sent weather\n");
         break;
     case STATS:
         if (system_analyze() < 0) {

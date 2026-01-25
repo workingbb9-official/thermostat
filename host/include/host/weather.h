@@ -1,10 +1,10 @@
 #ifndef WEATHER_H
 #define WEATHER_H
 
-#define WEATHER_OK       0 
-#define WEATHER_E_INVAL  -1
-#define WEATHER_E_NOMEM  -2
-#define WEATHER_E_JSON   -3
+#define WEATHER_OK           0
+#define WEATHER_E_INVAL     -1
+#define WEATHER_E_NOMEM     -2
+#define WEATHER_E_JSON      -3
 
 struct weather_data {
     float temp;

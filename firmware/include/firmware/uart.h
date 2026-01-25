@@ -1,36 +1,49 @@
-#ifndef UART_MGR_H
-#define UART_MGR_H
+#ifndef UART_H
+#define UART_H
 
 #include <stdint.h>
-
 struct data_packet;
 
-/*
- * @brief Initialize UART for transmission
- *
- */
-void uart_mgr_init(void);
+enum uart_err {
+    UART_OK = 0,
+    UART_INCOMPLETE = -19,
+    UART_E_INVAL,
+    UART_E_IO
+} __attribute__((packed));
 
-/*
+// For receiving
+struct rx_ctx {
+    uint8_t stage;
+    uint8_t payload_idx;
+};
+    
+/**
+ * @brief Initialize UART
+ */
+void uart_init(void);
+
+/**
  * @brief Transmit data packet over UART
- * @param Packet to transmit
  * 
  * Transmit each byte of the packet
  * Loop over payload using the length provided
  *
+ * @param *pkt -- Packet to transmit
  */
-void uart_mgr_transmit(const struct data_packet *packet);
+void uart_send_packet(const struct data_packet *pkt);
 
-/*
+/**
  * @brief Receive data packet over UART
- * @param Packet to store received data
  *
  * 4 stages (start byte, type, payload)
  * Each call moves through one stage
  * Validated after checksum
  *
- * @return Pointer to pkt, 0 if invalid
+ * @param *ctx -- Context held between calls
+ * @param *pkt_out -- Data packet to store bytes
+ * @return UART error code, UART_INCOMPLETE for unfinished packet
  */
-struct data_packet* uart_mgr_receive(void);
+enum uart_err uart_receive_packet(struct rx_ctx *ctx,
+                                  struct data_packet *pkt_out);
 
-#endif // UART_MGR_H
+#endif // UART_H

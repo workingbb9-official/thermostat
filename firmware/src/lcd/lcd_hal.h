@@ -1,35 +1,35 @@
-#ifndef LCD_H
-#define LCD_H
+#ifndef LCD_HAL_H
+#define LCD_HAL_H
 
 #include <stdint.h>
 
-/*
- * @brief Initialize lcd display
+/**
+ * @brief Initialize LCD display
  *
  * This function sets all lcd pins to output and low
  * It enables 4-bit mode
  * Display on, cursor on, no blink
- *
  */
-void lcd_init(void);
+void lcd_hal_init(void);
 
-/*
+/**
  * @brief Send a command to the lcd
- * @param Byte command to send
  *
  * This function clears RS before sending byte
- * Writes the full byte, then shifts left 4 and sends that
+ * Sends the high half, then the low half
  *
+ * @param cmd -- Command to send
  */
-void lcd_send_cmd(uint8_t cmd);
+void lcd_hal_send_cmd(uint8_t cmd);
 
-/*
- * @brief Write a byte to the screen
- * @param Byte to draw on the display
+/**
+ * @brief Draw a byte to the screen
  *
  * This function sets RS before sending byte
- * Writes the full byte, then shifts left 4 and sends that
+ * Sends the high half, then the low half
+ *
+ * @param byte -- Byte to draw
  */
-void lcd_write_byte(uint8_t byte);
+void lcd_hal_draw_byte(uint8_t byte);
     
-#endif // LCD_H
+#endif // LCD_HAL_H

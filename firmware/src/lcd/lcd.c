@@ -6,50 +6,60 @@
 
 static void itoa(char *string, int16_t value);
 
-void lcd_mgr_init(void) {
-    lcd_init();
+void lcd_init(void) {
+    lcd_hal_init();
 }
 
-void lcd_mgr_clear(void) {
-    lcd_mgr_set_cursor(0, 0);
+void lcd_clear(void) {
+    // Clear row 1
+    lcd_set_cursor(0, 0);
     for (uint8_t i = 0; i < 16; ++i) {
-        lcd_write_byte(' ');
+        lcd_hal_draw_byte(' ');
     }
-    lcd_mgr_set_cursor(1, 0);
+
+    // Clear row 2 
+    lcd_set_cursor(1, 0);
     for (uint8_t i = 0; i < 16; ++i) {
-        lcd_write_byte(' ');
+        lcd_hal_draw_byte(' ');
     }
-    lcd_mgr_set_cursor(0, 0);
+
+    lcd_set_cursor(0, 0);
 }
 
-void lcd_mgr_write(const char *string) {
+void lcd_draw_string(const char *string) {
+    if (!string)
+        return;
+
     while (*string != '\0') {
-        lcd_write_byte(*string);
+        lcd_hal_draw_byte(*string);
         ++string;
     }
 }
 
-void lcd_mgr_write_p(const char *string) {
+void lcd_draw_pstr(const char *string) {
+    if (!string)
+        return;
+
     char c;
     while ((c = pgm_read_byte(string++))) {
-        lcd_write_byte(c);
+        lcd_hal_draw_byte(c);
     }
 }
 
-void lcd_mgr_set_cursor(uint8_t row, uint8_t col) {
+void lcd_set_cursor(uint8_t row, uint8_t col) {
     if (row > 1 || col > 15) {
         return;
     }
+
     static const uint8_t row_base[] = {0x00, 0x40};
-    lcd_send_cmd(0x80 | (row_base[row] + col));
+    lcd_hal_send_cmd(0x80 | (row_base[row] + col));
 }
 
-void lcd_mgr_write_int(int16_t value) {
-
+void lcd_draw_int(int16_t value) {
     char string[8];
     itoa(string, value);
 
-    lcd_mgr_write(string);
+    lcd_draw_string(string);
 }
 
 static void itoa(char *string, int16_t value) {
