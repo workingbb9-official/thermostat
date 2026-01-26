@@ -69,6 +69,8 @@ static void home_init(void) {
     home_ctx.rx.stage = 0;
     home_ctx.rx.payload_idx = 0;
     home_ctx.flags.all = 0;
+
+    uart_clear_rx();
 }
 
 static void home_keypress(void) {

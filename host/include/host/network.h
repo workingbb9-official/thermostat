@@ -6,8 +6,8 @@
 // NET errors run from -29 to -20
 enum net_err {
     NET_OK = 0,
-    NET_E_SYS = -29,
-    NET_E_INVAL
+    NET_E_INVAL = -29,
+    NET_E_SYS
 };
 
 __attribute__((visibility("hidden"))) struct net_ops;

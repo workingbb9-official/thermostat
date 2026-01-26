@@ -10,8 +10,9 @@ add_subdirectory(src/weather)
 
 add_executable(host
     src/main.c
-    src/app/system_core.c
-    src/app/sys_utils.c
+    src/app/sys_core.c
+    src/app/state_home.c
+    src/app/state_stats.c
     src/app/weather_client.c
 )
 target_include_directories(host

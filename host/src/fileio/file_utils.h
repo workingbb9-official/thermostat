@@ -36,7 +36,7 @@ int file_open(const char *file_path);
  * Notes:
  *      This function depends on the file's seeker position.
  *      Pair with file_seek(fd, START) for intended functionality.
- *      Buffer is null-terminated before returning
+ *      Buffer is null-terminated before returning.
  */
 ssize_t file_read_line(int file, char *buf_out, size_t bytes, size_t line);
 
@@ -45,7 +45,7 @@ ssize_t file_read_line(int file, char *buf_out, size_t bytes, size_t line);
  *
  * Params:
  *      file: File desc to write to
- *      buf: Data to write
+ *      buf: Null-terminated data to write
  *      bytes: # of bytes to write
  *
  * Return:

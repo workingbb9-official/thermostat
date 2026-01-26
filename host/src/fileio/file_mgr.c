@@ -11,9 +11,17 @@
 static int temp_fd = -1;
 
 enum file_err file_mgr_init(void) {
-    temp_fd = file_open("host/data/temperature.txt");
+    temp_fd = file_open("/home/lebron/code/physical_things/thermostat/host/data/temperature.txt");
     if (temp_fd < 0) {
         return FILE_E_OPEN;
+    }
+
+    return FILE_OK;
+}
+
+enum file_err file_mgr_reset_temp(void) {
+    if (file_seek(temp_fd, START) < 0) {
+        return FILE_E_SEEK;
     }
 
     return FILE_OK;
@@ -22,29 +30,29 @@ enum file_err file_mgr_init(void) {
 enum file_err file_mgr_write_temp(float data) {
     // Convert to string
     char buf[16];
-    const int len = snprintf(buf, sizeof(buf) - 1, "%.2f", data);
+    const int len = snprintf(buf, sizeof(buf), "%.2f", data);
     buf[len] = '\0';
+    printf("String temp: %s\n", buf);
 
+    if (len < 0)
+        return FILE_E_SEEK;
 
     if (file_seek(temp_fd, END) < 0)
         return FILE_E_SEEK;
 
-    if (file_write_line(temp_fd, buf, len) < 0)
+    if (file_write_line(temp_fd, buf, len) <= 0)
         return FILE_E_WRITE;
 
     return FILE_OK;
 }
 
-enum file_err file_mgr_read_temp(float *val_out, size_t line) {
+enum file_err file_mgr_read_temp(float *val_out) {
     if (!val_out)
         return FILE_E_INVAL;
 
-    if (file_seek(temp_fd, START) < 0)
-        return FILE_E_SEEK;
-
     // Temporary buffer
-    char text[32];
-    if (file_read_line(temp_fd, text, sizeof(text) - 1, line) <= 0)
+    char text[32] = {0};
+    if (file_read_line(temp_fd, text, sizeof(text) - 1, 1) <= 0)
         return FILE_E_READ;
 
     // Convert to float and store

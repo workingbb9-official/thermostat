@@ -15,7 +15,7 @@
 static struct {
     uint32_t ticks;
     char input;
-    
+
     enum { 
         MAX = 0,
         MIN
@@ -26,7 +26,7 @@ static struct {
         int16_t max;
         int16_t min;
     } stats;
-    
+
     struct rx_ctx rx;
     struct data_packet rx_pkt;
     union {
@@ -64,11 +64,15 @@ const struct state_ops state_stats = {
 };
 
 static void stats_init(void) {
-    stats_ctx.ticks = STATS_DELAY_TICKS;
+    stats_ctx.ticks = STATS_DELAY_TICKS - 20;
     stats_ctx.limit = MAX;
 
+    stats_ctx.rx.stage = 0;
+    stats_ctx.rx.payload_idx = 0;
     stats_ctx.flags.all = 0;
     stats_ctx.flags.lcd_dirty = 1;
+
+    uart_clear_rx();
 }
 
 static void stats_keypress(void) {
@@ -128,6 +132,11 @@ static void stats_display(void) {
     lcd_draw_pstr(PSTR("Average: "));
     lcd_draw_int(stats_ctx.stats.avg / 100);
     lcd_draw_pstr(dot);
+
+    int16_t avg_decimal = stats_ctx.stats.avg % 100;
+    if (avg_decimal < 0)
+        avg_decimal = -avg_decimal;
+
     lcd_draw_int(stats_ctx.stats.avg % 100);
     lcd_set_cursor(1, 0);
 
@@ -136,12 +145,22 @@ static void stats_display(void) {
         lcd_draw_pstr(PSTR("Max: "));
         lcd_draw_int(stats_ctx.stats.max / 100);
         lcd_draw_pstr(dot);
+
+        int16_t max_decimal = stats_ctx.stats.max % 100;
+        if (max_decimal < 0)
+            max_decimal = -max_decimal;
+
         lcd_draw_int(stats_ctx.stats.max % 100);
     } else {
         // Display min
         lcd_draw_pstr(PSTR("Min: "));
         lcd_draw_int(stats_ctx.stats.min / 100);
         lcd_draw_pstr(dot);
+
+        int16_t min_decimal = stats_ctx.stats.min % 100;
+        if (min_decimal < 0)
+            min_decimal = -min_decimal;
+
         lcd_draw_int(stats_ctx.stats.min % 100);
     }
 }
@@ -151,24 +170,25 @@ static void stats_send(void) {
         return;
 
     stats_ctx.flags.tx_req = 0;
+    stats_ctx.flags.tx_complete = 1;
 
     struct data_packet stats_req = {
         .start_byte = START_BYTE,
         .type       = STATS,
         .length     = 1,
-        .payload[0] = 0x01,
+        .payload[0] = 10,
         .checksum   = 1
     };
 
     uart_send_packet(&stats_req);
-    stats_ctx.flags.tx_complete = 1;
 }
 
 static void stats_receive(void) {
     if (!stats_ctx.flags.rx_req)
         return;
-    
-    int8_t rx_status = uart_receive_packet(&stats_ctx.rx, &stats_ctx.rx_pkt);
+
+    struct data_packet *pkt = &stats_ctx.rx_pkt;
+    int8_t rx_status = uart_receive_packet(&stats_ctx.rx, pkt);
 
     // Check for errors
     if (rx_status < 0 && rx_status != UART_INCOMPLETE) {
@@ -182,7 +202,6 @@ static void stats_receive(void) {
         return;
 
     // Store stats
-    struct data_packet *pkt = &stats_ctx.rx_pkt;
     stats_ctx.stats.avg = 
         (int16_t) (((uint16_t) pkt->payload[0] << 8) | pkt->payload[1]);
     stats_ctx.stats.max = 

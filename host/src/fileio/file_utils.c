@@ -23,10 +23,11 @@ ssize_t file_read_line(int file, char *buf_out, size_t bytes, size_t line) {
         char c;
         ssize_t bytes_read = read(file, &c, 1);
 
-        if (bytes_read == 0)
+        if (bytes_read == 0) {
             return 0;
-        else if (bytes_read < 0)
+        } else if (bytes_read < 0) {
             return FILE_E_READ;
+        }
 
         if (c == '\n')
             ++current_line;
@@ -79,12 +80,13 @@ enum file_err file_seek(int file, int pos) {
     if (pos != START && pos != END)
         return FILE_E_INVAL;
 
-    if (pos == START)
+    if (pos == START) {
         if (lseek(file, 0, SEEK_SET) < 0)
             return FILE_E_SEEK;
-    else
+    } else {
         if (lseek(file, 0, SEEK_END) < 0)
             return FILE_E_SEEK;
+    }
 
     return FILE_OK;
 }

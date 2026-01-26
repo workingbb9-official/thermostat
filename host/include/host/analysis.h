@@ -4,11 +4,11 @@
 #include <stddef.h>
 
 /*
- * Calculate average of data
+ * Desc: Calculate average of data
  *
  * Params:
- *      data:       array of floats
- *      length:     # of elements in the array
+ *      data: array of floats
+ *      length: # of elements in the array
  *
  * Return:
  *      Average of data
@@ -17,27 +17,27 @@
 float analyze_average(const float *data, size_t length);
 
 /*
- * Find max value of data
+ * Desc: Find max value of data
  *
  * Params:
- *      data:       array of floats
- *      length:     # of elements in the array
+ *      data: array of floats
+ *      length: # of elements in the array
  *
  * Return:
- *      Max value in data
+ *      Max value of data
  *      0 for invalid params
  */
 float analyze_max(const float *data, size_t length);
 
 /*
- * Find min value of data
+ * Desc: Find min value of data
  *
  * Params:
- *      data:       array of floats
- *      length:     # of elements in the array
+ *      data: array of floats
+ *      length: # of elements in the array
  *
  * Return:
- *      Min value in data
+ *      Min value of data
  *      0 for invalid params
  */
 float analyze_min(const float *data, size_t length);

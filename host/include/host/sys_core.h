@@ -1,14 +1,10 @@
-#ifndef SYSTEM_CORE_H
-#define SYSTEM_CORE_H
+#ifndef SYS_CORE_H
+#define SYS_CORE_H
 
-#define TSYS_OK           0
-#define TSYS_E_PORT      -1
-#define TSYS_E_STORAGE   -2
-#define TSYS_E_SIGNAL    -3
-#define TSYS_E_ANALYZE   -4
-#define TSYS_E_NETWORK   -5
-#define TSYS_E_WEATHER   -6
-#define TSYS_E_FILE      -7
+#define NO_SHUTDOWN 0
+#define SHUTDOWN 1
+
+#include <host/common/tsys_errors.h>
 
 /*
  * @brief Initialize all managers and sigint
@@ -18,7 +14,7 @@
  *
  * @return TSYS_OK, TSYS_PORT_ERROR, TSYS_STORAGE_ERROR
  */
-int system_init(void);
+enum tsys_err sys_init(void);
 
 /*
  * @brief Run all system operations
@@ -28,7 +24,7 @@ int system_init(void);
  * It will printf() and exit if errors come up
  *
  */
-void system_run(void);
+void sys_run(void);
 
 /*
  * @brief Destroy all objects
@@ -38,7 +34,7 @@ void system_run(void);
  *
  * @return TSYS_OK, TSYS_PORT_ERROR, TSYS_STORAGE_ERROR
  */
-int system_cleanup(void);
+enum tsys_err sys_cleanup(void);
 
 /*
  * @brief Analyze all current storage data
@@ -49,7 +45,7 @@ int system_cleanup(void);
  *
  * @return TSYS_OK, TSYS_ANALYZE_ERROR
  */
-int system_analyze(void);
+int sys_analyze(void);
 
 /*
  * @brief Tell main when to shutdown
@@ -59,6 +55,6 @@ int system_analyze(void);
  *
  * @return 0 for no, 1 for shutdown
  */
-int system_should_shutdown(void);
+int sys_should_shutdown(void);
 
-#endif // SYSTEM_CORE_H
+#endif // SYS_CORE_H

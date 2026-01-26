@@ -72,7 +72,6 @@ ssize_t port_hal_read(int port, char *buf, size_t bytes) {
     if (bytes_read < 0)
         return PORT_E_READ;
     
-    buf[bytes_read] = '\0';
     return bytes_read;
 }
 

@@ -1,22 +1,20 @@
-#include <host/system_core.h>
+#include <host/sys_core.h>
+#include <host/common/tsys_errors.h>
 #include <stdio.h>
 
 int main(void) {
-    if (system_init() != TSYS_OK) {
+    if (sys_init() < TSYS_OK) {
         printf("System init error\n");
         return 1;
     }
+    
+    printf("System initialized\n\n");
 
-    if (system_analyze() != TSYS_OK) {
-        printf("System analyze error\n");
-        return 1;
+    while (!sys_should_shutdown()) {
+        sys_run();
     }
 
-    while (!system_should_shutdown()) {
-        system_run();
-    }
-
-    if (system_cleanup() != TSYS_OK) {
+    if (sys_cleanup() < TSYS_OK) {
         printf("System cleanup error\n");
         return 1;
     }

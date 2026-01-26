@@ -18,6 +18,15 @@
 enum file_err file_mgr_init(void);
 
 /**
+ * Desc: Reset temp file seeker to start
+ *
+ * Return:
+ *      FILE_OK: File reset
+ *      FILE_E_SEEK: Failed to seek to start
+ */
+enum file_err file_mgr_reset_temp(void);
+
+/**
  * Desc: Write temp to the temperature file
  * 
  * Params:
@@ -35,15 +44,17 @@ enum file_err file_mgr_write_temp(float data);
  *
  * Params:
  *      val_out: Buffer to store value
- *      line: Target line to read from
  *
  * Return:
  *      FILE_OK: Value was read and stored
  *      FILE_INVAL: val_out was NULL
- *      FILE_E_SEEK: Failed to set seeker
  *      FILE_E_READ: Failed to read from file
+ * 
+ * Notes:
+ *      Pair with file_mgr_reset_temp() to read full file.
+ *      Each line in the .txt is read sequentially.
  */
-enum file_err file_mgr_read_temp(float *val_out, size_t line);
+enum file_err file_mgr_read_temp(float *val_out);
 
 /**
  * Desc: Close all files

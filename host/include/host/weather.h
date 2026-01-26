@@ -1,32 +1,46 @@
 #ifndef WEATHER_H
 #define WEATHER_H
 
-#define WEATHER_OK           0
-#define WEATHER_E_INVAL     -1
-#define WEATHER_E_NOMEM     -2
-#define WEATHER_E_JSON      -3
+// WEATHER errors run from -59 to -50
+enum weather_err {
+    WEATHER_OK = 0,
+    WEATHER_E_INVAL = -59,
+    WEATHER_E_NOMEM,
+    WEATHER_E_JSON = -57
+};
 
 struct weather_data {
     float temp;
 };
 
 /**
- * @brief Parse raw json and store temperature in weather device
+ * Desc: Parse raw json and store temperature in weather data struct
  *
- * This function is designed to parse something like this
+ * Params:
+ *      raw_json: JSON in the format shown below
+ *      data_out: Weather data struct to store temperature
+ *
+ * Return:
+ *      WEATHER_OK: Temp was found and stored
+ *      WEATHER_E_INVAL: raw_json or data_out was NULL
+ *      WEATHER_E_NOMEM: No system mem to create cJSON item
+ *      WEATHER_E_JSON: Failed to find "current" or "temperature_2m"
+ *
+ * Notes:
+ *      This function is designed to parse something like this:
  *      "{"current":
  *          {
  *              "time":"2026-01-23T00:15",
  *              "interval":900,
- *              "temperature":2.2
+ *              "temperature_2m":2.2
  *          }
  *      }"
- *  JSON passed in must have the same "current":{"temperature": x.x} format.
  *
- * @param *raw_json     JSON containing the above key-value pair 
- * @param *data_out     Weather device to store temperature in
- * @return int          WEATHER error code
+ *      JSON must contain this: "current":{"temperature_2m": x.x}.
  */
-int weather_get_temp(const char *raw_json, struct weather_data *data_out);
+enum weather_err weather_get_temp(
+    const char *raw_json,
+    struct weather_data *data_out
+);
 
 #endif // WEATHER_H

@@ -25,6 +25,10 @@ void uart_send_packet(const struct data_packet *pkt) {
     uart_hal_write_byte(pkt->checksum);
 }
 
+void uart_clear_rx(void) {
+    while (uart_hal_read_byte() != UART_HAL_NO_BYTE);
+}
+
 enum uart_err uart_receive_packet(struct rx_ctx *ctx,
                                   struct data_packet *pkt_out)
 {
@@ -40,8 +44,11 @@ enum uart_err uart_receive_packet(struct rx_ctx *ctx,
     // Stage represents each member of data packet struct
     switch (ctx->stage) {
     case 0:
-        pkt_out->start_byte = byte;
-        ctx->stage = 1;
+        if (byte == START_BYTE) {
+            pkt_out->start_byte = byte;
+            ctx->stage = 1;
+        }
+
         break;
     case 1:
         pkt_out->type = byte;
@@ -65,7 +72,7 @@ enum uart_err uart_receive_packet(struct rx_ctx *ctx,
         if (validate_packet(pkt_out))
             return UART_OK;
         
-        return UART_E_IO;
+        return UART_E_BAD_PACKET;
     default:
         // Reset ctx
         ctx->stage = 0;
