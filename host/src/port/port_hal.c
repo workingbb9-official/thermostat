@@ -63,7 +63,7 @@ enum port_err port_hal_configure(int port, int speed) {
     return PORT_OK;
 }
 
-ssize_t port_hal_read(int port, char *buf, unsigned int bytes) {
+ssize_t port_hal_read(int port, char *buf, size_t bytes) {
     if (port < 0 || !buf)
         return PORT_E_INVAL;
 
@@ -76,7 +76,7 @@ ssize_t port_hal_read(int port, char *buf, unsigned int bytes) {
     return bytes_read;
 }
 
-ssize_t port_hal_write(int port, const char *buf, unsigned int bytes) {
+ssize_t port_hal_write(int port, const char *buf, size_t bytes) {
     if (port < 0 || !buf)
         return PORT_E_INVAL;
 

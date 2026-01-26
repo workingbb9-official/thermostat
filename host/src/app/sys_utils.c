@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include <host/storage.h>
+#include <host/file_mgr.h>
 #include <host/port.h>
 #include <thermostat/protocol.h>
 
@@ -69,7 +69,7 @@ int receive_data(struct data_packet *packet) {
 int store_temp(const struct data_packet *packet) {
     const int16_t value = (int16_t) (((uint16_t) packet->payload[0] << 8) | packet->payload[1]);
     const float data = value / 100.0f;
-    return storage_mgr_write_temp(data);
+    return file_mgr_write_temp(data);
 }
 
 int send_stats(float avg, float max, float min) {

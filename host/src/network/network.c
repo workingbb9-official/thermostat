@@ -10,13 +10,14 @@
 
 /* Private definition */
 __attribute__((visibility("hidden"))) struct net_ops {
-    int (*fetch)(const struct net_device *dev, 
-                 char *buf, 
-                 size_t buf_size);
+    ssize_t (*fetch)(
+        const struct net_device *dev, 
+        char *buf, 
+        size_t buf_size);
 };
 
 /* Public API */
-net_err_t net_dev_init(
+enum net_err net_dev_init(
     struct net_device *dev, 
     const struct net_ops *ops, 
     const char *host, 

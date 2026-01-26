@@ -2,7 +2,7 @@
 #define PORT_HAL_H
 
 #include <sys/types.h>
-#include <host/shared/port_errors.h>
+#include <host/common/port_errors.h>
 
 /**
  * Desc: Open serial port in i/o and no control mode
@@ -53,7 +53,7 @@ enum port_err port_hal_configure(int port, int baud_rate);
  *      If successful, this function will null-terminate.
  *      Otherwise, buffer is unsafe and should be discarded.
  */
-ssize_t port_hal_read(int port, char *buf, unsigned int bytes);
+ssize_t port_hal_read(int port, char *buf, size_t bytes);
 
 /**
  * Desc: Write to serial port
@@ -68,7 +68,7 @@ ssize_t port_hal_read(int port, char *buf, unsigned int bytes);
  *      PORT_E_INVAL: Port was <0 or buf was NULL
  *      PORT_E_WRITE: Call to write() failed
  */
-ssize_t port_hal_write(int port, const char *buf, unsigned int bytes);
+ssize_t port_hal_write(int port, const char *buf, size_t bytes);
 
 /**
  * Desc: Close serial port

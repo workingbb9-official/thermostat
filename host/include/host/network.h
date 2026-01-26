@@ -4,11 +4,11 @@
 #include <sys/types.h>
 
 // NET errors run from -29 to -20
-typedef enum net_err {
+enum net_err {
     NET_OK = 0,
     NET_E_SYS = -29,
     NET_E_INVAL
-} net_err_t;
+};
 
 __attribute__((visibility("hidden"))) struct net_ops;
 extern const struct net_ops http_ops;
@@ -23,8 +23,8 @@ struct net_device {
  * Initialize network device
  *
  * Params:
- *      dev: Ptr to device to init
- *      ops: Ptr to net ops, determines fetching
+ *      dev: Device to init
+ *      ops: Net ops for device, determines fetching
  *      host: Host URL (eg. youtube.com)
  *      path: Path to website (eg. /feed/history)
  * 
@@ -33,7 +33,7 @@ struct net_device {
  *      NET_E_INVAL: Invalid param
  *
  */
-net_err_t net_dev_init(
+enum net_err net_dev_init(
     struct net_device *dev,
     const struct net_ops *ops,
     const char *host,
@@ -44,7 +44,7 @@ net_err_t net_dev_init(
  * Fetch website response
  *
  * Params:
- *      dev: Ptr to initialized net device
+ *      dev: Initialized net device
  *      buf: Buffer to hold response
  *      buf_size: Size of the buffer
  *

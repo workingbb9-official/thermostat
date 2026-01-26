@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <signal.h>
 
-#include <host/storage.h>
+#include <host/file_mgr.h>
 #include <host/analysis.h>
 #include <host/port.h>
 #include <host/network.h>
@@ -31,18 +31,18 @@ static struct net_device http_dev = {0};
 static struct weather_data weather = {0};
 
 int system_init(void) {
-    if (port_init() < 0) {
+    if (port_init() < 0)
         return TSYS_E_PORT;
-    }
 
-    if (storage_mgr_init() != 0) {
+
+    if (file_mgr_init() != 0) {
         port_close();
-        return TSYS_E_STORAGE;
+        return TSYS_E_FILE;
     }
 
     if (net_dev_init(&http_dev, &http_ops, "api.open-meteo.com", API_URL)) {
         port_close();
-        storage_mgr_close();
+        file_mgr_close();
         return TSYS_E_NETWORK;
     }
 
@@ -125,14 +125,14 @@ void system_run(void) {
 
 int system_cleanup(void) {
     int port_close_status = port_close();
-    int storage_close_status = storage_mgr_close();
+    int file_mgr_close_status = file_mgr_close();
 
     if (port_close_status != 0) {
         return TSYS_E_PORT;
     }
 
-    if (storage_close_status != 0) {
-        return TSYS_E_STORAGE;
+    if (file_mgr_close_status != 0) {
+        return TSYS_E_FILE;
     }
 
     return TSYS_OK;
@@ -151,7 +151,7 @@ int system_analyze(void) {
     float temp_line;
     size_t line = 1;
 
-    while (storage_mgr_read_temp(&temp_line, line) == 0) {
+    while (file_mgr_read_temp(&temp_line, line) == 0) {
         if (count >= capacity) {
             size_t new_capacity = capacity * 2;
             float *temp_ptr = realloc(data, new_capacity * sizeof(float));

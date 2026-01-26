@@ -1,13 +1,14 @@
 #ifndef SYSTEM_CORE_H
 #define SYSTEM_CORE_H
 
-#define TSYS_OK          0
+#define TSYS_OK           0
 #define TSYS_E_PORT      -1
 #define TSYS_E_STORAGE   -2
 #define TSYS_E_SIGNAL    -3
 #define TSYS_E_ANALYZE   -4
 #define TSYS_E_NETWORK   -5
 #define TSYS_E_WEATHER   -6
+#define TSYS_E_FILE      -7
 
 /*
  * @brief Initialize all managers and sigint

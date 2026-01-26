@@ -2,7 +2,7 @@
 #define PORT_H
 
 #include <thermostat/protocol.h>
-#include <host/shared/port_errors.h>
+#include <host/common/port_errors.h>
 
 /**
  * Desc: Open and configure the serial port
