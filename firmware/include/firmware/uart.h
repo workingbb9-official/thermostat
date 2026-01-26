@@ -4,6 +4,7 @@
 #include <stdint.h>
 struct data_packet;
 
+// UART errors run from -19 to -10
 enum uart_err {
     UART_OK = 0,
     UART_INCOMPLETE = -19,

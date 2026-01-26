@@ -31,17 +31,17 @@ static struct net_device http_dev = {0};
 static struct weather_data weather = {0};
 
 int system_init(void) {
-    if (port_mgr_init() != 0) {
+    if (port_init() < 0) {
         return TSYS_E_PORT;
     }
 
     if (storage_mgr_init() != 0) {
-        port_mgr_close();
+        port_close();
         return TSYS_E_STORAGE;
     }
 
     if (net_dev_init(&http_dev, &http_ops, "api.open-meteo.com", API_URL)) {
-        port_mgr_close();
+        port_close();
         storage_mgr_close();
         return TSYS_E_NETWORK;
     }
@@ -124,7 +124,7 @@ void system_run(void) {
 }
 
 int system_cleanup(void) {
-    int port_close_status = port_mgr_close();
+    int port_close_status = port_close();
     int storage_close_status = storage_mgr_close();
 
     if (port_close_status != 0) {

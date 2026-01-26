@@ -8,7 +8,7 @@
 
 /**
  * @brief Open file in i/o mode
- * @param Path of file to open
+ * @param *file_path  Path to file
  *
  * @return Fd of file, -1 for syserror 
  */

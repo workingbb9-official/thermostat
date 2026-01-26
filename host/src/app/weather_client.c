@@ -48,7 +48,7 @@ int weather_client_send_weather(const struct weather_data *data) {
 
     pkt.checksum = 2;
 
-    if (port_mgr_send_packet(&pkt) < 0)
+    if (port_send_packet(&pkt) < 0)
         return WEATHER_CLIENT_E_PORT;
 
     return WEATHER_CLIENT_OK;

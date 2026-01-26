@@ -8,7 +8,7 @@
 
 int receive_data(struct data_packet *packet) {
     uint8_t first_byte;
-    if (port_mgr_read_byte(&first_byte) != 0) {
+    if (port_read_byte(&first_byte) < 0) {
         return -2;
     }
 
@@ -18,7 +18,7 @@ int receive_data(struct data_packet *packet) {
     packet->start_byte = first_byte;
 
     uint8_t second_byte;
-    if (port_mgr_read_byte(&second_byte) != 0) {
+    if (port_read_byte(&second_byte) < 0) {
         return -2;
     }
 
@@ -38,7 +38,7 @@ int receive_data(struct data_packet *packet) {
     }
 
     uint8_t third_byte;
-    if (port_mgr_read_byte(&third_byte) != 0) {
+    if (port_read_byte(&third_byte) < 0) {
         return -2;
     }
 
@@ -49,7 +49,7 @@ int receive_data(struct data_packet *packet) {
 
     for (uint8_t i = 0; i < packet->length; ++i) {
         uint8_t payload_byte;
-        if (port_mgr_read_byte(&payload_byte) != 0) {
+        if (port_read_byte(&payload_byte) < 0) {
             return -2;
         }
 
@@ -57,7 +57,7 @@ int receive_data(struct data_packet *packet) {
     }
 
     uint8_t checksum_byte;
-    if (port_mgr_read_byte(&checksum_byte) != 0) {
+    if (port_read_byte(&checksum_byte) < 0) {
         return -2;
     }
 
@@ -97,5 +97,6 @@ int send_stats(float avg, float max, float min) {
     stats_packet.payload[5] = min_low;
 
     stats_packet.checksum = 6;
-    return port_mgr_send_packet(&stats_packet);
+    if (port_send_packet(&stats_packet) < 0)
+        return -1;
 }
