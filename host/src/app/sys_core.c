@@ -67,20 +67,21 @@ void sys_run(void) {
         }
 
         if (home_send_weather(&http_dev, &weather) < 0) {
-            printf("Failed to send weather\n\n");
+            printf("Failed to send weather\n");
         }
 
         break;
     case STATS:
+        printf("Received stats packet\n");
         if (stats_analyze(&global_stats) < 0) {
             printf("Failed to analyze\n");
             global_stats.avg = 0.0f;
             global_stats.max = 0.0f;
             global_stats.min = 0.0f;
         } else {
-            printf("Average: %f\n", global_stats.avg);
-            printf("Max: %f\n", global_stats.max);
-            printf("Min: %f\n\n", global_stats.min);
+            printf("Average: %.2f\n", global_stats.avg);
+            printf("Max: %.2f\n", global_stats.max);
+            printf("Min: %.2f\n", global_stats.min);
         }
 
         if (stats_send(&global_stats) < 0) {

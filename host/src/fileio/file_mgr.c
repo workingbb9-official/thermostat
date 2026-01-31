@@ -32,7 +32,6 @@ enum file_err file_mgr_write_temp(float data) {
     char buf[16];
     const int len = snprintf(buf, sizeof(buf), "%.2f", data);
     buf[len] = '\0';
-    printf("String temp: %s\n", buf);
 
     if (len < 0)
         return FILE_E_SEEK;
