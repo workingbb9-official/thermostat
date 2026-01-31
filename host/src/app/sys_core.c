@@ -10,6 +10,7 @@
 #include <host/weather.h>
 #include <host/common/tsys_errors.h>
 #include <thermostat/protocol.h>
+#include "state_login.h"
 #include "state_home.h"
 #include "state_stats.h"
 
@@ -63,6 +64,8 @@ void sys_run(void) {
 
     switch (packet.type) {
     case LOGIN:
+        printf("Received login packet\n");
+        login_record_login();
         break;
     case HOME:
         printf("Received temp packet\n");
