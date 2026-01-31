@@ -2,27 +2,43 @@
 #define ANALYSIS_H
 
 #include <stddef.h>
-/**
- * @brief Averages data
- * @param Array of floats, # of non-garbage elements
+
+/*
+ * Desc: Calculate average of data
  *
- * @return Average of array
+ * Params:
+ *      data: array of floats
+ *      length: # of elements in the array
+ *
+ * Return:
+ *      Average of data
+ *      0 for invalid params
  */
 float analyze_average(const float *data, size_t length);
 
-/**
- * @brief Finds max of data
- * @param Array of floats, # of non-garbage elements
- * 
- * @return Max of array
+/*
+ * Desc: Find max value of data
+ *
+ * Params:
+ *      data: array of floats
+ *      length: # of elements in the array
+ *
+ * Return:
+ *      Max value of data
+ *      0 for invalid params
  */
 float analyze_max(const float *data, size_t length);
 
-/**
- * @brief Finds min of data
- * @param Array of floats, # of non-garbage elements
- * 
- * @return Min of array
+/*
+ * Desc: Find min value of data
+ *
+ * Params:
+ *      data: array of floats
+ *      length: # of elements in the array
+ *
+ * Return:
+ *      Min value of data
+ *      0 for invalid params
  */
 float analyze_min(const float *data, size_t length);
 

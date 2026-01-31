@@ -1,13 +1,12 @@
-#ifndef THERM_MGR_H
-#define THERM_MGR_H
+#ifndef THERMISTOR_H
+#define THERMISTOR_H
 
-/*
- * @brief Initialize thermistor for use
- *
+/**
+ * @brief Initialize thermistor
  */
-void therm_mgr_init(void);
+void therm_init(void);
 
-/*
+/**
  * @brief Calculate temperature
  *
  * Takes raw binary value from thermistor
@@ -16,6 +15,6 @@ void therm_mgr_init(void);
  *
  * @return Current temperature in celsius
  */
-float therm_mgr_get_temp(void);
+float therm_get_temp(void);
 
-#endif // THERM_MGR_H
+#endif // THERMISTOR_H

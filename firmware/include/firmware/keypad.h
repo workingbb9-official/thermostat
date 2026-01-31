@@ -1,19 +1,19 @@
-#ifndef KEYPAD_MGR_H
-#define KEYPAD_MGR_H
+#ifndef KEYPAD_H
+#define KEYPAD_H
 
-#define NO_KEY '\0'
+#define KEYPAD_NO_KEY '\0'
+
 struct keypad_state {
     char last_key;
     char current_key;
-} __attribute__((packed));
+};
 
-/*
+/**
  * @brief Initialize keypad
- *
  */
-void keypad_mgr_init(void);
+void keypad_init(void);
 
-/*
+/**
  * @brief Get the keypad state
  *
  * Access struct fields to see last and current key
@@ -21,7 +21,7 @@ void keypad_mgr_init(void);
  *
  * @return Current keypad state (definition above)
  */
-struct keypad_state keypad_mgr_read(void);
+struct keypad_state keypad_get_state(void);
 
 
-#endif // KEYPAD_MGR_H
+#endif // KEYPAD_H

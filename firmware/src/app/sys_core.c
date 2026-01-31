@@ -9,19 +9,24 @@
 static const struct state_ops *state; 
 
 void sys_init(void) {
-    therm_mgr_init();
-    uart_mgr_init();
-    lcd_mgr_init();
-    keypad_mgr_init();
-    
+    // Initialize components
+    therm_init();
+    uart_init();
+    lcd_init();
+    keypad_init();
+
+    // Set initial state to login
     state = &state_login;
     state->init();
 }
 
 void sys_run(void) {
-    state->on_keypress();
+    // Required functions
+    state->keypress();
     state->process();
     state->display();
+    
+    // Optional functions
     if (state->send) state->send();
     if (state->receive) state->receive();
 }
