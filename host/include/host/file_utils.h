@@ -26,7 +26,6 @@ int file_open(const char *file_path);
  *      file: File desc to read from
  *      buf: Buffer to store data
  *      bytes: # of bytes to read
- *      line: target line to read
  *
  * Return:
  *      >=0: Bytes read into buf (0 means empty file)
@@ -35,10 +34,9 @@ int file_open(const char *file_path);
  *
  * Notes:
  *      This function depends on the file's seeker position.
- *      Pair with file_seek(fd, START) for intended functionality.
  *      Buffer is null-terminated before returning.
  */
-ssize_t file_read_line(int file, char *buf_out, size_t bytes, size_t line);
+ssize_t file_read_line(int file, char *buf_out, size_t bytes);
 
 /**
  * Desc: Write a line and a '\n' to a file

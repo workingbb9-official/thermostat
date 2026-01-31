@@ -14,12 +14,13 @@ struct statistics {
  *
  * Params:
  *      stats_out: Statistics buffer to update
+ *      temp_fd: File desc of the temperature file
  * 
  * Return:
  *      TSYS_OK: Stats analyzed and stored
- *      TSYS_E_FILE: Failed to reset temp file
+ *      TSYS_E_FILE: Failed to set seeker or read from file
  */
-enum tsys_err stats_analyze(struct statistics *stats_out);
+enum tsys_err stats_analyze(int temp_fd, struct statistics *stats_out);
 
 /**
  * Desc: Send stats to firmware
