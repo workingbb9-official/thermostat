@@ -5,7 +5,7 @@
 #include <signal.h>
 
 #include <host/port.h>
-#include <host/file_mgr.h>
+#include <host/file_utils.h>
 #include <host/network.h>
 #include <host/weather.h>
 #include <host/common/tsys_errors.h>
@@ -16,7 +16,6 @@
 #define API_URL "/v1/forecast?latitude=39&longitude=-97"    \
                 "&current=temperature_2m&forecast_days=1"   \
 
-static int signal_shutdown = 0;
 static enum tsys_err signal_init(void);
 static void signal_handler(int signum);
 static int receive_data(struct data_packet *packet);
@@ -29,19 +28,24 @@ static struct statistics global_stats = {
 
 static struct net_device http_dev = {0};
 static struct weather_data weather = {0};
+static int signal_shutdown = 0;
+static int temp_fd = -1;
 
 int sys_init(void) {
     if (port_init() < 0)
         return TSYS_E_PORT;
 
-    if (file_mgr_init() != 0) {
+    /* Open storage files */
+    temp_fd = file_open("host/data/temperature.txt");
+    if (temp_fd < 0) {
         port_close();
+        printf("Failed to open temp_fd\n");
         return TSYS_E_FILE;
     }
 
     if (net_dev_init(&http_dev, &http_ops, "api.open-meteo.com", API_URL)) {
         port_close();
-        file_mgr_close();
+        file_close(temp_fd);
         return TSYS_E_NET;
     }
 
@@ -62,7 +66,7 @@ void sys_run(void) {
         break;
     case HOME:
         printf("Received temp packet\n");
-        if (home_store_temp(&packet) < 0) {
+        if (home_store_temp(temp_fd, &packet) < 0) {
             printf("Failed to store temp\n");
         }
 
@@ -73,7 +77,7 @@ void sys_run(void) {
         break;
     case STATS:
         printf("Received stats packet\n");
-        if (stats_analyze(&global_stats) < 0) {
+        if (stats_analyze(temp_fd, &global_stats) < 0) {
             printf("Failed to analyze\n");
             global_stats.avg = 0.0f;
             global_stats.max = 0.0f;
@@ -99,15 +103,15 @@ void sys_run(void) {
 
 enum tsys_err sys_cleanup(void) {
     int port_close_status = port_close();
-    int file_mgr_close_status = file_mgr_close();
+    int temp_file_close_status = file_close(temp_fd);
 
     if (port_close_status < 0) {
         printf("Failed to close port\n");
         return TSYS_E_PORT;
     }
 
-    if (file_mgr_close_status < 0) {
-        printf("Failed to close file_mgr\n");
+    if (temp_file_close_status < 0) {
+        printf("Failed to close temp file\n");
         return TSYS_E_FILE;
     }
 

@@ -22,5 +22,5 @@ target_include_directories(host
 )
 target_link_libraries(host
     PRIVATE
-    storage_lib analysis_lib port_lib weather_lib network_lib
+    file_lib analysis_lib port_lib weather_lib network_lib
 )

@@ -13,13 +13,14 @@ struct weather_data;
  *
  * Params:
  *      pkt: Raw data packet holding temp in payload[0] and [1]
+ *      temp_fd: File desc of the temperature file
  *
  * Return:
  *      TSYS_OK: Temp was stored
  *      TSYS_E_INVAL: pkt was NULL
  *      TSYS_E_FILE: Failed to write temp to file
  */
-enum tsys_err home_store_temp(const struct data_packet *pkt);
+enum tsys_err home_store_temp(int temp_fd, const struct data_packet *pkt);
 
 /**
  * Desc: Send weather data to firmware

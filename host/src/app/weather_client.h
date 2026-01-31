@@ -1,6 +1,8 @@
 #ifndef WEATHER_CLIENT_H
 #define WEATHER_CLIENT_H
 
+#include <host/common/tsys_errors.h>
+
 /* Forward declare */
 struct net_device;
 struct weather_data;
