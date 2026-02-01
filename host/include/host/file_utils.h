@@ -50,7 +50,7 @@ ssize_t file_read_line(int file, char *buf_out, size_t bytes);
  *      >0: Bytes written to port
  *      FILE_E_INVAL: File was <0 or buffer was NULL
  *      FILE_E_WRITE: Failed to write data
- * 
+ *
  * Notes:
  *      This function depends on the file's seeker position.
  *      Pair with file_seek(fd, END) to write a new line.
@@ -64,13 +64,13 @@ ssize_t file_write_line(int file, const char *buf, size_t bytes);
  * Params:
  *      file: File desc to set seeker
  *      pos: START or END of file
- * 
+ *
  * Return:
  *      FILE_OK: Seeker was set
  *      FILE_E_INVAL: File was <0 or invalid pos
  *      FILE_E_SEEK: Failed to set seeker
  *
- * Notes: 
+ * Notes:
  *      This function determines how write_line() and read_line() run.
  *      Calling this with END will allow for writing to the end of the file.
  *      Calling this with START will allow for proper use of read_line().

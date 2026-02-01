@@ -39,7 +39,6 @@ static void login_init(void);
 static void login_keypress(void);
 static void login_process(void);
 static void login_display(void);
-static void login_exit(void);
 
 const struct state_ops state_login = {
     .init     = login_init,
@@ -48,7 +47,7 @@ const struct state_ops state_login = {
     .display  = login_display,
     .send     = NULL,
     .receive  = NULL,
-    .exit     = login_exit
+    .exit     = NULL
 };
 
 static enum pwd_state pwd_validate(void);
@@ -118,19 +117,6 @@ static void login_display(void) {
         lcd_set_cursor(1, 0);
         lcd_draw_string(login_ctx.user_pwd.buf);
     }
-}
-
-static void login_exit(void) {
-    /* Tell host about login */
-    struct data_packet pkt = {
-        .start_byte = START_BYTE,
-        .type = LOGIN,
-        .length = 1,
-        .payload[0] = PAYLOAD_NONE,
-        .checksum = 1
-    };
-
-    uart_send_packet(&pkt);
 }
 
 static enum pwd_state pwd_validate(void) {

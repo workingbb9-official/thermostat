@@ -27,7 +27,7 @@ struct net_device {
  *      ops: Net ops for device, determines fetching
  *      host: Host URL (eg. youtube.com)
  *      path: Path to website (eg. /feed/history)
- * 
+ *
  * Return:
  *      NET_OK: Init was successful
  *      NET_E_INVAL: Invalid param

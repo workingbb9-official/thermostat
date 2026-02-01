@@ -12,7 +12,7 @@ void lcd_init(void);
  * @brief Clear the entire display
  *
  * This function will move to top left
- * Then it writes 16 spaces 
+ * Then it writes 16 spaces
  * Final position is top left (0, 0)
  */
 void lcd_clear(void);
@@ -40,7 +40,7 @@ void lcd_draw_pstr(const char *string);
 void lcd_draw_int(int16_t value);
 
 /**
- * @brief Set the cursor for next draw 
+ * @brief Set the cursor for next draw
  * @param row -- Row from 0 to 1
  * @param col -- Col from 0 to 16
  */

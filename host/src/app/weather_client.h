@@ -41,7 +41,7 @@ enum tsys_err weather_client_get_temp(
  *      TSYS_OK: Transmitted data
  *      TSYS_E_INVAL: data was NULL
  *      TSYS_E_PORT: Failed to send packet
- * 
+ *
  * Notes:
  *      Data is parsed into a data packet to transmit.
  *      Temperature is stored in payload[0] and [1].

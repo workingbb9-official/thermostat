@@ -10,7 +10,7 @@
 #include <host/weather.h>
 #include <host/common/tsys_errors.h>
 #include <thermostat/protocol.h>
-#include "state_login.h"
+#include "session.h"
 #include "state_home.h"
 #include "state_stats.h"
 
@@ -31,11 +31,12 @@ static struct net_device http_dev = {0};
 static struct weather_data weather = {0};
 static int signal_shutdown = 0;
 static int temp_fd = -1;
-static int login_fd = -1;
+static int session_fd = -1;
 
 int sys_init(void) {
-    if (port_init() < 0)
+    if (port_init() < 0) {
         return TSYS_E_PORT;
+    }
 
     /* Open storage files */
     temp_fd = file_open("host/data/temperature.txt");
@@ -45,11 +46,11 @@ int sys_init(void) {
         return TSYS_E_FILE;
     }
     
-    login_fd = file_open("host/data/login.txt");
-    if (login_fd < 0) {
+    session_fd = file_open("host/data/session.txt");
+    if (session_fd < 0) {
         port_close();
         file_close(temp_fd);
-        printf("Failed to open login_fd\n");
+        printf("Failed to open session_fd\n");
         return TSYS_E_FILE;
     }
 
@@ -74,7 +75,11 @@ void sys_run(void) {
     switch (packet.type) {
     case LOGIN:
         printf("Received login packet\n");
-        login_record_login(login_fd);
+        session_record_login(session_fd);
+        break;
+    case LOGOUT:
+        printf("Received logout packet\n");
+        session_record_logout(session_fd);
         break;
     case HOME:
         printf("Received temp packet\n");
@@ -116,7 +121,7 @@ void sys_run(void) {
 enum tsys_err sys_cleanup(void) {
     int port_close_status = port_close();
     int temp_file_close_status = file_close(temp_fd);
-    int login_file_close_status = file_close(login_fd);
+    int session_file_close_status = file_close(session_fd);
 
     if (port_close_status < 0) {
         printf("Failed to close port\n");
@@ -128,8 +133,8 @@ enum tsys_err sys_cleanup(void) {
         return TSYS_E_FILE;
     }
     
-    if (login_file_close_status < 0) {
-        printf("Failed to close login file\n");
+    if (session_file_close_status < 0) {
+        printf("Failed to close session file\n");
         return TSYS_E_FILE;
     }
 
@@ -145,36 +150,42 @@ static enum tsys_err signal_init(void) {
     sa.sa_handler = signal_handler;
     sigemptyset(&sa.sa_mask);
 
-    if (sigaction(SIGINT, &sa, NULL) < 0)
+    if (sigaction(SIGINT, &sa, NULL) < 0) {
         return TSYS_E_SIGNAL;
+    }
 
     return TSYS_OK;
 }
 
 static void signal_handler(int signum) {
-    if (signum == SIGINT)
+    if (signum == SIGINT) {
         signal_shutdown = 1;
+    }
 }
 
 static int receive_data(struct data_packet *packet) {
     uint8_t first_byte;
-    if (port_read_byte(&first_byte) < 0)
+    if (port_read_byte(&first_byte) < 0) {
         return TSYS_E_PORT;
+    }
 
-
-    if (first_byte != START_BYTE)
+    if (first_byte != START_BYTE) {
         return TSYS_E_PORT;
+    }
 
     packet->start_byte = first_byte;
 
     uint8_t second_byte;
-    if (port_read_byte(&second_byte) < 0)
+    if (port_read_byte(&second_byte) < 0) {
         return TSYS_E_PORT;
-
+    }
 
     switch (second_byte) {
     case LOGIN:
         packet->type = LOGIN;
+        break;
+    case LOGOUT:
+        packet->type = LOGOUT;
         break;
     case HOME:
         packet->type = HOME;
@@ -188,27 +199,29 @@ static int receive_data(struct data_packet *packet) {
     }
 
     uint8_t third_byte;
-    if (port_read_byte(&third_byte) < 0)
+    if (port_read_byte(&third_byte) < 0) {
         return TSYS_E_PORT;
+    }
 
-
-    if (third_byte < 1 || third_byte > MAX_PAYLOAD)
+    if (third_byte < 1 || third_byte > MAX_PAYLOAD) {
         return -1;
+    }
 
     packet->length = third_byte;
 
     for (uint8_t i = 0; i < packet->length; ++i) {
         uint8_t payload_byte;
-        if (port_read_byte(&payload_byte) < 0)
+        if (port_read_byte(&payload_byte) < 0) {
             return TSYS_E_PORT;
+        }
 
         packet->payload[i] = payload_byte;
     }
 
     uint8_t checksum_byte;
-    if (port_read_byte(&checksum_byte) < 0)
+    if (port_read_byte(&checksum_byte) < 0) {
         return TSYS_E_PORT;
-
+    }
 
     packet->checksum = checksum_byte;
 

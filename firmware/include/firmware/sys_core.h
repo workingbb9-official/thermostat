@@ -1,4 +1,4 @@
-#ifndef SYS_CORE_H 
+#ifndef SYS_CORE_H
 #define SYS_CORE_H
 
 /*
@@ -8,7 +8,7 @@ void sys_init(void);
 
 /*
  * @brief Run all operations
- * 
+ *
  * This function runs on a state ops ptr
  * The state ops struct holds func ptrs
  * This function will run those func ptrs

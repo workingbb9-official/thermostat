@@ -3,10 +3,11 @@
 
 #include <stdint.h>
 
-#define HOME            0x02
-#define LOGIN           0x01
-#define STATS           0x03
 #define START_BYTE      0xAA
+#define LOGIN           0x01
+#define LOGOUT          0x02
+#define HOME            0x03
+#define STATS           0x04
 #define MAX_PAYLOAD     128
 #define PAYLOAD_NONE    0xFF
 

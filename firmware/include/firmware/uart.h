@@ -17,7 +17,7 @@ struct rx_ctx {
     uint8_t stage;
     uint8_t payload_idx;
 };
-    
+
 /**
  * Desc: Initialize UART
  */
@@ -25,7 +25,7 @@ void uart_init(void);
 
 /**
  * Desc: Transmit data packet over UART
- * 
+ *
  * Params:
  *      pkt: Packet to transmit
  */
@@ -49,7 +49,7 @@ void uart_clear_rx(void);
  *      ctx: Context held between calls
  *      pkt_out: Data packet to store bytes
  *
- * Notes: 
+ * Notes:
  *      This function runs through 4 stages.
  *      It has start byte, type, payload, checksum.
  *      Each call moves through one stage.

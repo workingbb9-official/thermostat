@@ -6,7 +6,7 @@
 
 /**
  * Desc: Open serial port in i/o and no control mode
- * 
+ *
  * Params:
  *      file_path: Path of the port file
  *
@@ -23,7 +23,7 @@ int port_hal_open(const char *file_path);
  * Params:
  *      port: File desc of port
  *      baud_rate: Transmission speed
- * 
+ *
  * Return:
  *      PORT_OK: Configured port
  *      PORT_E_INVAL: Port was <0 or baud rate was invalid

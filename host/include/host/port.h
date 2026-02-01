@@ -11,7 +11,7 @@
  *      PORT_OK: Port opened and configured
  *      PORT_E_OPEN: Call to port_hal_open() failed
  *      PORT_E_CONFIGURE: Call to port_hal_configure() failed
- * 
+ *
  * Notes:
  *      The module knows file path and holds file desc of port.
  *      Settings for the port are in port_hal header.
@@ -26,10 +26,10 @@ enum port_err port_init(void);
  *
  * Return:
  *      PORT_OK: Byte was read into buffer
- *      PORT_E_INVAL: Buffer was NULL 
+ *      PORT_E_INVAL: Buffer was NULL
  *      PORT_E_READ: Call to port_hal_read() failed
  */
-enum port_err port_read_byte(char *buf); 
+enum port_err port_read_byte(char *buf);
 
 /**
  * Desc: Send a data packet through the port

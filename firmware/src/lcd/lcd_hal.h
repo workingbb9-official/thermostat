@@ -31,5 +31,5 @@ void lcd_hal_send_cmd(uint8_t cmd);
  * @param byte -- Byte to draw
  */
 void lcd_hal_draw_byte(uint8_t byte);
-    
+
 #endif // LCD_HAL_H
