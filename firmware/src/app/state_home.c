@@ -9,8 +9,9 @@
 #include "states.h"
 #include "strings.h"
 
-#define HOME_DELAY_TICKS 125000UL
-#define HOME_KEY_STATS   '#'
+#define HOME_DELAY_TICKS    125000UL
+#define HOME_KEY_STATS      '#'
+#define HOME_KEY_LOGOUT     '*'
 
 static struct {
     uint32_t ticks;
@@ -91,6 +92,8 @@ static void home_process(void) {
         case HOME_KEY_STATS:
             sys_change_state(&state_stats);
             return;
+        case HOME_KEY_LOGOUT:
+            sys_change_state(&state_login);
         default:
             break;
         }

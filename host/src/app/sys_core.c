@@ -76,6 +76,9 @@ void sys_run(void) {
         printf("Received login packet\n");
         login_record_login(login_fd);
         break;
+    case LOGOUT:
+        printf("Received logout packet\n");
+        break;
     case HOME:
         printf("Received temp packet\n");
         if (home_store_temp(temp_fd, &packet) < 0) {
@@ -175,6 +178,9 @@ static int receive_data(struct data_packet *packet) {
     switch (second_byte) {
     case LOGIN:
         packet->type = LOGIN;
+        break;
+    case LOGOUT:
+        packet->type = LOGOUT;
         break;
     case HOME:
         packet->type = HOME;
