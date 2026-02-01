@@ -176,7 +176,7 @@ static void stats_send(void) {
         .start_byte = START_BYTE,
         .type       = STATS,
         .length     = 1,
-        .payload[0] = 10,
+        .payload[0] = PAYLOAD_NONE,
         .checksum   = 1
     };
 

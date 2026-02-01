@@ -10,6 +10,7 @@
 #include <host/weather.h>
 #include <host/common/tsys_errors.h>
 #include <thermostat/protocol.h>
+#include "state_login.h"
 #include "state_home.h"
 #include "state_stats.h"
 
@@ -30,6 +31,7 @@ static struct net_device http_dev = {0};
 static struct weather_data weather = {0};
 static int signal_shutdown = 0;
 static int temp_fd = -1;
+static int login_fd = -1;
 
 int sys_init(void) {
     if (port_init() < 0)
@@ -40,6 +42,14 @@ int sys_init(void) {
     if (temp_fd < 0) {
         port_close();
         printf("Failed to open temp_fd\n");
+        return TSYS_E_FILE;
+    }
+    
+    login_fd = file_open("host/data/login.txt");
+    if (login_fd < 0) {
+        port_close();
+        file_close(temp_fd);
+        printf("Failed to open login_fd\n");
         return TSYS_E_FILE;
     }
 
@@ -63,6 +73,8 @@ void sys_run(void) {
 
     switch (packet.type) {
     case LOGIN:
+        printf("Received login packet\n");
+        login_record_login(login_fd);
         break;
     case HOME:
         printf("Received temp packet\n");
@@ -104,6 +116,7 @@ void sys_run(void) {
 enum tsys_err sys_cleanup(void) {
     int port_close_status = port_close();
     int temp_file_close_status = file_close(temp_fd);
+    int login_file_close_status = file_close(login_fd);
 
     if (port_close_status < 0) {
         printf("Failed to close port\n");
@@ -112,6 +125,11 @@ enum tsys_err sys_cleanup(void) {
 
     if (temp_file_close_status < 0) {
         printf("Failed to close temp file\n");
+        return TSYS_E_FILE;
+    }
+    
+    if (login_file_close_status < 0) {
+        printf("Failed to close login file\n");
         return TSYS_E_FILE;
     }
 

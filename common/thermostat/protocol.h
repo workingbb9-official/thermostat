@@ -3,11 +3,12 @@
 
 #include <stdint.h>
 
-#define MAX_PAYLOAD 128
-#define START_BYTE  0xAA
-#define LOGIN       0x01
-#define STATS       0x03
-#define HOME        0x02
+#define HOME            0x02
+#define LOGIN           0x01
+#define STATS           0x03
+#define START_BYTE      0xAA
+#define MAX_PAYLOAD     128
+#define PAYLOAD_NONE    0xFF
 
 struct data_packet {
     uint8_t start_byte;

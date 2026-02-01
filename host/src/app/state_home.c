@@ -18,17 +18,15 @@ enum tsys_err home_store_temp(int temp_fd, const struct data_packet *pkt) {
     const float temp = value / 100.0f;
     printf("Temp received: %.2f\n", temp);
     
-    // Convert to string
+    // Convert temp to string
     char temp_string[16];
     const int len = snprintf(temp_string, sizeof(temp_string), "%.2f", temp);
-    temp_string[len] = '\0';
     
-    // Set seeker so we can write to end of file
+    // Seek to end of file and write line
     if (file_seek(temp_fd, END) < 0) {
         return TSYS_E_FILE;
     }
     
-    // Write the string and omit null-terminator
     if (file_write_line(temp_fd, temp_string, len) <= 0) {
         return TSYS_E_FILE;
     }

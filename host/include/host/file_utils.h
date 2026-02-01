@@ -43,7 +43,7 @@ ssize_t file_read_line(int file, char *buf_out, size_t bytes);
  *
  * Params:
  *      file: File desc to write to
- *      buf: Null-terminated data to write
+ *      buf: String to write (no null-terminator)
  *      bytes: # of bytes to write
  *
  * Return:
