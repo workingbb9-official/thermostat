@@ -1,12 +1,18 @@
 #include "state_home.h"
 
 #include <stdio.h>
+#include <stdint.h>
 
 #include <host/file_utils.h>
+#include <host/port.h>
 #include <host/weather.h>
 #include <host/common/tsys_errors.h>
 #include <thermostat/protocol.h>
 #include "weather_client.h"
+
+static enum tsys_err send_temp(const struct weather_data *data);
+static enum tsys_err send_condition(const struct weather_data *data);
+static int16_t float_to_int(float value);
 
 enum tsys_err home_store_temp(int temp_fd, const struct data_packet *pkt) {
     if (!pkt) {
@@ -42,14 +48,71 @@ enum tsys_err home_send_weather(
         return TSYS_E_INVAL;
     }
 
-    if (weather_client_get_temp(http_dev, weather) < 0) {
-        return TSYS_E_WEATHER;
+    // Get temp from API
+    int get_temp_err = weather_client_get_temp(http_dev, weather);
+    if (get_temp_err < 0) {
+        return get_temp_err;
     }
-
-    if (weather_client_send_weather(weather) < 0) {
-        return TSYS_E_WEATHER;
-    }
-
     printf("Outdoor temp: %.2f\n", weather->temp);
+
+    // Send temp to firmware
+    int send_temp_err = send_temp(weather);
+    if (send_temp_err < 0) {
+        return send_temp_err;
+    }
+
+    // Get condition from API
+    int get_condition_err 
+        = weather_client_get_condition(http_dev, weather);
+    if (get_condition_err < 0) {
+        return get_condition_err;
+    }
+    printf("Got condition\n");
+
+    // Send condition to firmware
+    int send_condition_err = send_condition(weather);
+    if (send_condition_err < 0) {
+        return send_condition_err;
+    }
+
     return TSYS_OK;
+}
+
+static enum tsys_err send_temp(const struct weather_data *data) {
+    if (!data) {
+        return TSYS_E_INVAL;
+    }
+
+    struct data_packet pkt = {0};
+    pkt.start_byte = START_BYTE;
+    pkt.type = HOME;
+    pkt.length = 2;
+
+    int16_t temp_scaled = float_to_int(data->temp);
+    pkt.payload[0] = (uint8_t) (temp_scaled >> 8);
+    pkt.payload[1] = (uint8_t) (temp_scaled & 0xFF);
+
+    pkt.checksum = 2;
+
+    if (port_send_packet(&pkt) < 0) {
+        return TSYS_E_PORT;
+    }
+
+    return TSYS_OK;
+}
+
+static enum tsys_err send_condition(const struct weather_data *data) {
+    if (!data) {
+        return TSYS_E_INVAL;
+    }
+
+    return TSYS_OK;
+}
+
+static int16_t float_to_int(float value) {
+    if (value > 0.0f) {
+        return (int16_t) 100.0f * value + 0.5f;
+    } else {
+        return (int16_t) 100.0f * value - 0.5f;
+    }
 }

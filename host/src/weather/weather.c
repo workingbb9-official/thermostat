@@ -4,9 +4,9 @@
 
 enum weather_err weather_get_temp(
     const char *raw_json, 
-    struct weather_data *data_out) 
+    struct weather_data *weather_out) 
 {
-    if (!raw_json || !data_out)
+    if (!raw_json || !weather_out)
         return WEATHER_E_INVAL;
     
     // Create root JSON object
@@ -28,8 +28,19 @@ enum weather_err weather_get_temp(
         return WEATHER_E_JSON;
     }
 
-    data_out->temp = (float) temp->valuedouble;
+    weather_out->temp = (float) temp->valuedouble;
     
     cJSON_Delete(root);
+    return WEATHER_OK;
+}
+
+enum weather_err weather_get_condition(
+        const char *raw_json,
+        struct weather_data *weather_out)
+{
+    if (!raw_json || !weather_out) {
+        return WEATHER_E_INVAL;
+    }
+    
     return WEATHER_OK;
 }

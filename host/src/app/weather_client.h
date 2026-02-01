@@ -11,14 +11,14 @@ struct weather_data;
  * Desc: Get temp from an online api
  *
  * Params:
- *      dev: Device to fetch JSON from web
- *      data_out: Weather data struct to store temp
+ *      dev: Network device to fetch JSON from web
+ *      weather_out: Weather data struct to store temp
  *
  * Return:
  *      TSYS_OK: Temp retrieved and stored
- *      TSYS_E_INVAL: dev or data_out was NULL
- *      TSYS_E_NET: Failed to fetch or invalid API
- *      TSYS_E_WEATHER: Failed to parse JSON
+ *      TSYS_E_INVAL: dev or weather_out was NULL
+ *      TSYS_E_NET: Failed to fetch or got invalid JSON
+ *      TSYS_E_WEATHER: Failed to parse JSON for temp
  *
  * Notes:
  *      Network device must have host and path compatible with its ops.
@@ -28,26 +28,32 @@ struct weather_data;
  */
 enum tsys_err weather_client_get_temp(
     const struct net_device *dev,
-    struct weather_data *data_out
+    struct weather_data *weather_out
 );
 
 /**
- * Desc: Send weather data to the firmware
+ * // WIP //
+ *
+ * Desc: Get weather condition from an online API
  *
  * Params:
- *      data: Weather data to transmit
+ *      dev: Network device to fetch JSON from web
+ *      weather_out: Weather data struct to store condition
  *
  * Return:
- *      TSYS_OK: Transmitted data
- *      TSYS_E_INVAL: data was NULL
- *      TSYS_E_PORT: Failed to send packet
+ *      TSYS_OK: Condition retrieved and stored
+ *      TSYS_E_INVAL: dev or weather_out was NULL
+ *      TSYS_E_NET: Failed to fetch or got invalid JSON
+ *      TSYS_E_WEATHER: Failed to parse JSON for condition
  *
  * Notes:
- *      Data is parsed into a data packet to transmit.
- *      Temperature is stored in payload[0] and [1].
+ *      Everything from weather_client_get_temp() applies here.
+ *      Conditions are stored as CONDITION enums.
+ *      See weather module for specifics.
  */
-enum tsys_err weather_client_send_weather(
-    const struct weather_data *data
+enum tsys_err weather_client_get_condition(
+    const struct net_device *dev,
+    struct weather_data *weather_out
 );
 
 #endif // WEATHER_CLIENT_H
