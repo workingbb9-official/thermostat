@@ -10,8 +10,9 @@
 #include <thermostat/protocol.h>
 #include "weather_client.h"
 
-static enum tsys_err send_temp(const struct weather_data *data);
-static enum tsys_err send_condition(const struct weather_data *data);
+static enum tsys_err send_temp(float temp);
+static enum tsys_err send_condition(enum weather_condit condit);
+static const char *condit_tostr(enum weather_condit condit);
 static int16_t float_to_int(float value);
 
 enum tsys_err home_store_temp(int temp_fd, const struct data_packet *pkt) {
@@ -56,7 +57,7 @@ enum tsys_err home_send_weather(
     printf("Outdoor temp: %.2f\n", weather->temp);
 
     // Send temp to firmware
-    int send_temp_err = send_temp(weather);
+    int send_temp_err = send_temp(weather->temp);
     if (send_temp_err < 0) {
         return send_temp_err;
     }
@@ -67,10 +68,17 @@ enum tsys_err home_send_weather(
     if (get_condition_err < 0) {
         return get_condition_err;
     }
-    printf("Got condition\n");
+
+    // Convert enum to string and print
+    const char *condit_string = condit_tostr(weather->condit);
+    if (!condit_string) {
+        return TSYS_E_INVAL;
+    }
+
+    printf("Condition: %s\n", condit_string);
 
     // Send condition to firmware
-    int send_condition_err = send_condition(weather);
+    int send_condition_err = send_condition(weather->condit);
     if (send_condition_err < 0) {
         return send_condition_err;
     }
@@ -78,17 +86,13 @@ enum tsys_err home_send_weather(
     return TSYS_OK;
 }
 
-static enum tsys_err send_temp(const struct weather_data *data) {
-    if (!data) {
-        return TSYS_E_INVAL;
-    }
-
+static enum tsys_err send_temp(float temp) {
     struct data_packet pkt = {0};
     pkt.start_byte = START_BYTE;
-    pkt.type = HOME;
+    pkt.type = TEMP;
     pkt.length = 2;
 
-    int16_t temp_scaled = float_to_int(data->temp);
+    int16_t temp_scaled = float_to_int(temp);
     pkt.payload[0] = (uint8_t) (temp_scaled >> 8);
     pkt.payload[1] = (uint8_t) (temp_scaled & 0xFF);
 
@@ -101,12 +105,35 @@ static enum tsys_err send_temp(const struct weather_data *data) {
     return TSYS_OK;
 }
 
-static enum tsys_err send_condition(const struct weather_data *data) {
-    if (!data) {
-        return TSYS_E_INVAL;
+static enum tsys_err send_condition(enum weather_condit condit) {
+    struct data_packet pkt = {0};
+    pkt.start_byte = START_BYTE;
+    pkt.type = CONDITION;
+    pkt.length = 1;
+
+    pkt.payload[0] = condit;
+    pkt.checksum = 1;
+    
+    if (port_send_packet(&pkt) < 0) {
+        return TSYS_E_PORT;
     }
 
     return TSYS_OK;
+}
+
+static const char *condit_tostr(enum weather_condit condit) {
+    switch (condit) {
+    case CONDIT_CLEAR:
+        return "Clear";
+    case CONDIT_CLOUDY:
+        return "Cloudy";
+    case CONDIT_RAINING:
+        return "Raining";
+    case CONDIT_SNOWING:
+        return "Snowing";
+    default:
+        return "Unknown";
+    }
 }
 
 static int16_t float_to_int(float value) {

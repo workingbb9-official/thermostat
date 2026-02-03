@@ -48,7 +48,24 @@ enum tsys_err weather_client_get_condition(
     if (!dev || !weather_out) {
         return TSYS_E_INVAL;
     }
+    
+    // Fetch response
+    char buf[BUF_SIZE];
+    if (net_dev_fetch(dev, buf, BUF_SIZE) < 0) {
+        return TSYS_E_NET;
+    }
 
+    // Remove header and get raw JSON
+    const char *raw_json = find_json(buf);
+    if (!raw_json) {
+        return TSYS_E_NET;
+    }
+
+    // Parse JSON and store condition in weather_out 
+    if (weather_get_condition(raw_json, weather_out) < 0) {
+        return TSYS_E_WEATHER;
+    }
+    
     return TSYS_OK;
 }
 

@@ -48,7 +48,7 @@ enum tsys_err weather_client_get_temp(
  *
  * Notes:
  *      Everything from weather_client_get_temp() applies here.
- *      Conditions are stored as CONDITION enums.
+ *      Conditions are stored in weather_out as WEATHER_CONDIT enums.
  *      See weather module for specifics.
  */
 enum tsys_err weather_client_get_condition(

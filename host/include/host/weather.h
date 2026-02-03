@@ -9,6 +9,13 @@ enum weather_err {
     WEATHER_E_JSON = -57
 };
 
+enum weather_condit {
+    CONDIT_CLEAR = 0,
+    CONDIT_CLOUDY,
+    CONDIT_RAINING,
+    CONDIT_SNOWING
+};
+
 struct weather_data {
     float temp;
     enum weather_condit condit;

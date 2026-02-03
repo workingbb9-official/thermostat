@@ -15,7 +15,8 @@
 #include "state_stats.h"
 
 #define API_URL "/v1/forecast?latitude=39&longitude=-97"    \
-                "&current=temperature_2m&forecast_days=1"   \
+                "&current=temperature_2m,weather_code"      \
+                "&forecast_days=1"
 
 static enum tsys_err signal_init(void);
 static void signal_handler(int signum);
@@ -81,13 +82,14 @@ void sys_run(void) {
         printf("Received logout packet\n");
         session_record_logout(session_fd);
         break;
-    case HOME:
+    case TEMP:
         printf("Received temp packet\n");
         if (home_store_temp(temp_fd, &packet) < 0) {
             printf("Failed to store temp\n");
         }
 
-        if (home_send_weather(&http_dev, &weather) < 0) {
+        int send_weather_err = home_send_weather(&http_dev, &weather);
+        if (send_weather_err < 0) {
             printf("Failed to send weather\n");
         }
 
@@ -187,8 +189,8 @@ static int receive_data(struct data_packet *packet) {
     case LOGOUT:
         packet->type = LOGOUT;
         break;
-    case HOME:
-        packet->type = HOME;
+    case TEMP:
+        packet->type = TEMP;
         break;
     case STATS:
         packet->type = STATS;

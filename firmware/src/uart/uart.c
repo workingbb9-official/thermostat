@@ -84,17 +84,22 @@ enum uart_err uart_receive_packet(struct rx_ctx *ctx,
 }
 
 static uint8_t validate_packet(const struct data_packet *pkt) {
-    if (pkt->start_byte != START_BYTE)
+    if (pkt->start_byte != START_BYTE) {
         return 0;
+    }
 
-    if (pkt->type != LOGIN &&
-        pkt->type != HOME  &&
-        pkt->type != STATS)
+    if (pkt->type != TEMP &&
+        pkt->type != STATS &&
+        pkt->type != CONDITION)
+    {
         return 0;
+    }
 
     if (pkt->length <= 0 ||
         pkt->length > MAX_PAYLOAD)
+    {
         return 0;
+    }
 
     return 1;
 }
