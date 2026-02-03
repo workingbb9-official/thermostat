@@ -2,6 +2,7 @@ add_library(weather_lib STATIC weather.c cJSON.c)
 target_include_directories(weather_lib
     PUBLIC ${CMAKE_SOURCE_DIR}/include
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+    PRIVATE ${CMAKE_SOURCE_DIR}/../common
 )
 
 if (TESTS)

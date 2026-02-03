@@ -10,7 +10,7 @@
 #define LOGOUT          0x02
 #define TEMP            0x03
 #define STATS           0x04
-#define HOME            0x05
+#define WEATHER         0x05
 #define CONDITION       0x06
 
 #define MAX_PAYLOAD     128

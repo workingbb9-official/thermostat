@@ -12,10 +12,11 @@ int main(void) {
         " }"
         "}";
 
-    if (weather_get_temp(json_fail, &data) < 0)
+    if (weather_get_temp(json_fail, &data) < 0) {
         printf("Failed to parse json_fail\n");
-    else
+    } else {
         printf("From json_fail: %f", data.temp);
+    }
 
     /* Test for success */
     const char *json_success = 

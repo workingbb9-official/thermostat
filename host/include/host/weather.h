@@ -1,19 +1,14 @@
 #ifndef WEATHER_H
 #define WEATHER_H
 
+#include <thermostat/weather_condit.h>
+
 // WEATHER errors run from -59 to -50
 enum weather_err {
     WEATHER_OK = 0,
     WEATHER_E_INVAL = -59,
     WEATHER_E_NOMEM,
     WEATHER_E_JSON = -57
-};
-
-enum weather_condit {
-    CONDIT_CLEAR = 0,
-    CONDIT_CLOUDY,
-    CONDIT_RAINING,
-    CONDIT_SNOWING
 };
 
 struct weather_data {

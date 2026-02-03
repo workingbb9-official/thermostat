@@ -2,6 +2,8 @@
 
 #include "cJSON.h"
 
+#include <thermostat/weather_condit.h>
+
 enum weather_err weather_get_temp(
     const char *raw_json, 
     struct weather_data *weather_out) 
