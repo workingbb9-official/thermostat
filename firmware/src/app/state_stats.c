@@ -93,10 +93,12 @@ static void stats_process(void) {
         case STATS_KEY_HOME:
             sys_change_state(&state_home);
             return;
+
         case STATS_KEY_SWITCH_LIMIT:
             stats_ctx.limit = !stats_ctx.limit;
             stats_ctx.flags.lcd_dirty = 1;
             break;
+
         default:
             break;
         }

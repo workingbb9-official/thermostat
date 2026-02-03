@@ -23,7 +23,7 @@ struct weather_data;
 enum tsys_err home_store_temp(int temp_fd, const struct data_packet *pkt);
 
 /**
- * Desc: Send weather data to firmware
+ * Desc: Get weather data and send to firmware
  *
  * Params:
  *      http_dev: Net device for fetching from http API
@@ -33,6 +33,10 @@ enum tsys_err home_store_temp(int temp_fd, const struct data_packet *pkt);
  *      TSYS_OK: Weather was collected and sent
  *      TSYS_E_INVAL: http_dev or weather was NULL
  *      TSYS_E_WEATHER: Failed to get or send weather
+ *
+ * Notes:
+ *      Outdoor temp is sent in a packet.
+ *      It is split into payload[0] and [1].
  */
 enum tsys_err home_send_weather(
     const struct net_device *http_dev,

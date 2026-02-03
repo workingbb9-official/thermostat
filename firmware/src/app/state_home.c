@@ -6,12 +6,14 @@
 #include <firmware/lcd.h>
 #include <firmware/keypad.h>
 #include <thermostat/protocol.h>
+#include <thermostat/weather_condit.h>
 #include "states.h"
 #include "strings.h"
 
-#define HOME_DELAY_TICKS    125000UL
-#define HOME_KEY_STATS      '#'
-#define HOME_KEY_LOGOUT     '*'
+#define HOME_DELAY_TICKS        250000UL
+#define HOME_KEY_STATS          '#'
+#define HOME_KEY_LOGOUT         '*'
+#define HOME_KEY_SWITCH_WEATHER 'B'
 
 static struct {
     uint32_t ticks;
@@ -24,8 +26,10 @@ static struct {
     
     struct {
         int16_t temp;
+        enum weather_condit condit;
+        uint8_t show_condit : 1;
     } weather;
-    
+
     struct rx_ctx rx;
     struct data_packet rx_pkt;
 
@@ -64,6 +68,7 @@ const struct state_ops state_home = {
 
 static int16_t format_temp(float temp);
 static void configure_temp_packet(void);
+static const char* condit_tostr(enum weather_condit condit);
 
 static void home_init(void) {
     home_ctx.ticks = HOME_DELAY_TICKS;
@@ -92,8 +97,16 @@ static void home_process(void) {
         case HOME_KEY_STATS:
             sys_change_state(&state_stats);
             return;
+
         case HOME_KEY_LOGOUT:
             sys_change_state(&state_login);
+            return;
+
+        case HOME_KEY_SWITCH_WEATHER:
+            home_ctx.weather.show_condit = !home_ctx.weather.show_condit;
+            home_ctx.flags.lcd_dirty = 1;
+            break;
+
         default:
             break;
         }
@@ -137,20 +150,28 @@ static void home_display(void) {
     lcd_draw_pstr(dot);
     lcd_draw_int(home_ctx.indoor.temp % 100);
     lcd_draw_pstr(degrees_c);
-    
-    // Outdoor temp
+   
     lcd_set_cursor(1, 0);
-    lcd_draw_pstr(PSTR("Out: "));
-    lcd_draw_int(home_ctx.weather.temp / 100);
-    lcd_draw_pstr(dot);
-    
-    // Keep low part positive to prevent -15.-70
-    int16_t decimal = home_ctx.weather.temp % 100;
-    if (decimal < 0)
-        decimal = -decimal;
+    if (home_ctx.weather.show_condit) {
+        // Diplay outdoor condition
+        lcd_draw_pstr(PSTR("Condit: "));
+        const char *condit_str = condit_tostr(home_ctx.weather.condit);
+        lcd_draw_string(condit_str);
+    } else {
+        // Display outdoor temp
+        lcd_set_cursor(1, 0);
+        lcd_draw_pstr(PSTR("Out: "));
+        lcd_draw_int(home_ctx.weather.temp / 100);
+        lcd_draw_pstr(dot);
 
-    lcd_draw_int(decimal);
-    lcd_draw_pstr(degrees_c);
+        // Keep low part positive to prevent -15.-70
+        int16_t decimal = home_ctx.weather.temp % 100;
+        if (decimal < 0)
+            decimal = -decimal;
+
+        lcd_draw_int(decimal);
+        lcd_draw_pstr(degrees_c);
+    }
 }
 
 static void home_send(void) {
@@ -185,6 +206,9 @@ static void home_receive(void) {
     // Store temp
     home_ctx.weather.temp =
         (int16_t) (((uint16_t) pkt->payload[0] << 8) | pkt->payload[1]);
+    
+    // Store condition
+    home_ctx.weather.condit = pkt->payload[2];
 
     // Reset for the next packet
     home_ctx.rx.stage = 0;
@@ -206,11 +230,30 @@ static void configure_temp_packet(void) {
     struct data_packet *packet = &home_ctx.indoor.temp_packet;
 
     packet->start_byte = START_BYTE;
-    packet->type = HOME; 
+    packet->type = TEMP; 
     packet->length = 2;
 
     packet->payload[0] = (uint8_t) (home_ctx.indoor.temp >> 8);
     packet->payload[1] = (uint8_t) (home_ctx.indoor.temp & 0xFF);
 
     packet->checksum = 2;
+}
+
+static const char* condit_tostr(enum weather_condit condit) {
+    switch (condit) {
+    case CONDIT_CLEAR:
+        return "Clear";
+
+    case CONDIT_CLOUDY:
+        return "Cloudy";
+
+    case CONDIT_RAINING:
+        return "Raining";
+
+    case CONDIT_SNOWING:
+        return "Snowing";
+
+    default:
+        return "Unknown";
+    }
 }
