@@ -6,9 +6,33 @@
 #include <host/common/tsys_errors.h>
 #include <host/file_utils.h>
 
-static int get_time(char *buf, size_t buf_size);
+static int get_time(char *buf, size_t buf_size)
+{
+    const time_t time_abs = time(NULL);
+    struct tm *const time = localtime(&time_abs);
 
-enum tsys_err session_record_login(int session_fd) {
+    // Convert timestamp to string
+    const int data_len = snprintf(
+        buf,
+        buf_size,
+        "%d-%d-%d",
+        time->tm_year,
+        time->tm_mon,
+        time->tm_mday);
+
+    const int time_len = snprintf(
+        buf + data_len,
+        buf_size - data_len,
+        "T%d:%d:%d",
+        time->tm_hour,
+        time->tm_min,
+        time->tm_sec);
+
+    return data_len;
+}
+
+enum tsys_err session_record_login(int session_fd)
+{
     if (session_fd < 0) {
         printf("Record login: invalid fd\n");
         return TSYS_E_INVAL;
@@ -38,7 +62,8 @@ enum tsys_err session_record_login(int session_fd) {
     return TSYS_OK;
 }
 
-enum tsys_err session_record_logout(int session_fd) {
+enum tsys_err session_record_logout(int session_fd)
+{
     if (session_fd < 0) {
         printf("Record logout: invalid fd\n");
         return TSYS_E_INVAL;
@@ -66,20 +91,4 @@ enum tsys_err session_record_logout(int session_fd) {
     }
 
     return TSYS_OK;
-}
-
-static int get_time(char *buf, size_t buf_size) {
-    const time_t time_abs = time(NULL);
-    struct tm * const time = localtime(&time_abs);
-
-    // Convert timestamp to string
-    const int data_len = snprintf(
-            buf, buf_size, "%d-%d-%d",
-            time->tm_year, time->tm_mon, time->tm_mday);
-
-    const int time_len = snprintf(
-            buf + data_len, buf_size - data_len, "T%d:%d:%d",
-            time->tm_hour, time->tm_min, time->tm_sec);
-
-    return data_len;
 }

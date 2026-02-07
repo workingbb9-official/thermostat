@@ -1,22 +1,24 @@
 #include <host/sys_core.h>
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#include <host/port.h>
+#include <host/common/tsys_errors.h>
 #include <host/file_utils.h>
 #include <host/network.h>
+#include <host/port.h>
 #include <host/weather.h>
-#include <host/common/tsys_errors.h>
 #include <thermostat/protocol.h>
+
 #include "session.h"
 #include "state_home.h"
 #include "state_stats.h"
 
-#define API_URL "/v1/forecast?latitude=39&longitude=-97"    \
-                "&current=temperature_2m,weather_code"      \
-                "&forecast_days=1"
+#define API_URL                                                      \
+    "/v1/forecast?latitude=39&longitude=-97"                         \
+    "&current=temperature_2m,weather_code"                           \
+    "&forecast_days=1"
 
 static enum tsys_err signal_init(void);
 static void signal_handler(int signum);
@@ -25,7 +27,7 @@ static int receive_data(struct data_packet *packet);
 static struct statistics global_stats = {
     .avg = 0.0f,
     .min = 85.0f,
-    .max = -50.0f
+    .max = -50.0f,
 };
 
 static struct net_device http_dev = {0};
@@ -34,7 +36,8 @@ static int signal_shutdown = 0;
 static int temp_fd = -1;
 static int session_fd = -1;
 
-int sys_init(void) {
+int sys_init(void)
+{
     if (port_init() < 0) {
         return TSYS_E_PORT;
     }
@@ -46,7 +49,7 @@ int sys_init(void) {
         printf("Failed to open temp_fd\n");
         return TSYS_E_FILE;
     }
-    
+
     session_fd = file_open("host/data/session.txt");
     if (session_fd < 0) {
         port_close();
@@ -55,7 +58,8 @@ int sys_init(void) {
         return TSYS_E_FILE;
     }
 
-    if (net_dev_init(&http_dev, &http_ops, "api.open-meteo.com", API_URL)) {
+    if (net_dev_init(
+            &http_dev, &http_ops, "api.open-meteo.com", API_URL)) {
         port_close();
         file_close(temp_fd);
         return TSYS_E_NET;
@@ -64,7 +68,8 @@ int sys_init(void) {
     return signal_init();
 }
 
-void sys_run(void) {
+void sys_run(void)
+{
     struct data_packet packet = {0};
     int receive_status = receive_data(&packet);
 
@@ -120,7 +125,8 @@ void sys_run(void) {
     printf("\n");
 }
 
-enum tsys_err sys_cleanup(void) {
+enum tsys_err sys_cleanup(void)
+{
     int port_close_status = port_close();
     int temp_file_close_status = file_close(temp_fd);
     int session_file_close_status = file_close(session_fd);
@@ -134,7 +140,7 @@ enum tsys_err sys_cleanup(void) {
         printf("Failed to close temp file\n");
         return TSYS_E_FILE;
     }
-    
+
     if (session_file_close_status < 0) {
         printf("Failed to close session file\n");
         return TSYS_E_FILE;
@@ -143,11 +149,13 @@ enum tsys_err sys_cleanup(void) {
     return TSYS_OK;
 }
 
-int sys_should_shutdown(void) {
+int sys_should_shutdown(void)
+{
     return signal_shutdown;
 }
 
-static enum tsys_err signal_init(void) {
+static enum tsys_err signal_init(void)
+{
     struct sigaction sa = {0};
     sa.sa_handler = signal_handler;
     sigemptyset(&sa.sa_mask);
@@ -159,13 +167,15 @@ static enum tsys_err signal_init(void) {
     return TSYS_OK;
 }
 
-static void signal_handler(int signum) {
+static void signal_handler(int signum)
+{
     if (signum == SIGINT) {
         signal_shutdown = 1;
     }
 }
 
-static int receive_data(struct data_packet *packet) {
+static int receive_data(struct data_packet *packet)
+{
     uint8_t first_byte;
     if (port_read_byte(&first_byte) < 0) {
         return TSYS_E_PORT;

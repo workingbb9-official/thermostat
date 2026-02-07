@@ -72,26 +72,21 @@ enum uart_err uart_receive_packet(
             pkt_out->start_byte = byte;
             ctx->stage = 1;
         }
-
         break;
-
     case 1:
         pkt_out->type = byte;
         ctx->stage = 2;
         break;
-
     case 2:
         pkt_out->length = byte;
         ctx->stage = 3;
         break;
-
     case 3:
         pkt_out->payload[ctx->payload_idx++] = byte;
         if (ctx->payload_idx >= pkt_out->length) {
             ctx->stage = 4;
         }
         break;
-
     case 4:
         pkt_out->checksum = byte;
 
@@ -103,7 +98,6 @@ enum uart_err uart_receive_packet(
         }
 
         return UART_E_BAD_PACKET;
-
     default:
         // Reset ctx
         ctx->stage = 0;
