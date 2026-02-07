@@ -6,8 +6,10 @@
 #define UART_HAL_NO_BYTE -1
 
 /**
- * @brief Initialize UART (Baud rate in config.h, no parity, 1 stop
- * bit, 8 bit data)
+ * @brief Initialize UART
+ *
+ * Baud rate is found in config.h.
+ * Settings are no parity, 1 stop bit, 8 bit data.
  */
 void uart_hal_init(void);
 

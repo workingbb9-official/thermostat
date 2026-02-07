@@ -147,12 +147,6 @@ enum tsys_err home_send_weather(
     }
     printf("Outdoor temp: %.2f\n", weather->temp);
 
-    // Send temp to firmware
-    /* int send_temp_err = send_temp(weather->temp);
-    if (send_temp_err < 0) {
-        return send_temp_err;
-    } */
-
     // Get condition from API
     int get_condition_err =
         weather_client_get_condition(http_dev, weather);
@@ -167,12 +161,6 @@ enum tsys_err home_send_weather(
     }
 
     printf("Condition: %s\n", condit_string);
-
-    // Send condition to firmware
-    /* int send_condition_err = send_condition(weather->condit);
-    if (send_condition_err < 0) {
-        return send_condition_err;
-    } */
 
     /* Construct and send weather packet */
     struct data_packet pkt = {0};

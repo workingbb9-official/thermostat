@@ -50,13 +50,6 @@ static struct {
     } flags;
 } home_ctx;
 
-static void home_init(void);
-static void home_keypress(void);
-static void home_process(void);
-static void home_display(void);
-static void home_send(void);
-static void home_receive(void);
-
 static int16_t format_temp(float temp)
 {
     if (temp > 0.0f) {
@@ -70,10 +63,6 @@ static void configure_temp_packet(void)
 {
     struct data_packet *packet = &home_ctx.indoor.temp_packet;
 
-<<<<<<< HEAD
-static void home_init(void) {
-    home_ctx.ticks = HOME_DELAY_TICKS;
-=======
     packet->start_byte = START_BYTE;
     packet->type = TEMP;
     packet->length = 2;
@@ -107,7 +96,6 @@ static const char *condit_tostr(enum weather_condit condit)
 static void home_init(void)
 {
     home_ctx.ticks = HOME_DELAY_TICKS - 20;
->>>>>>> 02c6ebb (chore(fw): format and remove forward decs for app)
     home_ctx.rx.stage = 0;
     home_ctx.rx.payload_idx = 0;
     home_ctx.flags.all = 0;

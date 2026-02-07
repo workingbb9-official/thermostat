@@ -1,11 +1,12 @@
 #include <host/file_utils.h>
 
-#include <unistd.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include <host/common/file_errors.h>
 
-int file_open(const char *file_path) {
+int file_open(const char *file_path)
+{
     int file = open(file_path, O_RDWR);
     if (file < 0) {
         return FILE_E_OPEN;
@@ -14,7 +15,8 @@ int file_open(const char *file_path) {
     return file;
 }
 
-ssize_t file_read_line(int file, char *buf_out, size_t bytes) {
+ssize_t file_read_line(int file, char *buf_out, size_t bytes)
+{
     if (file < 0 || !buf_out) {
         return FILE_E_INVAL;
     }
@@ -23,7 +25,7 @@ ssize_t file_read_line(int file, char *buf_out, size_t bytes) {
 
     while (pos < bytes - 1) {
         ssize_t bytes_read = read(file, &buf_out[pos], 1);
-        
+
         if (bytes_read == 0) {
             // Reached EOF
             buf_out[pos] = '\0';
@@ -33,7 +35,7 @@ ssize_t file_read_line(int file, char *buf_out, size_t bytes) {
             buf_out[pos] = '\0';
             return FILE_E_READ;
         }
-        
+
         if (buf_out[pos] == '\n') {
             // Found end of line
             buf_out[pos] = '\0';
@@ -47,7 +49,8 @@ ssize_t file_read_line(int file, char *buf_out, size_t bytes) {
     return FILE_E_READ;
 }
 
-ssize_t file_write_line(int file, const char *buf, size_t bytes) {
+ssize_t file_write_line(int file, const char *buf, size_t bytes)
+{
     if (file < 0 || !buf) {
         return FILE_E_INVAL;
     }
@@ -62,7 +65,8 @@ ssize_t file_write_line(int file, const char *buf, size_t bytes) {
     return bytes_written;
 }
 
-enum file_err file_seek(int file, int pos) {
+enum file_err file_seek(int file, int pos)
+{
     if (file < 0) {
         return FILE_E_INVAL;
     }
@@ -84,7 +88,8 @@ enum file_err file_seek(int file, int pos) {
     return FILE_OK;
 }
 
-enum file_err file_close(int file) {
+enum file_err file_close(int file)
+{
     int close_status = close(file);
     if (close_status < 0) {
         return FILE_E_CLOSE;

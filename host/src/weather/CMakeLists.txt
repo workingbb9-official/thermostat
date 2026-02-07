@@ -9,6 +9,7 @@ if (TESTS)
     add_executable(test_weather test_weather.c)
     target_include_directories(test_weather
         PUBLIC ${CMAKE_SOURCE_DIR}/include
+        PRIVATE ${CMAKE_SOURCE_DIR}/../common
     )
     target_link_libraries(test_weather PRIVATE weather_lib)
 endif()
