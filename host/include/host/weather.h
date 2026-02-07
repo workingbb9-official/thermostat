@@ -17,49 +17,40 @@ struct weather_data {
 };
 
 /**
- * Desc: Parse json for outdoor temp and store it
+ * @brief Parse json for outdoor temp and store it
  *
- * Params:
- *      raw_json: JSON in the format shown below
- *      weather_out: Struct to store temperature
+ * JSON must contain this: "current":{"temperature_2m": <int>.<int>}.
+ * Temp is stored into weather_data.temp.
  *
- * Return:
- *      WEATHER_OK: Temp was found and stored
- *      WEATHER_E_INVAL: raw_json or weather_out was NULL
- *      WEATHER_E_NOMEM: No system mem to create cJSON item
- *      WEATHER_E_JSON: Failed to find "current" or "temperature_2m"
+ * @param raw_json - JSON in the format shown below
+ * @param weather_out - Struct to store temperature
  *
- * Notes:
- *      JSON must contain this: "current":{"temperature_2m": <int>.<int>}.
- *      Temp is stored into weather_data.temp.
+ * @retval WEATHER_OK - Temp was found and stored
+ * @retval WEATHER_E_INVAL - raw_json or weather_out was NULL
+ * @retval WEATHER_E_NOMEM - No system mem to create cJSON item
+ * @retval WEATHER_E_JSON - Failed to find "current" or
+ * "temperature_2m"
  */
 enum weather_err weather_get_temp(
     const char *raw_json,
-    struct weather_data *weather_out
-);
+    struct weather_data *weather_out);
 
 /**
- * // WIP //
+ * @brief Parse json for weather condition and store it
  *
- * Desc: Parse json for weather condition and store it
+ * JSON must contain this: "current":{"weather_code":<int>}.
+ * Weather code will be stored into weather_data.condit.
  *
- * Params:
- *      raw_json: JSON in format shown below
- *      weather_out: Struct to store condition
+ * @param raw_json - JSON in format shown below
+ * @param weather_out - Struct to store condition
  *
- * Return:
- *      WEATHER_OK: Condition was found and stored
- *      WEATHER_E_INVAL: raw_json or weather_out was NULL
- *      WEATHER_E_NOMEM: No system mem to create cJSON item
- *      WEATHER_E_JSON: Failed to find "current" or "weather_code"
- *
- * Notes:
- *      JSON must contain this: "current":{"weather_code":<int>}.
- *      Weather code will be stored into weather_data.condit.
+ * @retval WEATHER_OK - Condition was found and stored
+ * @retval WEATHER_E_INVAL - raw_json or weather_out was NULL
+ * @retval WEATHER_E_NOMEM - No system mem to create cJSON item
+ * @retval WEATHER_E_JSON - Failed to find "current" or "weather_code"
  */
 enum weather_err weather_get_condition(
     const char *raw_json,
-    struct weather_data *weather_out
-);
+    struct weather_data *weather_out);
 
 #endif // WEATHER_H

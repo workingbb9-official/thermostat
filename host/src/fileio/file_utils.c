@@ -71,11 +71,11 @@ enum file_err file_seek(int file, int pos)
         return FILE_E_INVAL;
     }
 
-    if (pos != START && pos != END) {
+    if (pos != FILE_UTILS_START && pos != FILE_UTILS_END) {
         return FILE_E_INVAL;
     }
 
-    if (pos == START) {
+    if (pos == FILE_UTILS_START) {
         if (lseek(file, 0, SEEK_SET) < 0) {
             return FILE_E_SEEK;
         }

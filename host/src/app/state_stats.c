@@ -17,7 +17,7 @@ enum tsys_err stats_analyze(int temp_fd, struct statistics *stats_out)
     char buf[16];
 
     // Read from start
-    if (file_seek(temp_fd, START) < 0) {
+    if (file_seek(temp_fd, FILE_UTILS_START) < 0) {
         return TSYS_E_FILE;
     }
 

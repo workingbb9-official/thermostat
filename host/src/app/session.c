@@ -39,7 +39,7 @@ enum tsys_err session_record_login(int session_fd)
     }
 
     // Seek to end of file
-    if (file_seek(session_fd, END) < 0) {
+    if (file_seek(session_fd, FILE_UTILS_END) < 0) {
         printf("Record login: failed to seek\n");
         return TSYS_E_FILE;
     }
@@ -70,7 +70,7 @@ enum tsys_err session_record_logout(int session_fd)
     }
 
     // Seek to end of file
-    if (file_seek(session_fd, END) < 0) {
+    if (file_seek(session_fd, FILE_UTILS_END) < 0) {
         printf("Record logout: failed to seek\n");
         return TSYS_E_FILE;
     }

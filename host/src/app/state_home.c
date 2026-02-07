@@ -121,7 +121,7 @@ enum tsys_err home_store_temp(
         snprintf(temp_string, sizeof(temp_string), "%.2f", temp);
 
     // Seek to end of file and write line
-    if (file_seek(temp_fd, END) < 0) {
+    if (file_seek(temp_fd, FILE_UTILS_END) < 0) {
         return TSYS_E_FILE;
     }
 

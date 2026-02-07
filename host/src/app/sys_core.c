@@ -20,10 +20,6 @@
     "&current=temperature_2m,weather_code"                           \
     "&forecast_days=1"
 
-static enum tsys_err signal_init(void);
-static void signal_handler(int signum);
-static int receive_data(struct data_packet *packet);
-
 static struct statistics global_stats = {
     .avg = 0.0f,
     .min = 85.0f,
@@ -35,6 +31,92 @@ static struct weather_data weather = {0};
 static int signal_shutdown = 0;
 static int temp_fd = -1;
 static int session_fd = -1;
+
+static void signal_handler(int signum)
+{
+    if (signum == SIGINT) {
+        signal_shutdown = 1;
+    }
+}
+
+static enum tsys_err signal_init(void)
+{
+    struct sigaction sa = {0};
+    sa.sa_handler = signal_handler;
+    sigemptyset(&sa.sa_mask);
+
+    if (sigaction(SIGINT, &sa, NULL) < 0) {
+        return TSYS_E_SIGNAL;
+    }
+
+    return TSYS_OK;
+}
+
+static int receive_data(struct data_packet *packet)
+{
+    uint8_t first_byte;
+    if (port_read_byte(&first_byte) < 0) {
+        return TSYS_E_PORT;
+    }
+
+    if (first_byte != START_BYTE) {
+        return TSYS_E_PORT;
+    }
+
+    packet->start_byte = first_byte;
+
+    uint8_t second_byte;
+    if (port_read_byte(&second_byte) < 0) {
+        return TSYS_E_PORT;
+    }
+
+    switch (second_byte) {
+    case LOGIN:
+        packet->type = LOGIN;
+        break;
+    case LOGOUT:
+        packet->type = LOGOUT;
+        break;
+    case TEMP:
+        packet->type = TEMP;
+        break;
+    case STATS:
+        packet->type = STATS;
+        break;
+    default:
+        return TSYS_E_PORT;
+        break;
+    }
+
+    uint8_t third_byte;
+    if (port_read_byte(&third_byte) < 0) {
+        return TSYS_E_PORT;
+    }
+
+    if (third_byte < 1 || third_byte > MAX_PAYLOAD) {
+        return -1;
+    }
+
+    packet->length = third_byte;
+
+    for (uint8_t i = 0; i < packet->length; ++i) {
+        uint8_t payload_byte;
+        if (port_read_byte(&payload_byte) < 0) {
+            return TSYS_E_PORT;
+        }
+
+        packet->payload[i] = payload_byte;
+    }
+
+    uint8_t checksum_byte;
+    if (port_read_byte(&checksum_byte) < 0) {
+        return TSYS_E_PORT;
+    }
+
+    packet->checksum = checksum_byte;
+
+    return TSYS_OK;
+}
 
 int sys_init(void)
 {
@@ -152,90 +234,4 @@ enum tsys_err sys_cleanup(void)
 int sys_should_shutdown(void)
 {
     return signal_shutdown;
-}
-
-static enum tsys_err signal_init(void)
-{
-    struct sigaction sa = {0};
-    sa.sa_handler = signal_handler;
-    sigemptyset(&sa.sa_mask);
-
-    if (sigaction(SIGINT, &sa, NULL) < 0) {
-        return TSYS_E_SIGNAL;
-    }
-
-    return TSYS_OK;
-}
-
-static void signal_handler(int signum)
-{
-    if (signum == SIGINT) {
-        signal_shutdown = 1;
-    }
-}
-
-static int receive_data(struct data_packet *packet)
-{
-    uint8_t first_byte;
-    if (port_read_byte(&first_byte) < 0) {
-        return TSYS_E_PORT;
-    }
-
-    if (first_byte != START_BYTE) {
-        return TSYS_E_PORT;
-    }
-
-    packet->start_byte = first_byte;
-
-    uint8_t second_byte;
-    if (port_read_byte(&second_byte) < 0) {
-        return TSYS_E_PORT;
-    }
-
-    switch (second_byte) {
-    case LOGIN:
-        packet->type = LOGIN;
-        break;
-    case LOGOUT:
-        packet->type = LOGOUT;
-        break;
-    case TEMP:
-        packet->type = TEMP;
-        break;
-    case STATS:
-        packet->type = STATS;
-        break;
-    default:
-        return TSYS_E_PORT;
-        break;
-    }
-
-    uint8_t third_byte;
-    if (port_read_byte(&third_byte) < 0) {
-        return TSYS_E_PORT;
-    }
-
-    if (third_byte < 1 || third_byte > MAX_PAYLOAD) {
-        return -1;
-    }
-
-    packet->length = third_byte;
-
-    for (uint8_t i = 0; i < packet->length; ++i) {
-        uint8_t payload_byte;
-        if (port_read_byte(&payload_byte) < 0) {
-            return TSYS_E_PORT;
-        }
-
-        packet->payload[i] = payload_byte;
-    }
-
-    uint8_t checksum_byte;
-    if (port_read_byte(&checksum_byte) < 0) {
-        return TSYS_E_PORT;
-    }
-
-    packet->checksum = checksum_byte;
-
-    return TSYS_OK;
 }
