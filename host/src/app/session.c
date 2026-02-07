@@ -92,3 +92,21 @@ enum tsys_err session_record_logout(int session_fd)
 
     return TSYS_OK;
 }
+
+enum tsys_err session_validate_pwd(
+    int pwd_fd,
+    const char *pwd,
+    int *output)
+{
+    return SESSION_PWD_VALID;
+}
+
+enum tsys_err session_send_valid_pwd(void)
+{
+    return TSYS_OK;
+}
+
+enum tsys_err session_send_invalid_pwd(void)
+{
+    return TSYS_OK;
+}

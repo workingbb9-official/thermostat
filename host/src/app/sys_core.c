@@ -31,6 +31,7 @@ static struct weather_data weather = {0};
 static int signal_shutdown = 0;
 static int temp_fd = -1;
 static int session_fd = -1;
+static int pwd_fd = -1;
 
 static void signal_handler(int signum)
 {
@@ -118,36 +119,86 @@ static int receive_data(struct data_packet *packet)
     return TSYS_OK;
 }
 
+static void handle_login_request(const char *pwd)
+{
+    int ret;
+
+    // TODO: Implement all session_*_pwd functions
+    int output;
+    ret = session_validate_pwd(pwd_fd, pwd, &output);
+    if (ret < 0) {
+        printf("Failed to validate pwd\n");
+        return;
+    }
+
+    if (output == SESSION_PWD_INVALID) {
+        ret = session_send_invalid_pwd();
+        if (ret < 0) {
+            printf("Failed to send invalid pwd\n");
+        }
+        return;
+    }
+
+    ret = session_send_valid_pwd();
+    if (ret < 0) {
+        printf("Failed to send valid pwd\n");
+    }
+}
+
 int sys_init(void)
 {
-    if (port_init() < 0) {
+    int ret;
+
+    ret = port_init();
+    if (ret < 0) {
         return TSYS_E_PORT;
     }
 
     /* Open storage files */
-    temp_fd = file_open("host/data/temperature.txt");
-    if (temp_fd < 0) {
-        port_close();
+    ret = file_open("host/data/temperature.txt");
+    if (ret < 0) {
         printf("Failed to open temp_fd\n");
-        return TSYS_E_FILE;
+        ret = TSYS_E_FILE;
+        goto err_temp;
     }
+    temp_fd = ret;
 
-    session_fd = file_open("host/data/session.txt");
-    if (session_fd < 0) {
-        port_close();
-        file_close(temp_fd);
+    ret = file_open("host/data/session.txt");
+    if (ret < 0) {
         printf("Failed to open session_fd\n");
-        return TSYS_E_FILE;
+        ret = TSYS_E_FILE;
+        goto err_session;
+    }
+    session_fd = ret;
+
+    ret = file_open("host/data/password.txt");
+    if (ret < 0) {
+        printf("Failed to open pwd_fd\n");
+        ret = TSYS_E_FILE;
+        goto err_pwd;
     }
 
     if (net_dev_init(
-            &http_dev, &http_ops, "api.open-meteo.com", API_URL)) {
-        port_close();
-        file_close(temp_fd);
-        return TSYS_E_NET;
+            &http_dev,
+            &http_ops,
+            "api.open-meteo.com",
+            API_URL)) {
+        printf("Failed to init net device\n");
+        ret = TSYS_E_NET;
+        goto err_net;
     }
 
-    return signal_init();
+    ret = signal_init();
+    return ret;
+
+err_net:
+    file_close(pwd_fd);
+err_pwd:
+    file_close(session_fd);
+err_session:
+    file_close(temp_fd);
+err_temp:
+    return ret;
 }
 
 void sys_run(void)
@@ -161,6 +212,10 @@ void sys_run(void)
     }
 
     switch (packet.type) {
+    case AUTH:
+        // TODO: Have firmware send password
+        // For now we fake a valid password
+        handle_login_request("1234");
     case LOGIN:
         printf("Received login packet\n");
         session_record_login(session_fd);
@@ -212,6 +267,7 @@ enum tsys_err sys_cleanup(void)
     int port_close_status = port_close();
     int temp_file_close_status = file_close(temp_fd);
     int session_file_close_status = file_close(session_fd);
+    int pwd_file_close_status = file_close(pwd_fd);
 
     if (port_close_status < 0) {
         printf("Failed to close port\n");
@@ -225,6 +281,11 @@ enum tsys_err sys_cleanup(void)
 
     if (session_file_close_status < 0) {
         printf("Failed to close session file\n");
+        return TSYS_E_FILE;
+    }
+
+    if (pwd_file_close_status < 0) {
+        printf("Failed to close password file\n");
         return TSYS_E_FILE;
     }
 
