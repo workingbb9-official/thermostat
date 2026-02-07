@@ -1,0 +1,25 @@
+BasedOnStyle: LLVM
+UseTab: Never
+IndentWidth: 4
+TabWidth: 4
+ContinuationIndentWidth: 4
+ColumnLimit: 70
+
+InsertBraces: true
+BreakBeforeBraces: Linux
+AllowShortIfStatementsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortEnumsOnASingleLine: false
+
+AlignAfterOpenBracket: AlwaysBreak
+PenaltyReturnTypeOnItsOwnLine: 1000
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+BinPackArguments: false
+BinPackParameters: false
+AllowAllParametersOfDeclarationOnNextLine: false
+SpaceAfterCStyleCast: true
+SpaceBeforeParens: ControlStatements
+
+SortIncludes: true
+IncludeBlocks: Preserve

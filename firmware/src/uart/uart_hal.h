@@ -6,21 +6,22 @@
 #define UART_HAL_NO_BYTE -1
 
 /**
- * @brief Initialize UART (Baud rate in config.h, no parity, 1 stop bit, 8 bit data)
+ * @brief Initialize UART (Baud rate in config.h, no parity, 1 stop
+ * bit, 8 bit data)
  */
 void uart_hal_init(void);
 
 /**
  * @brief Transmit a byte over UART
- * @param byte -- Byte to transmit
+ * @param byte Byte to transmit
  */
 void uart_hal_write_byte(uint8_t byte);
 
 /**
  * @brief Receive a byte over UART
  *
- * All data send to UART should be unsigned
- * This allows for check of UART_NO_BYTE
+ * All data sent to UART should be unsigned.
+ * This allows for check of UART_NO_BYTE.
  *
  * @return Byte received or UART_NO_BYTE
  */

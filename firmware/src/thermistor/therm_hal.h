@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief Initialize the thermistor and ADC converter
+ * @brief Initialize thermistor and ADC converter
  */
 void therm_hal_init(void);
 
