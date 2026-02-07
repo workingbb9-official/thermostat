@@ -26,7 +26,7 @@ extern const struct state_ops state_stats;
  * Then it calls the init of the new state.
  * Current state is updated to be the new state.
  *
- * @param *new_state -- State to transition to
+ * @param *new_state - State to transition to
  */
 void sys_change_state(const struct state_ops *new_state);
 

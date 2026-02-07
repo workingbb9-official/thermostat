@@ -13,7 +13,7 @@ void uart_hal_init(void);
 
 /**
  * @brief Transmit a byte over UART
- * @param byte Byte to transmit
+ * @param byte - Byte to transmit
  */
 void uart_hal_write_byte(uint8_t byte);
 

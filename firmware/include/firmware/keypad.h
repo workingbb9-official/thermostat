@@ -16,12 +16,11 @@ void keypad_init(void);
 /**
  * @brief Get the keypad state
  *
- * Access struct fields to see last and current key
- * This can be used for debouncing / stop key spam
+ * Access struct fields to see last and current key.
+ * This can be used for debouncing / stop key spam.
  *
  * @return Current keypad state (definition above)
  */
 struct keypad_state keypad_get_state(void);
-
 
 #endif // KEYPAD_H

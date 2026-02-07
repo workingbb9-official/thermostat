@@ -29,7 +29,7 @@ void uart_init(void);
  * Params:
  *      pkt: Packet to transmit
  */
-void uart_send_packet(const struct data_packet *pkt);
+void uart_send_packet(const struct data_packet* pkt);
 
 /**
  * Desc: Used to clear ghost bytes from buffer
@@ -64,7 +64,7 @@ void uart_clear_rx(void);
  * @param *pkt_out: Data packet to store bytes
  * @return UART error code, UART_INCOMPLETE for unfinished packet
  */
-enum uart_err uart_receive_packet(struct rx_ctx *ctx,
-                                  struct data_packet *pkt_out);
+enum uart_err uart_receive_packet(
+    struct rx_ctx* ctx, struct data_packet* pkt_out);
 
 #endif // UART_H

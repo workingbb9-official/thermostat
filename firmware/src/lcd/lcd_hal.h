@@ -18,7 +18,7 @@ void lcd_hal_init(void);
  * This function clears RS before sending byte.
  * Sends the high half, then the low half.
  *
- * @param cmd Command to send
+ * @param cmd - Command to send
  */
 void lcd_hal_send_cmd(uint8_t cmd);
 
@@ -28,7 +28,7 @@ void lcd_hal_send_cmd(uint8_t cmd);
  * This function sets RS before sending byte.
  * Sends the high half, then the low half.
  *
- * @param byte Byte to draw
+ * @param byte - Byte to draw
  */
 void lcd_hal_draw_byte(uint8_t byte);
 
