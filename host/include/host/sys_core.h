@@ -6,54 +6,47 @@
 
 #include <host/common/tsys_errors.h>
 
-/*
+/**
  * @brief Initialize all managers and sigint
  *
- * This function will exit the program if init fails
- * It will printf() the specific errors
+ * This function will exit the program if init fails.
+ * It will printf() the specific errors.
  *
- * @return TSYS_OK, TSYS_PORT_ERROR, TSYS_STORAGE_ERROR
+ * @retval TSYS_OK - Successful init
+ * @retval TSYS_PORT_ERROR - Failed to init port
+ * @retval TSYS_STORAGE_ERROR - Failed to open storage files
  */
 enum tsys_err sys_init(void);
 
-/*
+/**
  * @brief Run all system operations
  *
- * This function will receive data with system receiver
- * Then it will give it over to the system handler
- * It will printf() and exit if errors come up
- *
+ * This function will receive data with system receiver.
+ * Then it will give it over to the system handler.
+ * It will printf() and return if errors come up.
  */
 void sys_run(void);
 
 /*
  * @brief Destroy all objects
  *
- * This function exits the program
- * It will printf() errors if they come up
+ * This function closes the port and files.
+ * It will printf() errors if they come up.
  *
- * @return TSYS_OK, TSYS_PORT_ERROR, TSYS_STORAGE_ERROR
+ * @retval TSYS_OK - Successful cleanup
+ * @retval TSYS_PORT_ERROR - Failed to close port
+ * @retval TSYS_STORAGE_ERROR - Failed to close a storage file
  */
 enum tsys_err sys_cleanup(void);
 
 /*
- * @brief Analyze all current storage data
- *
- * This function must be called after system_init()
- * It requires the storage manager
- * It will print average, max, and min
- *
- * @return TSYS_OK, TSYS_ANALYZE_ERROR
- */
-int sys_analyze(void);
-
-/*
  * @brief Tell main when to shutdown
  *
- * This function will be true on signal interrupt
- * Used to exit the program with CTRL-C
+ * This function will be true on signal interrupt.
+ * Used to exit the program with CTRL-C.
  *
- * @return 0 for no, 1 for shutdown
+ * @retval NO_SHUTDOWN - Program has not received CTRL-C
+ * @retval SHUTDOWN - Program received CTRL-C
  */
 int sys_should_shutdown(void);
 

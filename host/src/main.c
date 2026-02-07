@@ -1,13 +1,14 @@
-#include <host/sys_core.h>
 #include <host/common/tsys_errors.h>
+#include <host/sys_core.h>
 #include <stdio.h>
 
-int main(void) {
+int main(void)
+{
     if (sys_init() < TSYS_OK) {
         printf("System init error\n");
         return 1;
     }
-    
+
     printf("System initialized\n\n");
 
     while (!sys_should_shutdown()) {

@@ -19,49 +19,41 @@ struct net_device {
     const char *path;
 };
 
-/*
- * Initialize network device
+/**
+ * @brief Initialize network device
  *
- * Params:
- *      dev: Device to init
- *      ops: Net ops for device, determines fetching
- *      host: Host URL (eg. youtube.com)
- *      path: Path to website (eg. /feed/history)
+ * @param dev - Device to init
+ * @param ops - Net ops for device, determines fetching
+ * @param host - Host URL (eg. youtube.com)
+ * @param path - Path to website (eg. /feed/history)
  *
- * Return:
- *      NET_OK: Init was successful
- *      NET_E_INVAL: Invalid param
- *
+ * @retval NET_OK - Init was successful
+ * @retval NET_E_INVAL - Invalid param
  */
 enum net_err net_dev_init(
     struct net_device *dev,
     const struct net_ops *ops,
     const char *host,
-    const char *path
-);
+    const char *path);
 
-/*
- * Fetch website response
+/**
+ * @brief: Fetch website response
  *
- * Params:
- *      dev: Initialized net device
- *      buf: Buffer to hold response
- *      buf_size: Size of the buffer
+ * This function will go to the host from the dev.
+ * Then it will request to retrieve the path given by dev.
+ * The given string is stored in buf, which is null-terminated.
  *
- * Return:
- *      >0: Bytes read into buffer
- *      NET_E_INVAL: Invalid param
- *      NET_E_SYS: System error
+ * @param dev - Initialized net device
+ * @param buf - Buffer to hold response
+ * @param buf_size - Size of the buffer
  *
- * Notes:
- *      This function will go to the host from the dev.
- *      Then it will request to retrieve the path given by dev.
- *      The given string is stored in buf, which is null-terminated.
+ * @return Bytes read into buffer, or NET error
+ * @retval NET_E_INVAL - Invalid param
+ * @retval NET_E_SYS - System error
  */
 ssize_t net_dev_fetch(
     const struct net_device *dev,
     char *buf,
-    size_t buf_size
-);
+    size_t buf_size);
 
 #endif // NETWORK_H

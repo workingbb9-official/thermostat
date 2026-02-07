@@ -6,4 +6,4 @@
 extern const char dot[] PROGMEM;
 extern const char degrees_c[] PROGMEM;
 
-#endif // PROGMEM_H
+#endif // STRINGS_H

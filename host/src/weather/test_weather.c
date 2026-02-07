@@ -1,16 +1,18 @@
-#include <host/weather.h> 
+#include <host/weather.h>
 #include <stdio.h>
 
-int main(void) {
+int main(void)
+{
     struct weather_data data = {0};
 
     /* Test for failure */
-    const char *json_fail = 
+    const char *json_fail = {
         "{"
         " \"hiko\": {"
         "   \"InhumanReactions\": 4"
         " }"
-        "}";
+        "}",
+    };
 
     if (weather_get_temp(json_fail, &data) < 0) {
         printf("Failed to parse json_fail\n");
@@ -19,14 +21,15 @@ int main(void) {
     }
 
     /* Test for success */
-    const char *json_success = 
+    const char *json_success = {
         "{"
         "  \"current\": {"
         "    \"time\": \"2024-03-20T12:00\","
         "    \"interval\": 900,"
-        "    \"temperature\": 15.4"
+        "    \"temperature_2m\": 15.4"
         "  }"
-        "}";
+        "}",
+    };
 
     if (weather_get_temp(json_success, &data) < 0) {
         printf("Failed to parse json_success\n");

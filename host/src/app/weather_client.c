@@ -1,17 +1,28 @@
 #include "weather_client.h"
 
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
 
-#include <host/network.h>
-#include <host/weather.h>
-#include <host/port.h>
 #include <host/common/tsys_errors.h>
+#include <host/network.h>
+#include <host/port.h>
+#include <host/weather.h>
 #include <thermostat/protocol.h>
 
 #define BUF_SIZE 2048
 
-static const char *find_json(const char *full_response);
+static const char *find_json(const char *full_response)
+{
+    const char *body_start = strstr(full_response, "\r\n\r\n");
+    if (!body_start) {
+        return NULL;
+    }
+
+    body_start += 4;
+
+    const char *json_start = strchr(body_start, '{');
+    return json_start;
+}
 
 enum tsys_err weather_client_get_temp(
     const struct net_device *dev,
@@ -21,7 +32,7 @@ enum tsys_err weather_client_get_temp(
         return TSYS_E_INVAL;
     }
 
-    // Fetch response 
+    // Fetch response
     char buf[BUF_SIZE];
     if (net_dev_fetch(dev, buf, BUF_SIZE) < 0) {
         return TSYS_E_NET;
@@ -33,7 +44,7 @@ enum tsys_err weather_client_get_temp(
         return TSYS_E_NET;
     }
 
-    // Parse JSON and store temp in weather_out 
+    // Parse JSON and store temp in weather_out
     if (weather_get_temp(raw_json, weather_out) < 0) {
         return TSYS_E_WEATHER;
     }
@@ -48,7 +59,7 @@ enum tsys_err weather_client_get_condition(
     if (!dev || !weather_out) {
         return TSYS_E_INVAL;
     }
-    
+
     // Fetch response
     char buf[BUF_SIZE];
     if (net_dev_fetch(dev, buf, BUF_SIZE) < 0) {
@@ -61,22 +72,10 @@ enum tsys_err weather_client_get_condition(
         return TSYS_E_NET;
     }
 
-    // Parse JSON and store condition in weather_out 
+    // Parse JSON and store condition in weather_out
     if (weather_get_condition(raw_json, weather_out) < 0) {
         return TSYS_E_WEATHER;
     }
-    
+
     return TSYS_OK;
-}
-
-static const char *find_json(const char *full_response) {
-    const char *body_start = strstr(full_response, "\r\n\r\n");
-    if (!body_start) {
-        return NULL;
-    }
-
-    body_start += 4;
-
-    const char *json_start = strchr(body_start, '{');
-    return json_start;
 }

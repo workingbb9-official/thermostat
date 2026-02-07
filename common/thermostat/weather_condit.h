@@ -7,4 +7,5 @@ enum weather_condit {
     CONDIT_RAINING,
     CONDIT_SNOWING
 } __attribute__((packed));
+
 #endif // WEATHER_CONDIT_H

@@ -1,22 +1,22 @@
 #ifndef KEYPAD_HAL_H
 #define KEYPAD_HAL_H
 
-#define KEYPAD_ROWS 4
-#define KEYPAD_COLS 4
+#define KEYPAD_HAL_ROWS 4
+#define KEYPAD_HAL_COLS 4
 
 /**
- * @brief Initialize keypad
+ * @brief Initialize keypad hardware
  *
- * This function enables cols as outputs
- * Rows are input pullups
+ * This function enables cols as outputs.
+ * Rows are input pullups.
  */
 void keypad_hal_init(void);
 
 /**
  * @brief Read a pressed key
  *
- * This function sets each column to 0
- * If a row is also 0, that key is pressed
+ * This function sets each column to 0.
+ * If a row is also 0, that key is pressed.
  *
  * @return Pressed key or '\0'
  */

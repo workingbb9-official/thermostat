@@ -1,91 +1,73 @@
 #ifndef FILE_UTILS_H
 #define FILE_UTILS_H
 
-#include <sys/types.h>
 #include <host/common/file_errors.h>
+#include <sys/types.h>
 
-#define START 0
-#define END 1
+#define FILE_UTILS_START 0
+#define FILE_UTILS_END 1
 
 /**
- * Desc: Open a file in i/o mode
+ * @brief Open a file in i/o mode
  *
- * Params:
- *      file_path: Path of the file
+ * @param file_path - Path of the file
  *
- * Return:
- *      >0: File desc of the file
- *      FILE_E_OPEN: Failed to open file
+ * @return File desc of file, or FILE_E_OPEN
  */
 int file_open(const char *file_path);
 
 /**
- * Desc: Read a line from a file
+ * @brief Read a line from a file
  *
- * Params:
- *      file: File desc to read from
- *      buf: Buffer to store data
- *      bytes: # of bytes to read
+ * This function depends on the file's seeker position.
+ * Buffer is null-terminated before returning.
  *
- * Return:
- *      >=0: Bytes read into buf (0 means empty file)
- *      FILE_E_INVAL: File was <0 or buffer was NULL
- *      FILE_E_READ: Failed to read from file
+ * @param file - File desc to read from
+ * @param buf - Buffer to store data
+ * @param bytes - # of bytes to read
  *
- * Notes:
- *      This function depends on the file's seeker position.
- *      Buffer is null-terminated before returning.
+ * @return Bytes read into buf (0 if empty file), or FILE error
+ * @retval FILE_E_INVAL - File was <0 or buffer was NULL
+ * @retval FILE_E_READ - Failed to read from file
  */
 ssize_t file_read_line(int file, char *buf_out, size_t bytes);
 
 /**
- * Desc: Write a line and a '\n' to a file
+ * @brief Write a line and a '\n' to a file
  *
- * Params:
- *      file: File desc to write to
- *      buf: String to write (no null-terminator)
- *      bytes: # of bytes to write
+ * This function depends on the file's seeker position.
+ * Pair with file_seek(fd, FILE_UTILS_END) to write a new line.
+ * Otherwise, it will rewrite the seeker's current line.
  *
- * Return:
- *      >0: Bytes written to port
- *      FILE_E_INVAL: File was <0 or buffer was NULL
- *      FILE_E_WRITE: Failed to write data
+ * @param file - File desc to write to
+ * @param buf - String to write (no null-terminator)
+ * @param bytes - # of bytes to write
  *
- * Notes:
- *      This function depends on the file's seeker position.
- *      Pair with file_seek(fd, END) to write a new line.
- *      Otherwise, it will rewrite the seeker's current line.
+ * @return Bytes written to buffer (without '\n'), or FILE error
+ * @retval FILE_E_INVAL - File was <0 or buffer was NULL
+ * @retval FILE_E_WRITE - Failed to write data
  */
 ssize_t file_write_line(int file, const char *buf, size_t bytes);
 
 /**
- * Desc: Set a file seeker to start or end
+ * @brief Set a file seeker to start or end
  *
- * Params:
- *      file: File desc to set seeker
- *      pos: START or END of file
+ * @param file - File desc to set seeker
+ * @param pos - FILE_UTILS_START or FILE_UTILS_END
  *
- * Return:
- *      FILE_OK: Seeker was set
- *      FILE_E_INVAL: File was <0 or invalid pos
- *      FILE_E_SEEK: Failed to set seeker
- *
- * Notes:
- *      This function determines how write_line() and read_line() run.
- *      Calling this with END will allow for writing to the end of the file.
- *      Calling this with START will allow for proper use of read_line().
+ * @retval FILE_OK - Seeker was set
+ * @retval FILE_E_INVAL - File was <0 or invalid pos
+ * @retval FILE_E_SEEK - Failed to set seeker
  */
 enum file_err file_seek(int file, int pos);
 
 /**
- * Desc: Close a file
+ * @brief Close a file
  *
- * Params:
- *      file: File desc of file to close
+ * @param file - File desc of file to close
  *
- * Return:
- *      FILE_OK: Close was successful
- *      FILE_E_CLOSE: Failed to close file
+ * @retval FILE_OK - Close was successful
+ * @retval FILE_E_CLOSE - Failed to close file
  */
 enum file_err file_close(int file);
 
