@@ -2,7 +2,7 @@
 #define STATES_H
 
 #ifndef NULL
-    #define NULL ((void *) 0)
+#define NULL ((void *) 0)
 #endif
 
 struct state_ops {
@@ -22,9 +22,9 @@ extern const struct state_ops state_stats;
 /**
  * @brief Handle transition of state
  *
- * This will call the exit of the current state
- * Then it calls the init of the new state
- * Current state is updated to be the new state
+ * This will call the exit of the current state.
+ * Then it calls the init of the new state.
+ * Current state is updated to be the new state.
  *
  * @param *new_state -- State to transition to
  */

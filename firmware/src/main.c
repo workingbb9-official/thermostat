@@ -1,11 +1,12 @@
 #include <firmware/sys_core.h>
 
-int main(void) {
+int main(void)
+{
     sys_init();
 
-	for (;;) {
+    while (1) {
         sys_run();
-	}
+    }
 
-	return 0;
+    return 0;
 }
