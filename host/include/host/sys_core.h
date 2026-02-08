@@ -12,7 +12,7 @@
  * This function will exit the program if init fails.
  * It will printf() the specific errors.
  *
- * @retval TSYS_OK - Successful init
+ * @retval TSYS_OK - System initialized
  * @retval TSYS_PORT_ERROR - Failed to init port
  * @retval TSYS_STORAGE_ERROR - Failed to open storage files
  */
@@ -33,7 +33,7 @@ void sys_run(void);
  * This function closes the port and files.
  * It will printf() errors if they come up.
  *
- * @retval TSYS_OK - Successful cleanup
+ * @retval TSYS_OK - System was cleaned up
  * @retval TSYS_PORT_ERROR - Failed to close port
  * @retval TSYS_STORAGE_ERROR - Failed to close a storage file
  */

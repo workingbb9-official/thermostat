@@ -14,7 +14,8 @@ static uint8_t validate_packet(const struct data_packet *pkt)
         return 0;
     }
 
-    if (pkt->type != WEATHER && pkt->type != STATS) {
+    if (pkt->type != AUTH && pkt->type != WEATHER &&
+        pkt->type != STATS) {
         return 0;
     }
 

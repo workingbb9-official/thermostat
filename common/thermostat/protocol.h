@@ -6,7 +6,7 @@
 #define START_BYTE 0xAA
 
 /* Packet types */
-#define LOGIN 0x01
+#define AUTH 0x01
 #define LOGOUT 0x02
 #define TEMP 0x03
 #define STATS 0x04

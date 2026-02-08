@@ -7,19 +7,23 @@ ColumnLimit: 70
 
 InsertBraces: true
 BreakBeforeBraces: Linux
-AllowShortIfStatementsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: None
-AllowShortEnumsOnASingleLine: false
+SpaceAfterCStyleCast: true
+AlignConsecutiveBitFields: true
 
+BinPackParameters: false
+BinPackArguments: false
 AlignAfterOpenBracket: AlwaysBreak
 PenaltyReturnTypeOnItsOwnLine: 1000
-AlignConsecutiveAssignments: false
-AlignConsecutiveDeclarations: false
-BinPackArguments: false
-BinPackParameters: false
 AllowAllParametersOfDeclarationOnNextLine: false
-SpaceAfterCStyleCast: true
-SpaceBeforeParens: ControlStatements
+AllowAllArgumentsOnNextLine: false
+
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortLambdasOnASingleLine: None
 
 SortIncludes: true
 IncludeBlocks: Preserve

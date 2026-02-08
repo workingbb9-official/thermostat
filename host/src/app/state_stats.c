@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include <host/analysis.h>
 #include <host/common/tsys_errors.h>
@@ -71,6 +72,8 @@ enum tsys_err stats_send(const struct statistics *stats)
     pkt.payload[5] = min_low;
 
     pkt.checksum = 6;
+
+    usleep(250000);
     if (port_send_packet(&pkt) < 0) {
         return TSYS_E_PORT;
     }

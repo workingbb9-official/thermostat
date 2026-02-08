@@ -10,19 +10,6 @@
 
 static const struct state_ops *state;
 
-static void notify_host_login(void)
-{
-    struct data_packet login = {
-        .start_byte = START_BYTE,
-        .type = LOGIN,
-        .length = 1,
-        .payload[0] = PAYLOAD_NONE,
-        .checksum = 1,
-    };
-
-    uart_send_packet(&login);
-}
-
 static void notify_host_logout(void)
 {
     struct data_packet logout = {
@@ -72,11 +59,7 @@ void sys_change_state(const struct state_ops *new_state)
         state->exit();
     }
 
-    if (state->process == state_login.process) {
-        // Moving from login
-        notify_host_login();
-    } else if (new_state->process == state_login.process) {
-        // Moving to login
+    if (new_state->process == state_login.process) {
         notify_host_logout();
     }
 

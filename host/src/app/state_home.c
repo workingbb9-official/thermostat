@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include <host/common/tsys_errors.h>
 #include <host/file_utils.h>
@@ -42,43 +43,6 @@ static void construct_weather_packet(
     pkt->payload[2] = (uint8_t) weather->condit;
 
     pkt->checksum = 3;
-}
-
-static enum tsys_err send_temp(float temp)
-{
-    struct data_packet pkt = {0};
-    pkt.start_byte = START_BYTE;
-    pkt.type = TEMP;
-    pkt.length = 2;
-
-    int16_t temp_scaled = float_to_int(temp);
-    pkt.payload[0] = (uint8_t) (temp_scaled >> 8);
-    pkt.payload[1] = (uint8_t) (temp_scaled & 0xFF);
-
-    pkt.checksum = 2;
-
-    if (port_send_packet(&pkt) < 0) {
-        return TSYS_E_PORT;
-    }
-
-    return TSYS_OK;
-}
-
-static enum tsys_err send_condition(enum weather_condit condit)
-{
-    struct data_packet pkt = {0};
-    pkt.start_byte = START_BYTE;
-    pkt.type = CONDITION;
-    pkt.length = 1;
-
-    pkt.payload[0] = condit;
-    pkt.checksum = 1;
-
-    if (port_send_packet(&pkt) < 0) {
-        return TSYS_E_PORT;
-    }
-
-    return TSYS_OK;
 }
 
 static const char *condit_tostr(enum weather_condit condit)
@@ -166,6 +130,7 @@ enum tsys_err home_send_weather(
     struct data_packet pkt = {0};
     construct_weather_packet(&pkt, weather);
 
+    usleep(250000);
     if (port_send_packet(&pkt) < 0) {
         return TSYS_E_PORT;
     }
