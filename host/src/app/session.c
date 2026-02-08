@@ -54,6 +54,20 @@ static void construct_auth_packet(struct data_packet *pkt, int valid)
     pkt->checksum = 1;
 }
 
+static void find_pwd(char *line, char **buf)
+{
+    if (!line || !buf) {
+        return;
+    }
+
+    char *temp = line;
+    while (*temp != '-') {
+        ++temp;
+    }
+
+    *buf = temp + 1;
+}
+
 enum tsys_err session_record_login(int session_fd)
 {
     if (session_fd < 0) {
@@ -132,9 +146,9 @@ enum tsys_err session_validate_pwd(
         return TSYS_E_FILE;
     }
 
-    char pwd_valid[64];
+    char line[64];
     while (1) {
-        ret = file_read_line(pwd_fd, pwd_valid, sizeof(pwd_valid));
+        ret = file_read_line(pwd_fd, line, sizeof(line));
         if (ret < 0) {
             return TSYS_E_FILE;
         }
@@ -143,7 +157,16 @@ enum tsys_err session_validate_pwd(
             break;
         }
 
+        char *pwd_valid;
+        find_pwd(line, &pwd_valid);
+
         if (strcmp(pwd, pwd_valid) == 0) {
+            int len = pwd_valid - line;
+            char user[64];
+            memcpy(user, line, len - 1);
+            user[len - 1] = '\0';
+            printf("Username: %s\n", user);
+
             *output = SESSION_PWD_VALID;
             return TSYS_OK;
         }
