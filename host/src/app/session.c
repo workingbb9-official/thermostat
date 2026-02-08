@@ -1,12 +1,16 @@
 #include "session.h"
 
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #include <host/common/tsys_errors.h>
 #include <host/file_utils.h>
+#include <host/port.h>
+#include <thermostat/protocol.h>
 
-static int get_time(char *buf, size_t buf_size)
+static int get_timestamp(char *buf, size_t buf_size)
 {
     const time_t time_abs = time(NULL);
     struct tm *const time = localtime(&time_abs);
@@ -31,6 +35,25 @@ static int get_time(char *buf, size_t buf_size)
     return data_len;
 }
 
+static void construct_auth_packet(struct data_packet *pkt, int valid)
+{
+    if (!pkt) {
+        return;
+    }
+
+    pkt->start_byte = START_BYTE;
+    pkt->type = AUTH;
+    pkt->length = 1;
+
+    if (valid) {
+        pkt->payload[0] = SESSION_PWD_VALID;
+    } else {
+        pkt->payload[0] = SESSION_PWD_INVALID;
+    }
+
+    pkt->checksum = 1;
+}
+
 enum tsys_err session_record_login(int session_fd)
 {
     if (session_fd < 0) {
@@ -46,7 +69,7 @@ enum tsys_err session_record_login(int session_fd)
 
     // Buf must be at least 17 bytes
     char buf[32];
-    const int time_start = get_time(buf, sizeof(buf)) + 1;
+    const int time_start = get_timestamp(buf, sizeof(buf)) + 1;
     printf("Login at %s\n", buf + time_start);
 
     // Append 'I' to signify login
@@ -77,7 +100,7 @@ enum tsys_err session_record_logout(int session_fd)
 
     // Buf must be at least 17 bytes
     char buf[32];
-    const int time_start = get_time(buf, sizeof(buf)) + 1;
+    const int time_start = get_timestamp(buf, sizeof(buf)) + 1;
     printf("Logout at %s\n", buf + time_start);
 
     // Append 'O' to signify logout
@@ -98,15 +121,67 @@ enum tsys_err session_validate_pwd(
     const char *pwd,
     int *output)
 {
-    return SESSION_PWD_VALID;
+    if (pwd_fd < 0 || !pwd || !output) {
+        return TSYS_E_INVAL;
+    }
+
+    int ret;
+
+    ret = file_seek(pwd_fd, FILE_UTILS_START);
+    if (ret < 0) {
+        return TSYS_E_FILE;
+    }
+
+    char pwd_valid[64];
+    while (1) {
+        ret = file_read_line(pwd_fd, pwd_valid, sizeof(pwd_valid));
+        if (ret < 0) {
+            return TSYS_E_FILE;
+        }
+
+        if (ret == 0) {
+            break;
+        }
+
+        if (strcmp(pwd, pwd_valid) == 0) {
+            *output = SESSION_PWD_VALID;
+            return TSYS_OK;
+        }
+    }
+
+    *output = SESSION_PWD_INVALID;
+
+    return TSYS_OK;
 }
 
 enum tsys_err session_send_valid_pwd(void)
 {
+    int ret;
+
+    struct data_packet pkt = {0};
+    construct_auth_packet(&pkt, SESSION_PWD_VALID);
+
+    usleep(250000);
+    ret = port_send_packet(&pkt);
+    if (ret < 0) {
+        return TSYS_E_PORT;
+    }
+
     return TSYS_OK;
 }
 
 enum tsys_err session_send_invalid_pwd(void)
 {
+    int ret;
+
+    struct data_packet pkt = {0};
+    construct_auth_packet(&pkt, SESSION_PWD_INVALID);
+
+    usleep(250000);
+    ret = port_send_packet(&pkt);
+    if (ret < 0) {
+        return TSYS_E_PORT;
+    }
+
     return TSYS_OK;
 }

@@ -8,6 +8,7 @@ ColumnLimit: 70
 InsertBraces: true
 BreakBeforeBraces: Linux
 SpaceAfterCStyleCast: true
+AlignConsecutiveBitFields: true
 
 BinPackParameters: false
 BinPackArguments: false
@@ -21,6 +22,7 @@ AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
 AllowShortBlocksOnASingleLine: Never
 AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
 AllowShortLambdasOnASingleLine: None
 
 SortIncludes: true

@@ -72,8 +72,8 @@ static int receive_data(struct data_packet *packet)
     }
 
     switch (second_byte) {
-    case LOGIN:
-        packet->type = LOGIN;
+    case AUTH:
+        packet->type = AUTH;
         break;
     case LOGOUT:
         packet->type = LOGOUT;
@@ -123,7 +123,6 @@ static void handle_login_request(const char *pwd)
 {
     int ret;
 
-    // TODO: Implement all session_*_pwd functions
     int output;
     ret = session_validate_pwd(pwd_fd, pwd, &output);
     if (ret < 0) {
@@ -132,6 +131,7 @@ static void handle_login_request(const char *pwd)
     }
 
     if (output == SESSION_PWD_INVALID) {
+        printf("Invalid password\n");
         ret = session_send_invalid_pwd();
         if (ret < 0) {
             printf("Failed to send invalid pwd\n");
@@ -139,9 +139,15 @@ static void handle_login_request(const char *pwd)
         return;
     }
 
+    printf("Valid password\n");
     ret = session_send_valid_pwd();
     if (ret < 0) {
         printf("Failed to send valid pwd\n");
+    }
+
+    ret = session_record_login(session_fd);
+    if (ret < 0) {
+        printf("Failed to record login\n");
     }
 }
 
@@ -177,6 +183,7 @@ int sys_init(void)
         ret = TSYS_E_FILE;
         goto err_pwd;
     }
+    pwd_fd = ret;
 
     if (net_dev_init(
             &http_dev,
@@ -213,12 +220,8 @@ void sys_run(void)
 
     switch (packet.type) {
     case AUTH:
-        // TODO: Have firmware send password
-        // For now we fake a valid password
-        handle_login_request("1234");
-    case LOGIN:
-        printf("Received login packet\n");
-        session_record_login(session_fd);
+        printf("Received login request\n");
+        handle_login_request((char *) packet.payload);
         break;
     case LOGOUT:
         printf("Received logout packet\n");

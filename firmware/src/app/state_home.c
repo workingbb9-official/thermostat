@@ -31,18 +31,20 @@ static struct {
         uint8_t show_condit : 1;
     } weather;
 
-    struct rx_ctx rx;
-    struct data_packet rx_pkt;
+    struct {
+        struct rx_ctx ctx;
+        struct data_packet pkt;
+    } rx;
 
     union {
         uint8_t all;
         struct {
             uint8_t lcd_dirty : 1;
-            uint8_t tx_req : 1;
-            uint8_t rx_req : 1;
+            uint8_t tx_req    : 1;
+            uint8_t rx_req    : 1;
 
-            uint8_t tx_complete : 1;
-            uint8_t rx_complete : 1;
+            uint8_t tx_complete   : 1;
+            uint8_t rx_complete   : 1;
             uint8_t input_pending : 1;
 
             uint8_t reserved : 2;
@@ -96,8 +98,8 @@ static const char *condit_tostr(enum weather_condit condit)
 static void home_init(void)
 {
     home_ctx.ticks = HOME_DELAY_TICKS - 20;
-    home_ctx.rx.stage = 0;
-    home_ctx.rx.payload_idx = 0;
+    home_ctx.rx.ctx.stage = 0;
+    home_ctx.rx.ctx.payload_idx = 0;
     home_ctx.flags.all = 0;
 
     uart_clear_rx();
@@ -226,13 +228,13 @@ static void home_receive(void)
         return;
     }
 
-    struct data_packet *pkt = &home_ctx.rx_pkt;
-    int8_t rx_status = uart_receive_packet(&home_ctx.rx, pkt);
+    struct data_packet *pkt = &home_ctx.rx.pkt;
+    int8_t rx_status = uart_receive_packet(&home_ctx.rx.ctx, pkt);
 
     // Check for error
     if (rx_status < 0 && rx_status != UART_INCOMPLETE) {
-        home_ctx.rx.stage = 0;
-        home_ctx.rx.payload_idx = 0;
+        home_ctx.rx.ctx.stage = 0;
+        home_ctx.rx.ctx.payload_idx = 0;
         return;
     }
 
@@ -250,8 +252,8 @@ static void home_receive(void)
     home_ctx.weather.condit = pkt->payload[2];
 
     // Reset for the next packet
-    home_ctx.rx.stage = 0;
-    home_ctx.rx.payload_idx = 0;
+    home_ctx.rx.ctx.stage = 0;
+    home_ctx.rx.ctx.payload_idx = 0;
 
     home_ctx.flags.rx_req = 0;
     home_ctx.flags.rx_complete = 1;

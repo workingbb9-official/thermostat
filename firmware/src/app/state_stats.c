@@ -35,12 +35,12 @@ static struct {
 
         struct {
             uint8_t lcd_dirty : 1;
-            uint8_t tx_req : 1;
-            uint8_t rx_req : 1;
+            uint8_t tx_req    : 1;
+            uint8_t rx_req    : 1;
 
             uint8_t input_pending : 1;
-            uint8_t tx_complete : 1;
-            uint8_t rx_complete : 1;
+            uint8_t tx_complete   : 1;
+            uint8_t rx_complete   : 1;
 
             uint8_t reserved : 2;
         };

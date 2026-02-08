@@ -29,8 +29,7 @@ enum tsys_err session_record_login(int session_fd);
 enum tsys_err session_record_logout(int session_fd);
 
 /**
- * @brief Validate password against confirmed ones
- * @note TODO: Currently a STUB returning SESSION_PWD_VALID always
+ * @brief Compare password to valid ones
  *
  * @param pwd_fd - File desc of password storage file
  * @param pwd_given - Given password to validate
@@ -47,7 +46,6 @@ enum tsys_err session_validate_pwd(
 
 /**
  * @brief Notify firmware that password was valid
- * @note TODO: Currently a STUB returning TSYS_OK always
  *
  * The data packet will have type AUTH and payload[0] set to
  * SESSION_PWD_VALID. Firmware should recognize this as valid.
@@ -59,7 +57,6 @@ enum tsys_err session_send_valid_pwd(void);
 
 /**
  * @brief Notify firmware that password was invalid
- * @note TODO: Currently a STUB returning TSYS_OK always
  *
  * The data packet will have type AUTH and payload[0] set to
  * SESSION_PWD_INVALID. Firmware should recognize this as invalid.

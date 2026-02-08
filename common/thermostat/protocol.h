@@ -6,13 +6,12 @@
 #define START_BYTE 0xAA
 
 /* Packet types */
-#define LOGIN 0x01
+#define AUTH 0x01
 #define LOGOUT 0x02
 #define TEMP 0x03
 #define STATS 0x04
 #define WEATHER 0x05
 #define CONDITION 0x06
-#define AUTH 0x07
 
 #define MAX_PAYLOAD 128
 #define PAYLOAD_NONE 0xFF
