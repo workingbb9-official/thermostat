@@ -2,7 +2,7 @@
 
 ## Features
 * **Indoor Temp:** Uses thermistor to calculate temperature and displays on lcd
-* **Weather:** Uses http with a web API to get current outdoor temp and weather condition
+* **Weather:** Uses HTTP with a web API to get current outdoor temp and weather condition
 * **Login:** Need to input password to get into system, compared against host database
 * **Storage:** Stores indoor temperature and session details (login and logout time) on host
 * **Statistics:** Uses the temperature storage to calculate average, max, and min
