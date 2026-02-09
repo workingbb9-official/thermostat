@@ -2,7 +2,6 @@
 build_*/
 
 host/data/*.txt
-test/data/*.txt
 
 *.o
 *.elf

@@ -9,6 +9,7 @@
 #include "states.h"
 
 #define LOGIN_PWD_LEN 4
+#define LOGIN_DELAY_TICKS 35000UL
 
 static struct {
     struct {
@@ -22,7 +23,10 @@ static struct {
         struct data_packet pkt;
     } rx;
 
-    uint8_t login_valid : 1;
+    uint8_t login_valid   : 1;
+    uint8_t login_checked : 1;
+    uint16_t timer;
+    char username[64];
 
     union {
         uint8_t all;
@@ -52,6 +56,10 @@ static void login_init(void)
     login_ctx.flags.all = 0;
     login_ctx.flags.lcd_dirty = 1;
 
+    login_ctx.login_valid = 0;
+    login_ctx.login_checked = 0;
+    login_ctx.timer = 0;
+
     uart_clear_rx();
 }
 
@@ -69,7 +77,7 @@ static void login_keypress(void)
 
 static void login_process(void)
 {
-    if (login_ctx.flags.input_pending) {
+    if (login_ctx.flags.input_pending && !login_ctx.login_checked) {
         login_ctx.flags.input_pending = 0;
 
         // Update password and null-terminate
@@ -88,15 +96,21 @@ static void login_process(void)
 
     if (login_ctx.flags.rx_complete) {
         login_ctx.flags.rx_complete = 0;
+        login_ctx.login_checked = 1;
+    }
 
-        if (login_ctx.login_valid) {
-            sys_change_state(&state_home);
-        } else {
-            login_ctx.user_pwd.buf[0] = '\0';
-            login_ctx.user_pwd.idx = 0;
-
+    if (login_ctx.login_checked) {
+        login_ctx.flags.lcd_dirty = 1;
+        if (!login_ctx.login_valid) {
+            login_ctx.login_checked = 0;
             login_ctx.flags.auth_failed = 1;
-            login_ctx.flags.lcd_dirty = 1;
+            return;
+        }
+
+        if (login_ctx.timer < LOGIN_DELAY_TICKS) {
+            ++login_ctx.timer;
+        } else {
+            sys_change_state(&state_home);
         }
     }
 
@@ -124,6 +138,10 @@ static void login_display(void)
         lcd_draw_pstr(PSTR("Invalid password"));
         lcd_set_cursor(1, 0);
         lcd_draw_pstr(PSTR("3 more tries"));
+    } else if (login_ctx.login_valid) {
+        lcd_draw_pstr(PSTR("Logging you in"));
+        lcd_set_cursor(1, 0);
+        lcd_draw_string(login_ctx.username);
     } else {
         // Message for waiting for input
         lcd_draw_pstr(PSTR("Enter password"));
@@ -176,7 +194,14 @@ static void login_receive(void)
         return;
     }
 
-    login_ctx.login_valid = pkt->payload[0];
+    if (pkt->payload[0] == PAYLOAD_NONE) {
+        login_ctx.login_valid = 0;
+    } else {
+        login_ctx.login_valid = 1;
+        for (uint8_t i = 0; i < pkt->length; ++i) {
+            login_ctx.username[i] = pkt->payload[i];
+        }
+    }
 
     login_ctx.rx.ctx.stage = 0;
     login_ctx.rx.ctx.payload_idx = 0;

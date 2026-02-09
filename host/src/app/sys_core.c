@@ -123,14 +123,14 @@ static void handle_login_request(const char *pwd)
 {
     int ret;
 
-    int output;
-    ret = session_validate_pwd(pwd_fd, pwd, &output);
+    char user[64];
+    ret = session_validate_pwd(pwd_fd, pwd, user, sizeof(user));
     if (ret < 0) {
         printf("Failed to validate pwd\n");
         return;
     }
 
-    if (output == SESSION_PWD_INVALID) {
+    if (!user[0]) {
         printf("Invalid password\n");
         ret = session_send_invalid_pwd();
         if (ret < 0) {
@@ -140,7 +140,7 @@ static void handle_login_request(const char *pwd)
     }
 
     printf("Valid password\n");
-    ret = session_send_valid_pwd();
+    ret = session_send_valid_pwd(user);
     if (ret < 0) {
         printf("Failed to send valid pwd\n");
     }
