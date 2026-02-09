@@ -1,7 +1,7 @@
 # Thermostat - Simple environmental monitoring and logging system written in C
 
 ## Features
-* **Indoor Temp:** Uses thermistor to calculate temperature and displays on lcd
+* **Indoor Temp:** Uses thermistor to calculate temperature and displays on LCD
 * **Weather:** Uses HTTP with a web API to get current outdoor temp and weather condition
 * **Login:** Need to input password to get into system, compared against host database
 * **Storage:** Stores indoor temperature and session details (login and logout time) on host
