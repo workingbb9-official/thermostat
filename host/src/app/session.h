@@ -33,33 +33,37 @@ enum tsys_err session_record_logout(int session_fd);
  *
  * @param pwd_fd - File desc of password storage file
  * @param pwd_given - Given password to validate
- * @param output - Buffer to hold output (SESSION_PWD_VALID/INVALID)
+ * @param user - Buffer to hold username, set to '\0' for invalid
+ * @param len - Length of user buffer
  *
- * @retval TSYS_OK - Password was checked and output was wrote to
- * @retval TSYS_E_INVAL - pwd_fd was <0, pwd or output was NULL
+ * @retval TSYS_OK - Password was checked and result in user
+ * @retval TSYS_E_INVAL - pwd_fd was <0, pwd or user was NULL
  * @retval TSYS_E_FILE - Failed to read from file
  */
 enum tsys_err session_validate_pwd(
     int pwd_fd,
     const char *pwd,
-    int *output);
+    char *user,
+    int len);
 
 /**
- * @brief Notify firmware that password was valid
+ * @brief Send valid username of user to firmware
  *
- * The data packet will have type AUTH and payload[0] set to
- * SESSION_PWD_VALID. Firmware should recognize this as valid.
+ * The data packet will have type AUTH and payload set to represent a
+ * string. Firmware should recognize payload as a username.
+ *
+ * @param user - The username to send
  *
  * @retval TSYS_OK - Data packet was sent
  * @retval TSYS_E_PORT - Failed to send packet
  */
-enum tsys_err session_send_valid_pwd(void);
+enum tsys_err session_send_valid_pwd(const char *user);
 
 /**
  * @brief Notify firmware that password was invalid
  *
  * The data packet will have type AUTH and payload[0] set to
- * SESSION_PWD_INVALID. Firmware should recognize this as invalid.
+ * PAYLOAD_NONE. Firmware should recognize this as invalid.
  *
  * @retval TSYS_OK - Data packet was sent
  * @retval TSYS_E_PORT - Failed to send packet
