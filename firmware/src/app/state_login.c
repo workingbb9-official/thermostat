@@ -97,10 +97,10 @@ static void login_process(void)
     if (login_ctx.flags.rx_complete) {
         login_ctx.flags.rx_complete = 0;
         login_ctx.login_checked = 1;
+        login_ctx.flags.lcd_dirty = 1;
     }
 
     if (login_ctx.login_checked) {
-        login_ctx.flags.lcd_dirty = 1;
         if (!login_ctx.login_valid) {
             login_ctx.login_checked = 0;
             login_ctx.flags.auth_failed = 1;
@@ -137,7 +137,7 @@ static void login_display(void)
         // Message for wrong password
         lcd_draw_pstr(PSTR("Invalid password"));
         lcd_set_cursor(1, 0);
-        lcd_draw_pstr(PSTR("3 more tries"));
+        lcd_draw_pstr(PSTR("Try again"));
     } else if (login_ctx.login_valid) {
         lcd_draw_pstr(PSTR("Logging you in"));
         lcd_set_cursor(1, 0);

@@ -1,4 +1,4 @@
-# Thermostat - Simple environmental monitoring and logging system written in C
+# EnvLogger - Simple environmental monitoring and logging system written in C
 
 ## Features
 * **Indoor Temp:** Uses thermistor to calculate temperature and displays on LCD
