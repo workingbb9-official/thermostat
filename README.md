@@ -24,4 +24,7 @@
 * **Keypad:** 4x4 Matrix Membrane
 * **Communication:** UART via USB-Serial (115200 Baud)
 
-https://github.com/user-attachments/assets/c2a69cca-325e-4c9d-b389-516942a6d495
+
+
+https://github.com/user-attachments/assets/d7d6f795-1cef-4dfb-bd76-3350d78e6a83
+
