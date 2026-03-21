@@ -23,3 +23,5 @@
 * **Sensor:** 10k NTC Thermistor
 * **Keypad:** 4x4 Matrix Membrane
 * **Communication:** UART via USB-Serial (115200 Baud)
+
+https://github.com/user-attachments/assets/c2a69cca-325e-4c9d-b389-516942a6d495
